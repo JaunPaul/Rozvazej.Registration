@@ -17,7 +17,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.lastName": "Přijmení",
     "labels.phone": "Telefonní číslo",
     "labels.email": "Email",
-    "labels.rc": "Rodné číslo",
+    "labels.companyId": "Číslo firmy",
+    "labels.nationalId": "Rodné číslo",
+    "labels.applyAsCompany": "Podáváte žádost jako firma?",
     "labels.citizenship": "Státní občanství",
     "labels.street": "Ulice",
     "labels.houseNumber": "Číslo popisné",
@@ -32,20 +34,21 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
     "hints.useRealEmail":
-      "Zvolte prosím email, který reálně používáte. Budou Vám na něj chodit důležité emaily.",
+      "Zvolte prosím email, který reálně používáte. <strong>Budou Vám na něj chodit důležité emaily.</strong>",
 
     "ph.firstName": "Zde napište své křestní jméno",
     "ph.lastName": "Zde napište své přijmení",
     "ph.phone": "+420",
     "ph.email": "Zadejte svou e-mailovou adresu",
-    "ph.rc": "Vaše rodné číslo",
+    "ph.nationalId": "Vaše rodné číslo",
+    "ph.companyId": "Zadejte číslo vaší společnosti",
 
     "errors.firstName": "Zadejte prosím své jméno",
     "errors.lastName": "Zadejte prosím své přijmení",
     "errors.phone":
       "Zadejte české telefonní číslo ve formátu +420 XXX XXX XXX.",
     "errors.email": "Zadejte prosím svůj email",
-    "errors.rc": "Zadejte platné rodné číslo.",
+    "errors.nationalId": "Zadejte platné rodné číslo.",
     "errors.street": "Zadejte prosím název ulice",
     "errors.houseNumber": "Zadejte prosím číslo popisné",
     "errors.city": "Zadejte prosím město či obec",
@@ -100,7 +103,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.lastName": "Last name",
     "labels.phone": "Phone number",
     "labels.email": "Email",
-    "labels.rc": "National ID number",
+    "labels.companyId": "Company ID Number",
+    "labels.nationalId": "National ID number",
+    "labels.applyAsCompany": "Are you applying as a company?",
     "labels.citizenship": "Citizenship",
     "labels.street": "Street",
     "labels.houseNumber": "House number",
@@ -115,20 +120,21 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "hints.czPhone":
       "For deliveries in the Czech Republic you must provide a <strong>Czech phone number.</strong>",
     "hints.useRealEmail":
-      "Use an email you actually check. Important messages will go there.",
+      "Use an email you actually check. <strong>Important messages will go there.</strong>",
 
     "ph.firstName": "Type your first name",
     "ph.lastName": "Type your last name",
     "ph.phone": "+420",
     "ph.email": "Enter your email address",
-    "ph.rc": "Your national ID number",
+    "ph.nationalId": "Your national ID number",
+    "ph.companyId": "Enter your company number",
 
     "errors.firstName": "Please enter your first name",
     "errors.lastName": "Please enter your last name",
     "errors.phone":
       "Enter a Czech phone number in the format +420 XXX XXX XXX.",
     "errors.email": "Please enter your email",
-    "errors.rc": "Enter a valid national ID number.",
+    "errors.nationalId": "Enter a valid national ID number.",
     "errors.street": "Please enter the street name",
     "errors.houseNumber": "Please enter the house number",
     "errors.city": "Please enter the city or town",

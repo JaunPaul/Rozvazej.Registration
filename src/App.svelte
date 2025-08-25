@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
   import { t, setLocale } from "./lib/i18n/i18n.svelte";
-  setLocale("en");
+  setLocale("cs");
   const Steps = {
     step1: 1,
     step2: 2,
@@ -13,6 +14,9 @@
     firstName: "",
     lastName: "",
     phone: "",
+    companyId: "",
+    nationalId: "",
+    applyAsCompany: "",
   });
 
   $inspect(values);
@@ -98,47 +102,104 @@
                 </div>
               </div>
               <div class="input-wrap">
-                <label for="Email" class="field-label">Email</label><input
-                  data-parsley-error-message="Zadejte prosím svůj email"
+                <label for="email" class="field-label"
+                  >{t("labels.email")}</label
+                ><input
+                  data-parsley-error-message={t("errors.email")}
                   class="input-2 w-node-_5ce9e5d7-7108-1705-b1ac-8651e86feced-d6eb4364 w-input"
                   maxlength="256"
-                  name="Email"
-                  data-name="Email"
-                  placeholder="Zadejte svou e-mailovou adresu"
+                  name="email"
+                  data-name="email"
+                  placeholder={t("ph.email")}
                   type="email"
-                  id="Email"
-                  required=""
+                  id="email"
+                  required
                 />
                 <div class="text-explain">
-                  Zvolte prosím email, který reálně používáte. <strong
-                    >Budou Vám na něj chodit důležité emaily.</strong
-                  >
+                  {@html t("hints.useRealEmail")}
                 </div>
               </div>
             </div>
-            <div
-              id="w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4e9-d6eb4364"
-              class="input-group-wrap"
-            >
-              <div
-                id="w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4ee-d6eb4364"
-                class="input-wrap"
+            <div class="input-wrap">
+              <label for="field" class="field-label"
+                >{t("labels.applyAsCompany")}</label
               >
-                <label for="Rodno-cislo" class="field-label"
-                  >Rodné číslo
+              <div class="input-group-wrap">
+                <label
+                  id="ruzove-prohlaseni-ano"
+                  class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089dde-d6eb4364 w-radio"
+                >
+                  <div
+                    class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
+                    class:w--redirected-checked={values.applyAsCompany ===
+                      "ANO"}
+                  ></div>
+                  <input
+                    type="radio"
+                    name="ruzove-prohlaseni"
+                    id="apply-as-company-yes"
+                    data-name="ruzove-prohlaseni"
+                    style="opacity:0;position:absolute;z-index:-1"
+                    value="ANO"
+                    bind:group={values.applyAsCompany}
+                  /><span class="w-form-label">{t("answer.yes")}</span>
+                </label><label
+                  id="ruzove-prohlaseni-ne"
+                  class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089de2-d6eb4364 w-radio"
+                >
+                  <div
+                    class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
+                    class:w--redirected-checked={values.applyAsCompany === "NE"}
+                  ></div>
+                  <input
+                    type="radio"
+                    name="ruzove-prohlaseni"
+                    id="NE"
+                    data-name="ruzove-prohlaseni"
+                    style="opacity:0;position:absolute;z-index:-1"
+                    value="NE"
+                    bind:group={values.applyAsCompany}
+                  /><span class="w-form-label">{t("answer.no")}</span>
+                </label>
+              </div>
+            </div>
+            {#if values.applyAsCompany === "ANO"}
+              <div in:fade class="input-wrap">
+                <label for="companyId" class="field-label"
+                  >{t("labels.companyId")}
                 </label><input
                   data-parsley-error-message="Zadejte platné rodné číslo."
                   class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
                   maxlength="256"
-                  name="Rodno-cislo"
-                  data-name="Rodno cislo"
-                  placeholder="Vaše rodné číslo"
+                  name="companyId"
+                  data-name="companyId"
+                  placeholder={t("ph.companyId")}
                   data-parsley-rc=""
                   type="text"
-                  id="Rodno-cislo"
+                  id="companyId"
+                  bind:value={values.companyId}
                 />
               </div>
-            </div>
+            {/if}
+
+            {#if values.applyAsCompany === "NE"}
+              <div in:fade class="input-wrap">
+                <label for="nationalId" class="field-label"
+                  >{t("labels.nationalId")}
+                </label><input
+                  data-parsley-error-message={t("errors.nationalId")}
+                  class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
+                  maxlength="256"
+                  name="nationalId"
+                  data-name="nationalId"
+                  placeholder={t("ph.nationalId")}
+                  data-parsley-rc=""
+                  type="text"
+                  id="nationalId"
+                  bind:value={values.nationalId}
+                />
+              </div>
+            {/if}
           </div>
         </div>
         <div class="form-nav">
