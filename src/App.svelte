@@ -12,7 +12,7 @@
     step3: 3,
   };
 
-  let currentStep = $state(Steps.step2);
+  let currentStep = $state(Steps.step3);
   let filesNationalId: FileList | undefined = $state();
   let filesEuPassport: FileList | undefined = $state();
   let filesNonEu: FileList | undefined = $state();
@@ -759,7 +759,7 @@
           <div class="box has-8-gap">
             <div class="input-wrap">
               <label for="misto-rozvazeni" class="field-label"
-                >Město kde budete rozvážet</label
+                >{t("labels.cityToDeliver")}</label
               >
               <select
                 id="misto-rozvazeni"
