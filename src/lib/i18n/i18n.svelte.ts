@@ -89,6 +89,11 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "select.placeholder.insurance": "Vyberte zdravotní pojišťovnu",
     "select.placeholder.bank": "Vyberte banku",
 
+    "options.transport.car": "Auto",
+    "options.transport.bike": "Kolo",
+    "options.transport.motorcycle": "Motorka / Skútr",
+    "options.transport.electricScooter": "Elektrická koloběžka",
+
     "upload.button": "Nahrát soubor",
     "upload.max": "Maximální velikost souboru 10 MB.",
     "upload.error.size": "Nahrávání selhalo. Max. velikost souboru je 10 MB.",
@@ -180,6 +185,11 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "select.placeholder.transport": "Select transport",
     "select.placeholder.insurance": "Select health insurer",
     "select.placeholder.bank": "Select a bank",
+
+    "options.transport.car": "Car",
+    "options.transport.bike": "Bicycle",
+    "options.transport.motorcycle": "Motorcycle / Scooter",
+    "options.transport.electricScooter": "Electric Scooter",
 
     "upload.button": "Upload File",
     "upload.max": "Max file size 10MB.",

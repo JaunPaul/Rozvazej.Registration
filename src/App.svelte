@@ -118,6 +118,8 @@
       code: t("select.placeholder.bank"),
     },
     deliveryCity: t("select.placeholder.city"),
+    transport: t("select.placeholder.transport"),
+    insurance: t("select.placeholder.insurance"),
   });
 
   $inspect(values, filesNationalId);
@@ -783,33 +785,44 @@
             </div>
             <div class="input-wrap">
               <label for="field" class="field-label"
-                >Na čem budete rozvážet?</label
+                >{t("labels.transport")}</label
               >
               <div class="input-wrap">
                 <div class="w-embed">
-                  <select name="doprava" class="input-2" required="">
-                    <option value="" disabled="" selected=""
-                      >Vyberte způsob dopravy</option
+                  <select
+                    name="transport"
+                    class="input-2"
+                    required
+                    bind:value={values.transport}
+                  >
+                    <option value={t("select.placeholder.transport")} disabled
+                      >{t("select.placeholder.transport")}</option
                     >
-                    <option value="auto">Auto</option>
-                    <option value="kolo">Kolo</option>
-                    <option value="motorka">Motorka / Skútr</option>
-                    <option value="el-kolobezka">Elektrická koloběžka</option>
+                    <option value="auto">{t("options.transport.car")}</option>
+                    <option value="kolo">{t("options.transport.bike")}</option>
+                    <option value="motorka"
+                      >{t("options.transport.motorcycle")}</option
+                    >
+                    <option value="el-kolobezka"
+                      >{t("options.transport.electricScooter")}</option
+                    >
                   </select>
                 </div>
               </div>
             </div>
-            <div
-              id="w-node-_7a7458f0-b249-90e6-4e96-a52d92089dd6-d6eb4364"
-              class="input-wrap"
-            >
+            <div class="input-wrap">
               <label for="Pojistovna" class="field-label"
-                >Zdravotní pojištovna</label
+                >{t("labels.insurance")}</label
               >
               <div class="w-embed">
-                <select name="zdravotni-pojistovna" class="input-2" required="">
-                  <option value="" disabled="" selected=""
-                    >Vyberte zdravotní pojišťovnu</option
+                <select
+                  name="zdravotni-pojistovna"
+                  class="input-2"
+                  required
+                  bind:value={values.insurance}
+                >
+                  <option value={t("select.placeholder.insurance")} disabled
+                    >{t("select.placeholder.insurance")}</option
                   >
                   <option value="111"
                     >111 – Všeobecná zdravotní pojišťovna ČR</option
