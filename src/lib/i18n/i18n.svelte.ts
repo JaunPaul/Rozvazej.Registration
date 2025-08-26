@@ -28,13 +28,17 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.bank.prefix": "Předčíslí",
     "labels.bank.number": "Číslo bankovního účtu",
     "labels.bank.code": "Kód banky",
-    "labels.doc.front": "Nahrajte ID/ jiný platný doklad.\nPŘEDNÍ STRANA",
-    "labels.doc.back": "Nahrajte ID/ jiný platný doklad.\nZADNÍ STRANA",
+    "labels.doc.nationalId": `Nahrajte ID/ jiný platný doklad. <br /><span class="bold-green">PŘEDNÍ STRANA</span><br /><span class="bold-green">ZADNÍ STRANA</span>`,
+    "labels.doc.euPassport": `Nahrajte svůj občanský průkaz nebo cestovní pas. <br /><span class="bold-green">PŘEDNÍ STRANA</span><br /><span class="bold-green">ZADNÍ STRANA</span>`,
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
     "hints.useRealEmail":
       "Zvolte prosím email, který reálně používáte. <strong>Budou Vám na něj chodit důležité emaily.</strong>",
+    "hints.doc.nationalId":
+      "Nahrajte přední i zadní stranu svého občanského průkazu.",
+    "hints.doc.euPassport":
+      "Nahrajte přední i zadní stranu svého občanského průkazu.",
 
     "ph.firstName": "Zde napište své křestní jméno",
     "ph.lastName": "Zde napište své přijmení",
@@ -42,6 +46,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.email": "Zadejte svou e-mailovou adresu",
     "ph.nationalId": "Vaše rodné číslo",
     "ph.companyId": "Zadejte číslo vaší společnosti",
+    "ph.bank.prefix": "Např. 12345",
 
     "errors.firstName": "Zadejte prosím své jméno",
     "errors.lastName": "Zadejte prosím své přijmení",
@@ -53,7 +58,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.houseNumber": "Zadejte prosím číslo popisné",
     "errors.city": "Zadejte prosím město či obec",
     "errors.zip": "Zadejte prosím poštovní směrovací číslo",
-    "errors.bankNumber": "Zadejte prosím vaše číslo účtu",
+    "errors.bank.number": "Zadejte prosím vaše číslo účtu",
 
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat",
@@ -75,7 +80,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "answer.yes": "ANO",
     "answer.no": "NE",
 
-    "select.placeholder.state": "Vyberte stát",
+    "select.placeholder.country": "Vyberte stát",
     "select.placeholder.city": "Vyberte jednu z možností....",
     "select.placeholder.transport": "Vyberte způsob dopravy",
     "select.placeholder.insurance": "Vyberte zdravotní pojišťovnu",
@@ -114,13 +119,18 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.bank.prefix": "Prefix",
     "labels.bank.number": "Bank account number",
     "labels.bank.code": "Bank code",
-    "labels.doc.front": "Upload ID / other valid document.\nFRONT SIDE",
-    "labels.doc.back": "Upload ID / other valid document.\nBACK SIDE",
+    "labels.doc.nationalId": `Upload ID / other valid document. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
+    "labels.doc.euPassport": `Upload your Identity card or passport. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
+    "labels.doc.nonEu": `Upload the following valid documents. <br /><span class="bold-green">ID CARD OR PASSPORT</span><br /><span class="bold-green">VISA OR RESIDENCE PERMIT</span><span class="bold-green">STUDY OR PERMIT</span>`,
 
     "hints.czPhone":
       "For deliveries in the Czech Republic you must provide a <strong>Czech phone number.</strong>",
     "hints.useRealEmail":
       "Use an email you actually check. <strong>Important messages will go there.</strong>",
+    "hints.doc.nationalId": "Upload both front and back of your ID card.",
+    "hints.doc.euPassport": "Upload both front and back of your ID card.",
+    "hints.doc.nonEu":
+      "These files are required. ID card (front and back) or passport, Visa or residence permit, Study or work permit",
 
     "ph.firstName": "Type your first name",
     "ph.lastName": "Type your last name",
@@ -128,6 +138,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.email": "Enter your email address",
     "ph.nationalId": "Your national ID number",
     "ph.companyId": "Enter your company number",
+    "ph.bank.prefix": "Např. 12345",
 
     "errors.firstName": "Please enter your first name",
     "errors.lastName": "Please enter your last name",
@@ -139,7 +150,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.houseNumber": "Please enter the house number",
     "errors.city": "Please enter the city or town",
     "errors.zip": "Please enter the postal code",
-    "errors.bankNumber": "Please enter your bank account number",
+    "errors.bank.number": "Please enter your bank account number",
 
     "nav.prev": "Back",
     "nav.next": "Continue",
@@ -161,7 +172,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "answer.yes": "YES",
     "answer.no": "NO",
 
-    "select.placeholder.state": "Select a country",
+    "select.placeholder.country": "Select a country",
     "select.placeholder.city": "Choose an option…",
     "select.placeholder.transport": "Select transport",
     "select.placeholder.insurance": "Select health insurer",

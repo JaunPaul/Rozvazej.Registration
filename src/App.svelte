@@ -8,7 +8,92 @@
     step3: 3,
   };
 
-  const currentStep = $state(Steps.step1);
+  let currentStep = $state(Steps.step2);
+  let filesNationalId: FileList | undefined = $state();
+  let filesEuPassport: FileList | undefined = $state();
+  let filesNonEu: FileList | undefined = $state();
+  let filesNationalIdInput: HTMLInputElement | undefined = $state();
+  let filesEuPassportInput: HTMLInputElement | undefined = $state();
+  let filesNonEuInput: HTMLInputElement | undefined = $state();
+
+  type Bucket = "nationalId" | "euPassport" | "nonEu";
+
+  function toFileList(files: File[]): FileList {
+    const dt = new DataTransfer();
+    files.forEach((f) => dt.items.add(f));
+    return dt.files;
+  }
+  function appendFilesTo(which: Bucket, incoming: FileList | File[]) {
+    const get = (w: Bucket) =>
+      w === "nationalId"
+        ? filesNationalId
+        : w === "euPassport"
+          ? filesEuPassport
+          : filesNonEu;
+
+    const set = (w: Bucket, fl: FileList | undefined) => {
+      if (w === "nationalId") filesNationalId = fl;
+      else if (w === "euPassport") filesEuPassport = fl;
+      else filesNonEu = fl;
+    };
+
+    const current = Array.from(get(which) ?? []);
+    const add = Array.isArray(incoming) ? incoming : Array.from(incoming);
+
+    // de-dupe by (name, size, lastModified)
+    const byKey = new Map<string, File>();
+    for (const f of [...current, ...add]) {
+      byKey.set(`${f.name}|${f.size}|${f.lastModified}`, f);
+    }
+
+    const next = toFileList([...byKey.values()]);
+    set(which, next);
+
+    // clear the input so selecting the same file again triggers change
+    const node =
+      which === "nationalId"
+        ? filesNationalIdInput
+        : which === "euPassport"
+          ? filesEuPassportInput
+          : filesNonEuInput;
+    if (node) node.value = "";
+  }
+
+  function removeFileFrom(which: Bucket, target: File | string) {
+    const get = () =>
+      which === "nationalId"
+        ? filesNationalId
+        : which === "euPassport"
+          ? filesEuPassport
+          : filesNonEu;
+
+    const set = (fl: FileList) => {
+      if (which === "nationalId") {
+        filesNationalId = fl;
+        if (filesNationalIdInput) (filesNationalIdInput as any).files = fl; // TS says readonly; runtime works
+      } else if (which === "euPassport") {
+        filesEuPassport = fl;
+        if (filesEuPassportInput) (filesEuPassportInput as any).files = fl;
+      } else {
+        filesNonEu = fl;
+        if (filesNonEuInput) (filesNonEuInput as any).files = fl;
+      }
+    };
+
+    const current = get();
+    if (!current) return;
+
+    const keep = (f: File) =>
+      typeof target === "string"
+        ? f.name !== target
+        : !(
+            f === target ||
+            (f.name === target.name && f.lastModified === target.lastModified)
+          );
+
+    const next = toFileList(Array.from(current).filter(keep));
+    set(next);
+  }
 
   const values = $state({
     firstName: "",
@@ -17,9 +102,19 @@
     companyId: "",
     nationalId: "",
     applyAsCompany: "",
+    country: t("select.placeholder.country"),
+    street: "",
+    houseNumber: "",
+    city: "",
+    zip: "",
+    bank: {
+      prefix: "",
+      number: null,
+      code: t("select.placeholder.bank"),
+    },
   });
 
-  $inspect(values);
+  $inspect(values, filesNationalId);
 </script>
 
 <div>
@@ -225,17 +320,20 @@
           <div class="box has-8-gap">
             <div class="input-wrap">
               <label for="St-tn-ob-anstv" class="field-label"
-                ><strong>Státní občanství</strong></label
+                ><strong>{t("labels.citizenship")}</strong></label
               >
               <div class="w-embed">
                 <select
                   name="country"
                   id="statni-obcanstvi"
                   class="input-2"
-                  required=""
+                  required
                   autocomplete="off"
+                  bind:value={values.country}
                 >
-                  <option value="" disabled="" selected="">Vyberte stát</option>
+                  <option value={t("select.placeholder.country")} disabled
+                    >{t("select.placeholder.country")}</option
+                  >
                   <option value="CZ">Česko</option>
                   <option value="SK">Slovensko</option>
                   <option value="UA">Ukrajina</option>
@@ -484,105 +582,120 @@
             </div>
             <div class="input-group-wrap">
               <div class="input-wrap">
-                <label for="Ulice" class="field-label">Ulice</label><input
-                  data-parsley-error-message="Zadejte prosím název ulice"
+                <label for="street" class="field-label"
+                  >{t("labels.street")}</label
+                ><input
+                  data-parsley-error-message={t("errors.street")}
                   class="input-2 w-node-_48acfe53-5ca2-1118-0e8c-0cdd22174c3b-d6eb4364 w-input"
                   maxlength="256"
-                  name="Ulice"
-                  data-name="Ulice"
+                  name="street"
+                  data-name="street"
                   placeholder=""
                   type="text"
-                  id="Ulice"
-                  required=""
+                  id="street"
+                  required
+                  bind:value={values.street}
                 />
               </div>
               <div class="input-wrap">
-                <label for="Cislo-popisne" class="field-label"
-                  >Číslo popisné</label
+                <label for="houseNumber" class="field-label"
+                  >{t("labels.houseNumber")}</label
                 ><input
-                  data-parsley-error-message="Zadejte prosím číslo popisné"
+                  data-parsley-error-message={t("errors.houseNumber")}
                   class="input-2 w-node-_75182725-5b9f-8942-268c-668a41ccdfd7-d6eb4364 w-input"
                   maxlength="256"
-                  name="Cislo-popisne"
+                  name="houseNumber"
                   data-name="Cislo popisne"
                   placeholder=""
                   type="tel"
-                  id="Cislo-popisne"
-                  required=""
+                  id="houseNumber"
+                  required
+                  bind:value={values.houseNumber}
                 />
               </div>
             </div>
             <div class="input-group-wrap">
               <div class="input-wrap">
-                <label for="Mesto" class="field-label">Město</label><input
-                  data-parsley-error-message="Zadejte prosím město či obec"
+                <label for="city" class="field-label">{t("labels.city")}</label
+                ><input
+                  data-parsley-error-message={t("errors.city")}
                   class="input-2 w-node-_9b7ed3bb-d228-0d66-fa58-ba76e3894472-d6eb4364 w-input"
                   maxlength="256"
-                  name="Mesto"
-                  data-name="Mesto"
+                  name="city"
+                  data-name="city"
                   placeholder=""
                   type="text"
-                  id="Mesto"
-                  required=""
+                  id="city"
+                  required
+                  bind:value={values.city}
                 />
               </div>
               <div class="input-wrap">
-                <label for="PSC" class="field-label">PSČ</label><input
-                  data-parsley-error-message="Zadejte prosím poštovní směrovací číslo"
+                <label for="zip" class="field-label">{t("labels.zip")}</label
+                ><input
+                  data-parsley-error-message={t("errors.zip")}
                   class="input-2 w-node-_9b7ed3bb-d228-0d66-fa58-ba76e3894476-d6eb4364 w-input"
                   maxlength="256"
-                  name="PSC"
-                  data-name="PSC"
+                  name="zip"
+                  data-name="zip"
                   placeholder=""
                   type="tel"
-                  id="PSC"
-                  required=""
+                  id="zip"
+                  required
+                  bind:value={values.zip}
                 />
               </div>
             </div>
             <div class="input-group-wrap">
               <div class="input-group-wrap">
                 <div class="prefix">
-                  <label for="cislo-uctu" class="field-label">Předčíslí</label>
+                  <label for="bankPrefix" class="field-label"
+                    >{t("labels.bank.prefix")}</label
+                  >
                   <div class="w-embed">
                     <input
                       type="text"
-                      id="predcisli"
-                      name="predcisli"
+                      id="bankPrefix"
+                      name="bankPrefix"
                       class="input-2"
                       maxlength="5"
                       pattern="\d*"
                       inputmode="numeric"
-                      placeholder="Např. 12345"
+                      placeholder={t("ph.bank.prefix")}
+                      bind:value={values.bank.prefix}
                     />
                   </div>
                 </div>
                 <div class="bank-number">
-                  <label for="cislo-uctu" class="field-label"
-                    >Číslo bankovního účtu</label
+                  <label for="bankNumber" class="field-label"
+                    >{t("labels.bank.number")}</label
                   ><input
-                    data-parsley-error-message="Zadejte prosím vaše číslo účtu"
+                    data-parsley-error-message={t("errors.bank.number")}
                     class="input-2 w-node-_5456f3ba-5ad3-f3cf-d87e-1e89755a0bb4-d6eb4364 w-input"
                     maxlength="256"
-                    name="slo-tu"
+                    name="bankNumber"
                     data-name="Číslo účtu"
                     placeholder=""
                     type="number"
-                    id="cislo-uctu"
-                    required=""
+                    id="bankNumber"
+                    required
+                    bind:value={values.bank.number}
                   />
                 </div>
                 <div class="bank-code">
-                  <label for="cislo-uctu" class="field-label">Kód banky</label>
+                  <label for="bankCode" class="field-label"
+                    >{t("labels.bank.code")}</label
+                  >
                   <div class="w-embed">
                     <select
-                      name="kod-banky"
-                      id="kod-banky"
+                      name="bankCode"
+                      id="bankCode"
                       class="input-2"
-                      required=""
+                      required
+                      bind:value={values.bank.code}
                     >
-                      <option value="" disabled="" selected=""
-                        >Vyberte banku</option
+                      <option value={t("select.placeholder.bank")} disabled
+                        >{t("select.placeholder.bank")}</option
                       >
                       <option value="0100">0100 – Komerční banka</option>
                       <option value="0300">0300 – ČSOB</option>
@@ -648,81 +761,68 @@
               </div>
             </div>
             <div class="input-group-wrap">
+              {#snippet fileItem(f: File, b: Bucket)}
+                <div tabindex="-1" class="w-file-upload-success mt-4 mr-2">
+                  <div class="w-file-upload-file">
+                    <div class="w-file-upload-file-name">
+                      {f.name}
+                    </div>
+                    <button
+                      aria-label="Remove file"
+                      tabindex="0"
+                      class="w-file-remove-link"
+                      onclick={() => removeFileFrom(b, f)}
+                    >
+                      <div class="w-icon-file-upload-remove"></div>
+                    </button>
+                  </div>
+                </div>
+              {/snippet}
               <div class="upload">
                 <label for="Ulice" class="field-label"
-                  >Nahrajte ID/ jiný platný doklad. <br /><span
-                    class="bold-green">PŘEDNÍ STRANA</span
-                  ></label
+                  >{@html t("labels.doc.nationalId")}</label
                 >
                 <div id="file-1" class="w-file-upload">
                   <div class="default-state-2 w-file-upload-default">
                     <input
                       class="w-file-upload-input"
                       accept=""
-                      name="File-1-2"
-                      data-name="File 1"
+                      name="filesNationalId"
+                      data-name="filesNationalId"
                       aria-hidden="true"
                       type="file"
-                      id="File-1-2"
+                      id="filesNationalId"
                       tabindex="-1"
-                      required=""
-                    /><label
-                      for="File-1-2"
-                      role="button"
-                      tabindex="0"
-                      class="w-file-upload-label"
+                      required
+                      multiple
+                      onchange={(e) => {
+                        const files = (e.currentTarget as HTMLInputElement)
+                          .files;
+                        if (files) appendFilesTo("nationalId", files);
+                      }}
+                      bind:this={filesNationalIdInput}
+                    />
+                    <button
+                      class="upload-button"
+                      onclick={() => filesNationalIdInput?.click()}
                     >
-                      <div class="w-icon-file-upload-icon"></div>
-                      <div class="w-inline-block">Upload File</div>
-                    </label>
-                    <div class="w-file-upload-info">Max file size 10MB.</div>
+                      <label for="File-1-2" class="w-file-upload-label">
+                        <div class="w-icon-file-upload-icon"></div>
+                        <div class="w-inline-block">{t("upload.button")}</div>
+                      </label></button
+                    >
+
+                    <div class="w-file-upload-info">{t("upload.max")}</div>
                   </div>
-                  <div tabindex="-1" class="w-file-upload-uploading w-hidden">
-                    <div class="w-file-upload-uploading-btn">
-                      <svg
-                        class="w-icon-file-upload-uploading"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewbox="0 0 30 30"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fill="currentColor"
-                          opacity=".2"
-                          d="M15 30a15 15 0 1 1 0-30 15 15 0 0 1 0 30zm0-3a12 12 0 1 0 0-24 12 12 0 0 0 0 24z"
-                        ></path>
-                        <path
-                          fill="currentColor"
-                          opacity=".75"
-                          d="M0 15A15 15 0 0 1 15 0v3A12 12 0 0 0 3 15H0z"
-                        ></path>
-                        <animatetransform
-                          attributename="transform"
-                          attributetype="XML"
-                          dur="0.6s"
-                          from="0 15 15"
-                          repeatcount="indefinite"
-                          to="360 15 15"
-                          type="rotate"
-                        ></animatetransform>
-                      </svg>
-                      <div class="w-inline-block">Uploading...</div>
+
+                  {#if filesNationalId && filesNationalId?.length > 0}
+                    <div>
+                      {#each filesNationalId as file}
+                        {@render fileItem(file, "nationalId")}
+                      {/each}
                     </div>
-                  </div>
-                  <div tabindex="-1" class="w-file-upload-success w-hidden">
-                    <div class="w-file-upload-file">
-                      <div class="w-file-upload-file-name">
-                        fileuploaded.jpg
-                      </div>
-                      <div
-                        aria-label="Remove file"
-                        role="button"
-                        tabindex="0"
-                        class="w-file-remove-link"
-                      >
-                        <div class="w-icon-file-upload-remove"></div>
-                      </div>
-                    </div>
-                  </div>
+                  {/if}
+
                   <div tabindex="-1" class="w-file-upload-error w-hidden">
                     <div
                       class="w-file-upload-error-msg"
@@ -734,82 +834,56 @@
                     </div>
                   </div>
                 </div>
+                <div class="text-explain">
+                  {@html t("hints.doc.nationalId")}
+                </div>
               </div>
+
               <div class="upload">
                 <label for="Ulice" class="field-label"
-                  >Nahrajte ID/ jiný platný doklad. <br /><span
-                    class="bold-green">ZADNÍ STRANA</span
-                  ></label
+                  >{@html t("labels.doc.euPassport")}</label
                 >
                 <div id="file-2" class="w-file-upload">
                   <div class="default-state-2 w-file-upload-default">
                     <input
                       class="w-file-upload-input"
                       accept=""
-                      name="File-2-2"
-                      data-name="File 2"
+                      name="filesEuPassport"
+                      data-name="filesEuPassport"
                       aria-hidden="true"
                       type="file"
-                      id="File-2-2"
+                      id="filesEuPassport"
                       tabindex="-1"
-                      required=""
-                    /><label
-                      for="File-2-2"
-                      role="button"
-                      tabindex="0"
-                      class="w-file-upload-label"
+                      required
+                      multiple
+                      onchange={(e) => {
+                        const files = (e.currentTarget as HTMLInputElement)
+                          .files;
+                        if (files) appendFilesTo("euPassport", files);
+                      }}
+                      bind:this={filesEuPassportInput}
+                    />
+                    <button
+                      class="upload-button"
+                      onclick={() => filesEuPassportInput?.click()}
                     >
-                      <div class="w-icon-file-upload-icon"></div>
-                      <div class="w-inline-block">Upload File</div>
-                    </label>
-                    <div class="w-file-upload-info">Max file size 10MB.</div>
+                      <label for="File-1-2" class="w-file-upload-label">
+                        <div class="w-icon-file-upload-icon"></div>
+                        <div class="w-inline-block">{t("upload.button")}</div>
+                      </label></button
+                    >
+
+                    <div class="w-file-upload-info">{t("upload.max")}</div>
                   </div>
-                  <div tabindex="-1" class="w-file-upload-uploading w-hidden">
-                    <div class="w-file-upload-uploading-btn">
-                      <svg
-                        class="w-icon-file-upload-uploading"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewbox="0 0 30 30"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fill="currentColor"
-                          opacity=".2"
-                          d="M15 30a15 15 0 1 1 0-30 15 15 0 0 1 0 30zm0-3a12 12 0 1 0 0-24 12 12 0 0 0 0 24z"
-                        ></path>
-                        <path
-                          fill="currentColor"
-                          opacity=".75"
-                          d="M0 15A15 15 0 0 1 15 0v3A12 12 0 0 0 3 15H0z"
-                        ></path>
-                        <animatetransform
-                          attributename="transform"
-                          attributetype="XML"
-                          dur="0.6s"
-                          from="0 15 15"
-                          repeatcount="indefinite"
-                          to="360 15 15"
-                          type="rotate"
-                        ></animatetransform>
-                      </svg>
-                      <div class="w-inline-block">Uploading...</div>
+
+                  {#if filesEuPassport && filesEuPassport?.length > 0}
+                    <div>
+                      {#each filesEuPassport as file}
+                        {@render fileItem(file, "euPassport")}
+                      {/each}
                     </div>
-                  </div>
-                  <div tabindex="-1" class="w-file-upload-success w-hidden">
-                    <div class="w-file-upload-file">
-                      <div class="w-file-upload-file-name">
-                        fileuploaded.jpg
-                      </div>
-                      <div
-                        aria-label="Remove file"
-                        role="button"
-                        tabindex="0"
-                        class="w-file-remove-link"
-                      >
-                        <div class="w-icon-file-upload-remove"></div>
-                      </div>
-                    </div>
-                  </div>
+                  {/if}
+
                   <div tabindex="-1" class="w-file-upload-error w-hidden">
                     <div
                       class="w-file-upload-error-msg"
@@ -820,6 +894,70 @@
                       Upload failed. Max size for files is 10 MB.
                     </div>
                   </div>
+                </div>
+                <div class="text-explain">
+                  {@html t("hints.doc.euPassport")}
+                </div>
+              </div>
+
+              <div class="upload">
+                <label for="Ulice" class="field-label"
+                  >{@html t("labels.doc.nonEu")}</label
+                >
+                <div id="file-2" class="w-file-upload">
+                  <div class="default-state-2 w-file-upload-default">
+                    <input
+                      class="w-file-upload-input"
+                      accept=""
+                      name="filesNonEu"
+                      data-name="filesNonEu"
+                      aria-hidden="true"
+                      type="file"
+                      id="filesNonEu"
+                      tabindex="-1"
+                      required
+                      multiple
+                      onchange={(e) => {
+                        const files = (e.currentTarget as HTMLInputElement)
+                          .files;
+                        if (files) appendFilesTo("nonEu", files);
+                      }}
+                      bind:this={filesNonEuInput}
+                    />
+                    <button
+                      class="upload-button"
+                      onclick={() => filesNonEuInput?.click()}
+                    >
+                      <label for="File-1-2" class="w-file-upload-label">
+                        <div class="w-icon-file-upload-icon"></div>
+                        <div class="w-inline-block">{t("upload.button")}</div>
+                      </label></button
+                    >
+
+                    <div class="w-file-upload-info">{t("upload.max")}</div>
+                  </div>
+
+                  {#if filesNonEu && filesNonEu?.length > 0}
+                    <div>
+                      {#each filesNonEu as file}
+                        {@render fileItem(file, "nonEu")}
+                      {/each}
+                    </div>
+                  {/if}
+
+                  <div tabindex="-1" class="w-file-upload-error w-hidden">
+                    <div
+                      class="w-file-upload-error-msg"
+                      data-w-size-error="Upload failed. Max size for files is 10 MB."
+                      data-w-type-error="Upload failed. Invalid file type."
+                      data-w-generic-error="Upload failed. Something went wrong. Please retry."
+                    >
+                      Upload failed. Max size for files is 10 MB.
+                    </div>
+                  </div>
+                </div>
+                <div class="text-explain">
+                  {@html t("hints.doc.nonEu")}
                 </div>
               </div>
             </div>
@@ -998,3 +1136,21 @@
     <div>{t("result.fail")}</div>
   </div>
 </div>
+
+<style>
+  .upload-button {
+    background-color: transparent;
+  }
+
+  .mt-4 {
+    margin-top: 16px;
+  }
+
+  .mr-2 {
+    margin-right: 8px;
+  }
+
+  .block {
+    display: block;
+  }
+</style>
