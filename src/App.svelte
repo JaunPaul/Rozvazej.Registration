@@ -1,8 +1,8 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import { t, setLocale } from "./lib/i18n/i18n.svelte";
+  import { t, setLocale, type Locale } from "./lib/i18n/i18n.svelte";
   import { getCountries } from "./lib/i18n/countriesGetter";
-  let locale = "cs";
+  let locale: Locale = "en";
   setLocale(locale);
 
   const Steps = {
@@ -339,7 +339,9 @@
                   >
                   {#await getCountries(locale) then countries}
                     {#each countries as country}
-                      {country}
+                      {#each Object.entries(country) as [code, name]}
+                        <option value={code}>{name}</option>
+                      {/each}
                     {/each}
                   {/await}
                 </select>
