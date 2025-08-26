@@ -337,11 +337,11 @@
                   <option value={t("select.placeholder.country")} disabled
                     >{t("select.placeholder.country")}</option
                   >
-                  <!--                   {#await getCountries(locale) then countries}
+                  {#await getCountries(locale) then countries}
                     {#each countries as country}
                       {country}
                     {/each}
-                  {/await} -->
+                  {/await}
                 </select>
               </div>
             </div>
