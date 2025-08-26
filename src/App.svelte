@@ -2,6 +2,7 @@
   import { fade } from "svelte/transition";
   import { t, setLocale, type Locale } from "./lib/i18n/i18n.svelte";
   import { getCountries } from "./lib/i18n/countriesGetter";
+  import { isEu } from "./lib/i18n/euCountriesFilter";
   let locale: Locale = "en";
   setLocale(locale);
 
@@ -545,188 +546,194 @@
                   </div>
                 </div>
               {/snippet}
-              <div class="upload">
-                <label for="Ulice" class="field-label"
-                  >{@html t("labels.doc.nationalId")}</label
-                >
-                <div id="file-1" class="w-file-upload">
-                  <div class="default-state-2 w-file-upload-default">
-                    <input
-                      class="w-file-upload-input"
-                      accept=""
-                      name="filesNationalId"
-                      data-name="filesNationalId"
-                      aria-hidden="true"
-                      type="file"
-                      id="filesNationalId"
-                      tabindex="-1"
-                      required
-                      multiple
-                      onchange={(e) => {
-                        const files = (e.currentTarget as HTMLInputElement)
-                          .files;
-                        if (files) appendFilesTo("nationalId", files);
-                      }}
-                      bind:this={filesNationalIdInput}
-                    />
-                    <button
-                      class="upload-button"
-                      onclick={() => filesNationalIdInput?.click()}
-                    >
-                      <label for="File-1-2" class="w-file-upload-label">
-                        <div class="w-icon-file-upload-icon"></div>
-                        <div class="w-inline-block">{t("upload.button")}</div>
-                      </label></button
-                    >
+              {#if values.country === "CZ"}
+                <div class="upload">
+                  <label for="Ulice" class="field-label"
+                    >{@html t("labels.doc.nationalId")}</label
+                  >
+                  <div id="file-1" class="w-file-upload">
+                    <div class="default-state-2 w-file-upload-default">
+                      <input
+                        class="w-file-upload-input"
+                        accept=""
+                        name="filesNationalId"
+                        data-name="filesNationalId"
+                        aria-hidden="true"
+                        type="file"
+                        id="filesNationalId"
+                        tabindex="-1"
+                        required
+                        multiple
+                        onchange={(e) => {
+                          const files = (e.currentTarget as HTMLInputElement)
+                            .files;
+                          if (files) appendFilesTo("nationalId", files);
+                        }}
+                        bind:this={filesNationalIdInput}
+                      />
+                      <button
+                        class="upload-button"
+                        onclick={() => filesNationalIdInput?.click()}
+                      >
+                        <label for="File-1-2" class="w-file-upload-label">
+                          <div class="w-icon-file-upload-icon"></div>
+                          <div class="w-inline-block">{t("upload.button")}</div>
+                        </label></button
+                      >
 
-                    <div class="w-file-upload-info">{t("upload.max")}</div>
-                  </div>
-
-                  {#if filesNationalId && filesNationalId?.length > 0}
-                    <div>
-                      {#each filesNationalId as file}
-                        {@render fileItem(file, "nationalId")}
-                      {/each}
+                      <div class="w-file-upload-info">{t("upload.max")}</div>
                     </div>
-                  {/if}
 
-                  <div tabindex="-1" class="w-file-upload-error w-hidden">
-                    <div
-                      class="w-file-upload-error-msg"
-                      data-w-size-error="Upload failed. Max size for files is 10 MB."
-                      data-w-type-error="Upload failed. Invalid file type."
-                      data-w-generic-error="Upload failed. Something went wrong. Please retry."
-                    >
-                      Upload failed. Max size for files is 10 MB.
-                    </div>
-                  </div>
-                </div>
-                <div class="text-explain">
-                  {@html t("hints.doc.nationalId")}
-                </div>
-              </div>
+                    {#if filesNationalId && filesNationalId?.length > 0}
+                      <div>
+                        {#each filesNationalId as file}
+                          {@render fileItem(file, "nationalId")}
+                        {/each}
+                      </div>
+                    {/if}
 
-              <div class="upload">
-                <label for="Ulice" class="field-label"
-                  >{@html t("labels.doc.euPassport")}</label
-                >
-                <div id="file-2" class="w-file-upload">
-                  <div class="default-state-2 w-file-upload-default">
-                    <input
-                      class="w-file-upload-input"
-                      accept=""
-                      name="filesEuPassport"
-                      data-name="filesEuPassport"
-                      aria-hidden="true"
-                      type="file"
-                      id="filesEuPassport"
-                      tabindex="-1"
-                      required
-                      multiple
-                      onchange={(e) => {
-                        const files = (e.currentTarget as HTMLInputElement)
-                          .files;
-                        if (files) appendFilesTo("euPassport", files);
-                      }}
-                      bind:this={filesEuPassportInput}
-                    />
-                    <button
-                      class="upload-button"
-                      onclick={() => filesEuPassportInput?.click()}
-                    >
-                      <label for="File-1-2" class="w-file-upload-label">
-                        <div class="w-icon-file-upload-icon"></div>
-                        <div class="w-inline-block">{t("upload.button")}</div>
-                      </label></button
-                    >
-
-                    <div class="w-file-upload-info">{t("upload.max")}</div>
-                  </div>
-
-                  {#if filesEuPassport && filesEuPassport?.length > 0}
-                    <div>
-                      {#each filesEuPassport as file}
-                        {@render fileItem(file, "euPassport")}
-                      {/each}
-                    </div>
-                  {/if}
-
-                  <div tabindex="-1" class="w-file-upload-error w-hidden">
-                    <div
-                      class="w-file-upload-error-msg"
-                      data-w-size-error="Upload failed. Max size for files is 10 MB."
-                      data-w-type-error="Upload failed. Invalid file type."
-                      data-w-generic-error="Upload failed. Something went wrong. Please retry."
-                    >
-                      Upload failed. Max size for files is 10 MB.
+                    <div tabindex="-1" class="w-file-upload-error w-hidden">
+                      <div
+                        class="w-file-upload-error-msg"
+                        data-w-size-error="Upload failed. Max size for files is 10 MB."
+                        data-w-type-error="Upload failed. Invalid file type."
+                        data-w-generic-error="Upload failed. Something went wrong. Please retry."
+                      >
+                        Upload failed. Max size for files is 10 MB.
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="text-explain">
-                  {@html t("hints.doc.euPassport")}
-                </div>
-              </div>
-
-              <div class="upload">
-                <label for="Ulice" class="field-label"
-                  >{@html t("labels.doc.nonEu")}</label
-                >
-                <div id="file-2" class="w-file-upload">
-                  <div class="default-state-2 w-file-upload-default">
-                    <input
-                      class="w-file-upload-input"
-                      accept=""
-                      name="filesNonEu"
-                      data-name="filesNonEu"
-                      aria-hidden="true"
-                      type="file"
-                      id="filesNonEu"
-                      tabindex="-1"
-                      required
-                      multiple
-                      onchange={(e) => {
-                        const files = (e.currentTarget as HTMLInputElement)
-                          .files;
-                        if (files) appendFilesTo("nonEu", files);
-                      }}
-                      bind:this={filesNonEuInput}
-                    />
-                    <button
-                      class="upload-button"
-                      onclick={() => filesNonEuInput?.click()}
-                    >
-                      <label for="File-1-2" class="w-file-upload-label">
-                        <div class="w-icon-file-upload-icon"></div>
-                        <div class="w-inline-block">{t("upload.button")}</div>
-                      </label></button
-                    >
-
-                    <div class="w-file-upload-info">{t("upload.max")}</div>
-                  </div>
-
-                  {#if filesNonEu && filesNonEu?.length > 0}
-                    <div>
-                      {#each filesNonEu as file}
-                        {@render fileItem(file, "nonEu")}
-                      {/each}
-                    </div>
-                  {/if}
-
-                  <div tabindex="-1" class="w-file-upload-error w-hidden">
-                    <div
-                      class="w-file-upload-error-msg"
-                      data-w-size-error="Upload failed. Max size for files is 10 MB."
-                      data-w-type-error="Upload failed. Invalid file type."
-                      data-w-generic-error="Upload failed. Something went wrong. Please retry."
-                    >
-                      Upload failed. Max size for files is 10 MB.
-                    </div>
+                  <div class="text-explain">
+                    {@html t("hints.doc.nationalId")}
                   </div>
                 </div>
-                <div class="text-explain">
-                  {@html t("hints.doc.nonEu")}
+              {/if}
+
+              {#if values.country !== t("select.placeholder.country") && isEu(values.country) && values.country !== "CZ"}
+                <div class="upload">
+                  <label for="Ulice" class="field-label"
+                    >{@html t("labels.doc.euPassport")}</label
+                  >
+                  <div id="file-2" class="w-file-upload">
+                    <div class="default-state-2 w-file-upload-default">
+                      <input
+                        class="w-file-upload-input"
+                        accept=""
+                        name="filesEuPassport"
+                        data-name="filesEuPassport"
+                        aria-hidden="true"
+                        type="file"
+                        id="filesEuPassport"
+                        tabindex="-1"
+                        required
+                        multiple
+                        onchange={(e) => {
+                          const files = (e.currentTarget as HTMLInputElement)
+                            .files;
+                          if (files) appendFilesTo("euPassport", files);
+                        }}
+                        bind:this={filesEuPassportInput}
+                      />
+                      <button
+                        class="upload-button"
+                        onclick={() => filesEuPassportInput?.click()}
+                      >
+                        <label for="File-1-2" class="w-file-upload-label">
+                          <div class="w-icon-file-upload-icon"></div>
+                          <div class="w-inline-block">{t("upload.button")}</div>
+                        </label></button
+                      >
+
+                      <div class="w-file-upload-info">{t("upload.max")}</div>
+                    </div>
+
+                    {#if filesEuPassport && filesEuPassport?.length > 0}
+                      <div>
+                        {#each filesEuPassport as file}
+                          {@render fileItem(file, "euPassport")}
+                        {/each}
+                      </div>
+                    {/if}
+
+                    <div tabindex="-1" class="w-file-upload-error w-hidden">
+                      <div
+                        class="w-file-upload-error-msg"
+                        data-w-size-error="Upload failed. Max size for files is 10 MB."
+                        data-w-type-error="Upload failed. Invalid file type."
+                        data-w-generic-error="Upload failed. Something went wrong. Please retry."
+                      >
+                        Upload failed. Max size for files is 10 MB.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-explain">
+                    {@html t("hints.doc.euPassport")}
+                  </div>
                 </div>
-              </div>
+              {/if}
+
+              {#if values.country !== t("select.placeholder.country") && !isEu(values.country)}
+                <div class="upload">
+                  <label for="Ulice" class="field-label"
+                    >{@html t("labels.doc.nonEu")}</label
+                  >
+                  <div id="file-2" class="w-file-upload">
+                    <div class="default-state-2 w-file-upload-default">
+                      <input
+                        class="w-file-upload-input"
+                        accept=""
+                        name="filesNonEu"
+                        data-name="filesNonEu"
+                        aria-hidden="true"
+                        type="file"
+                        id="filesNonEu"
+                        tabindex="-1"
+                        required
+                        multiple
+                        onchange={(e) => {
+                          const files = (e.currentTarget as HTMLInputElement)
+                            .files;
+                          if (files) appendFilesTo("nonEu", files);
+                        }}
+                        bind:this={filesNonEuInput}
+                      />
+                      <button
+                        class="upload-button"
+                        onclick={() => filesNonEuInput?.click()}
+                      >
+                        <label for="File-1-2" class="w-file-upload-label">
+                          <div class="w-icon-file-upload-icon"></div>
+                          <div class="w-inline-block">{t("upload.button")}</div>
+                        </label></button
+                      >
+
+                      <div class="w-file-upload-info">{t("upload.max")}</div>
+                    </div>
+
+                    {#if filesNonEu && filesNonEu?.length > 0}
+                      <div>
+                        {#each filesNonEu as file}
+                          {@render fileItem(file, "nonEu")}
+                        {/each}
+                      </div>
+                    {/if}
+
+                    <div tabindex="-1" class="w-file-upload-error w-hidden">
+                      <div
+                        class="w-file-upload-error-msg"
+                        data-w-size-error="Upload failed. Max size for files is 10 MB."
+                        data-w-type-error="Upload failed. Invalid file type."
+                        data-w-generic-error="Upload failed. Something went wrong. Please retry."
+                      >
+                        Upload failed. Max size for files is 10 MB.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-explain">
+                    {@html t("hints.doc.nonEu")}
+                  </div>
+                </div>
+              {/if}
             </div>
           </div>
         </div>
