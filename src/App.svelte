@@ -4,7 +4,8 @@
   import { getCountries } from "./lib/i18n/countriesGetter";
   import { isEu } from "./lib/i18n/euCountriesFilter";
   import { getCities } from "./lib/i18n/citiesGetter";
-  let locale: Locale = "en";
+  import { getInsuranceOptions } from "./lib/i18n/insuranceGetter";
+  let locale: Locale = "cs";
   setLocale(locale);
 
   const Steps = {
@@ -824,30 +825,11 @@
                   <option value={t("select.placeholder.insurance")} disabled
                     >{t("select.placeholder.insurance")}</option
                   >
-                  <option value="111"
-                    >111 – Všeobecná zdravotní pojišťovna ČR</option
-                  >
-                  <option value="201"
-                    >201 – Vojenská zdravotní pojišťovna ČR</option
-                  >
-                  <option value="205"
-                    >205 – Česká průmyslová zdravotní pojišťovna</option
-                  >
-                  <option value="207"
-                    >207 – Oborová zdravotní pojišťovna zaměstnanců bank,
-                    pojišťoven a stavebnictví</option
-                  >
-                  <option value="209"
-                    >209 – Zaměstnanecká pojišťovna ŠKODA</option
-                  >
-                  <option value="211"
-                    >211 – Zdravotní pojišťovna Ministerstva vnitra ČR</option
-                  >
-                  <option value="213"
-                    >213 – Revírní bratrská pokladna, zdravotní pojišťovna</option
-                  >
-                  <option value="300">300 – Samoplátce</option>
-                  <option value="999">999 – Ostatní</option>
+                  {#await getInsuranceOptions(locale) then insuranceOptions}
+                    {#each Object.entries(insuranceOptions) as [key, value]}
+                      <option value={key}>{value}</option>
+                    {/each}
+                  {/await}
                 </select>
               </div>
             </div>
