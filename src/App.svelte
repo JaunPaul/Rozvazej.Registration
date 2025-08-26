@@ -3,6 +3,7 @@
   import { t, setLocale, type Locale } from "./lib/i18n/i18n.svelte";
   import { getCountries } from "./lib/i18n/countriesGetter";
   import { isEu } from "./lib/i18n/euCountriesFilter";
+  import { getCities } from "./lib/i18n/citiesGetter";
   let locale: Locale = "en";
   setLocale(locale);
 
@@ -116,6 +117,7 @@
       number: null,
       code: t("select.placeholder.bank"),
     },
+    deliveryCity: t("select.placeholder.city"),
   });
 
   $inspect(values, filesNationalId);
@@ -758,42 +760,25 @@
           </div>
           <div class="box has-8-gap">
             <div class="input-wrap">
-              <label for="misto-rozvazeni" class="field-label"
+              <label for="deliveryCity" class="field-label"
                 >{t("labels.cityToDeliver")}</label
               >
               <select
-                id="misto-rozvazeni"
-                name="Misto-rozvazeni"
+                id="deliveryCity"
+                name="deliveryCity"
                 data-name="Misto rozvazeni"
-                required=""
+                required
                 class="input-2 w-select"
+                bind:value={values.deliveryCity}
               >
-                <option value="">Vyberte jednu z možností....</option>
-                <option value="Brno">Brno</option>
-                <option value="České Budějovice">České Budějovice</option>
-                <option value="Cheb">Cheb</option>
-                <option value="Hradec Králové">Hradec Králové</option>
-                <option value="Jihlava">Jihlava</option>
-                <option value="Karlovy Vary">Karlovy Vary</option>
-                <option value="Kladno">Kladno</option>
-                <option value="Liberec">Liberec</option>
-                <option value="Mladá Boleslav">Mladá Boleslav</option>
-                <option value="Most">Most</option>
-                <option value="Olomouc">Olomouc</option>
-                <option value="Opava">Opava</option>
-                <option value="Ostrava">Ostrava</option>
-                <option value="Pardubice">Pardubice</option>
-                <option value="Písek">Písek</option>
-                <option value="Plzeň">Plzeň</option>
-                <option value="Praha">Praha</option>
-                <option value="Přerov">Přerov</option>
-                <option value="Příbram">Příbram</option>
-                <option value="Prostějov">Prostějov</option>
-                <option value="Tábor">Tábor</option>
-                <option value="Teplice">Teplice</option>
-                <option value="Uherské Hradiště">Uherské Hradiště</option>
-                <option value="Ústí nad Labem">Ústí nad Labem</option>
-                <option value="Zlín">Zlín</option>
+                <option value={t("select.placeholder.city")} disabled
+                  >{t("select.placeholder.city")}</option
+                >
+                {#await getCities(locale) then cities}
+                  {#each cities as city}
+                    <option value={city}>{city}</option>
+                  {/each}
+                {/await}
               </select>
             </div>
             <div class="input-wrap">
