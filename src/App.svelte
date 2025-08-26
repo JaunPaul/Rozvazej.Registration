@@ -14,7 +14,7 @@
     step3: 3,
   };
 
-  let currentStep = $state(Steps.step3);
+  let currentStep = $state(Steps.step2);
   let filesNationalId: FileList | undefined = $state();
   let filesEuPassport: FileList | undefined = $state();
   let filesNonEu: FileList | undefined = $state();
