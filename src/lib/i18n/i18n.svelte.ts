@@ -30,6 +30,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.bank.code": "Kód banky",
     "labels.doc.nationalId": `Nahrajte ID/ jiný platný doklad. <br /><span class="bold-green">PŘEDNÍ STRANA</span><br /><span class="bold-green">ZADNÍ STRANA</span>`,
     "labels.doc.euPassport": `Nahrajte svůj občanský průkaz nebo cestovní pas. <br /><span class="bold-green">PŘEDNÍ STRANA</span><br /><span class="bold-green">ZADNÍ STRANA</span>`,
+    "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">OBČANSKÝ PRŮKAZ NEBO CESTOVNÍ PAS</span><br /><span class="bold-green">VÍZUM NEBO POVOLENÍ K POBYTU</span><br /><span class="bold-green">STUDIE NEBO POVOLENÍ</span>`,
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
@@ -39,6 +40,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "Nahrajte přední i zadní stranu svého občanského průkazu.",
     "hints.doc.euPassport":
       "Nahrajte přední i zadní stranu svého občanského průkazu.",
+    "hints.doc.nonEu":
+      "*Tyto dokumenty jsou vyžadovány. Občanský průkaz (přední i zadní strana) nebo cestovní pas, vízum nebo povolení k pobytu, studijní nebo pracovní povolení.",
 
     "ph.firstName": "Zde napište své křestní jméno",
     "ph.lastName": "Zde napište své přijmení",
@@ -121,7 +124,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.bank.code": "Bank code",
     "labels.doc.nationalId": `Upload ID / other valid document. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
     "labels.doc.euPassport": `Upload your Identity card or passport. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
-    "labels.doc.nonEu": `Upload the following valid documents. <br /><span class="bold-green">ID CARD OR PASSPORT</span><br /><span class="bold-green">VISA OR RESIDENCE PERMIT</span><span class="bold-green">STUDY OR PERMIT</span>`,
+    "labels.doc.nonEu": `Upload the following valid documents. <br /><span class="bold-green">ID CARD OR PASSPORT</span><br /><span class="bold-green">VISA OR RESIDENCE PERMIT</span><br /><span class="bold-green">STUDY OR PERMIT</span>`,
 
     "hints.czPhone":
       "For deliveries in the Czech Republic you must provide a <strong>Czech phone number.</strong>",
@@ -130,7 +133,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "hints.doc.nationalId": "Upload both front and back of your ID card.",
     "hints.doc.euPassport": "Upload both front and back of your ID card.",
     "hints.doc.nonEu":
-      "These files are required. ID card (front and back) or passport, Visa or residence permit, Study or work permit",
+      "*These files are required. ID card (front and back) or passport, Visa or residence permit, Study or work permit",
 
     "ph.firstName": "Type your first name",
     "ph.lastName": "Type your last name",
