@@ -80,6 +80,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.transport": "Na čem budete rozvážet?",
     "labels.insurance": "Zdravotní pojištovna",
     "labels.pinkStatement": "Chcete uplatnit růžové prohlášení?",
+    "labels.gender": "Jaké je tvé pohlaví?",
+    "labels.birthDate": "Datum narození",
+    "labels.passportExpiryDate": "Datum vypršení platnosti pasu",
+
     "answer.yes": "ANO",
     "answer.no": "NE",
 
@@ -88,11 +92,15 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "select.placeholder.transport": "Vyberte způsob dopravy",
     "select.placeholder.insurance": "Vyberte zdravotní pojišťovnu",
     "select.placeholder.bank": "Vyberte banku",
+    "select.placeholder.gender": "Vyberte pohlaví",
 
     "options.transport.car": "Auto",
     "options.transport.bike": "Kolo",
     "options.transport.motorcycle": "Motorka / Skútr",
     "options.transport.electricScooter": "Elektrická koloběžka",
+    "options.gender.male": "Samec",
+    "options.gender.female": "Žena",
+    "options.gender.other": "Ostatní",
 
     "upload.button": "Nahrát soubor",
     "upload.max": "Maximální velikost souboru 10 MB.",
@@ -177,6 +185,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.transport": "What will you deliver on?",
     "labels.insurance": "Health insurance",
     "labels.pinkStatement": "Apply the “pink tax declaration”?",
+    "labels.birthDate": "Birth date",
+    "labels.gender": "What is your gender?",
+    "labels.passportExpiry": "Passport expiry date",
+
     "answer.yes": "YES",
     "answer.no": "NO",
 
@@ -184,12 +196,16 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "select.placeholder.city": "Choose an option…",
     "select.placeholder.transport": "Select transport",
     "select.placeholder.insurance": "Select health insurer",
+    "select.placeholder.gender": "Select gender",
     "select.placeholder.bank": "Select a bank",
 
     "options.transport.car": "Car",
     "options.transport.bike": "Bicycle",
     "options.transport.motorcycle": "Motorcycle / Scooter",
     "options.transport.electricScooter": "Electric Scooter",
+    "options.gender.male": "Male",
+    "options.gender.female": "Female",
+    "options.gender.other": "Other",
 
     "upload.button": "Upload File",
     "upload.max": "Max file size 10MB.",

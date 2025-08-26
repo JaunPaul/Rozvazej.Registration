@@ -5,16 +5,34 @@
   import { isEu } from "./lib/i18n/euCountriesFilter";
   import { getCities } from "./lib/i18n/citiesGetter";
   import { getInsuranceOptions } from "./lib/i18n/insuranceGetter";
+  import { getVisibleIds } from "./lib/utils/validation";
   let locale: Locale = "cs";
   setLocale(locale);
 
   const Steps = {
-    step1: 1,
-    step2: 2,
-    step3: 3,
+    step1: "step1",
+    step2: "step2",
+    step3: "step2",
   };
 
-  let currentStep = $state(Steps.step2);
+  abstract class PageHelper {
+    static updateParamsWithState(state: string): void {
+      const params = new URLSearchParams(window.location.search);
+      params.set("state", state);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, "", newUrl);
+    }
+  }
+  const validate = async (path: string) => {};
+
+  const params = new URLSearchParams(window.location.search);
+  const formStep = params.get("state");
+
+  let currentStep = $state(Steps.step1);
+  if (formStep) {
+    currentStep = Steps[formStep];
+  }
+
   let filesNationalId: FileList | undefined = $state();
   let filesEuPassport: FileList | undefined = $state();
   let filesNonEu: FileList | undefined = $state();
@@ -107,8 +125,9 @@
     phone: "",
     companyId: "",
     nationalId: "",
+    passportOrId: "",
     applyAsCompany: "",
-    country: t("select.placeholder.country"),
+    country: "",
     street: "",
     houseNumber: "",
     city: "",
@@ -116,14 +135,16 @@
     bank: {
       prefix: "",
       number: null,
-      code: t("select.placeholder.bank"),
+      code: "",
     },
-    deliveryCity: t("select.placeholder.city"),
-    transport: t("select.placeholder.transport"),
-    insurance: t("select.placeholder.insurance"),
+    deliveryCity: "",
+    transport: "",
+    insurance: "",
+    pinkStatement: "",
+    gender: "",
+    birthDate: "",
+    passportExpiryDate: "",
   });
-
-  $inspect(values, filesNationalId);
 </script>
 
 <div>
@@ -230,85 +251,50 @@
               >
               <div class="input-group-wrap">
                 <label
-                  id="ruzove-prohlaseni-ano"
+                  id="applyAsCompany-ano"
                   class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089dde-d6eb4364 w-radio"
                 >
                   <div
                     class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
-                    class:w--redirected-checked={values.applyAsCompany ===
-                      "ANO"}
+                    class:w--redirected-checked={values.applyAsCompany === true}
                   ></div>
                   <input
                     type="radio"
-                    name="ruzove-prohlaseni"
+                    name="applyAsCompany"
                     id="apply-as-company-yes"
-                    data-name="ruzove-prohlaseni"
+                    data-name="applyAsCompany"
                     style="opacity:0;position:absolute;z-index:-1"
-                    value="ANO"
+                    value={true}
                     bind:group={values.applyAsCompany}
                   /><span class="w-form-label">{t("answer.yes")}</span>
                 </label><label
-                  id="ruzove-prohlaseni-ne"
+                  id="applyAsCompany-ne"
                   class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089de2-d6eb4364 w-radio"
                 >
                   <div
                     class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
-                    class:w--redirected-checked={values.applyAsCompany === "NE"}
+                    class:w--redirected-checked={values.applyAsCompany ===
+                      false}
                   ></div>
                   <input
                     type="radio"
-                    name="ruzove-prohlaseni"
+                    name="applyAsCompany"
                     id="NE"
-                    data-name="ruzove-prohlaseni"
+                    data-name="applyAsCompany"
                     style="opacity:0;position:absolute;z-index:-1"
-                    value="NE"
+                    value={false}
                     bind:group={values.applyAsCompany}
                   /><span class="w-form-label">{t("answer.no")}</span>
                 </label>
               </div>
             </div>
-            {#if values.applyAsCompany === "ANO"}
-              <div in:fade class="input-wrap">
-                <label for="companyId" class="field-label"
-                  >{t("labels.companyId")}
-                </label><input
-                  data-parsley-error-message="Zadejte platné rodné číslo."
-                  class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
-                  maxlength="256"
-                  name="companyId"
-                  data-name="companyId"
-                  placeholder={t("ph.companyId")}
-                  data-parsley-rc=""
-                  type="text"
-                  id="companyId"
-                  bind:value={values.companyId}
-                />
-              </div>
-            {/if}
-
-            {#if values.applyAsCompany === "NE"}
-              <div in:fade class="input-wrap">
-                <label for="nationalId" class="field-label"
-                  >{t("labels.nationalId")}
-                </label><input
-                  data-parsley-error-message={t("errors.nationalId")}
-                  class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
-                  maxlength="256"
-                  name="nationalId"
-                  data-name="nationalId"
-                  placeholder={t("ph.nationalId")}
-                  data-parsley-rc=""
-                  type="text"
-                  id="nationalId"
-                  bind:value={values.nationalId}
-                />
-              </div>
-            {/if}
           </div>
         </div>
         <div class="form-nav">
           <div></div>
-          <button class="button w-button">{t("nav.next")} </button>
+          <button class="button w-button" onclick={() => (currentStep = 2)}
+            >{t("nav.next")}
+          </button>
         </div>
       </div>
     {/if}
@@ -327,32 +313,91 @@
             <p class="body-text">{t("step2.lead")}</p>
           </div>
           <div class="box has-8-gap">
-            <div class="input-wrap">
-              <label for="St-tn-ob-anstv" class="field-label"
-                ><strong>{t("labels.citizenship")}</strong></label
-              >
-              <div class="w-embed">
-                <select
-                  name="country"
-                  id="statni-obcanstvi"
-                  class="input-2"
-                  required
-                  autocomplete="off"
-                  bind:value={values.country}
-                >
-                  <option value={t("select.placeholder.country")} disabled
-                    >{t("select.placeholder.country")}</option
-                  >
-                  {#await getCountries(locale) then countries}
-                    {#each countries as country}
-                      {#each Object.entries(country) as [code, name]}
-                        <option value={code}>{name}</option>
-                      {/each}
-                    {/each}
-                  {/await}
-                </select>
+            {#if values.applyAsCompany === "ANO"}
+              <div in:fade class="input-wrap">
+                <label for="companyId" class="field-label"
+                  >{t("labels.companyId")}
+                </label><input
+                  data-parsley-error-message="Zadejte platné rodné číslo."
+                  class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
+                  maxlength="256"
+                  name="companyId"
+                  data-name="companyId"
+                  placeholder={t("ph.companyId")}
+                  data-parsley-rc=""
+                  type="text"
+                  id="companyId"
+                  bind:value={values.companyId}
+                />
               </div>
-            </div>
+            {/if}
+            {#if values.applyAsCompany === "NE"}
+              <div class="input-wrap">
+                <label for="St-tn-ob-anstv" class="field-label"
+                  ><strong>{t("labels.citizenship")}</strong></label
+                >
+                <div class="w-embed">
+                  <select
+                    name="country"
+                    id="statni-obcanstvi"
+                    class="input-2"
+                    required
+                    autocomplete="off"
+                    bind:value={values.country}
+                  >
+                    <option value="" disabled
+                      >{t("select.placeholder.country")}</option
+                    >
+                    {#await getCountries(locale) then countries}
+                      {#each countries as country}
+                        {#each Object.entries(country) as [code, name]}
+                          <option value={code}>{name}</option>
+                        {/each}
+                      {/each}
+                    {/await}
+                  </select>
+                </div>
+              </div>
+            {/if}
+
+            {#if values.applyAsCompany === "NE" && values.country === "CZ"}
+              <div in:fade class="input-wrap">
+                <label for="nationalId" class="field-label"
+                  >{t("labels.nationalId")}
+                </label><input
+                  data-parsley-error-message={t("errors.nationalId")}
+                  class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
+                  maxlength="256"
+                  name="nationalId"
+                  data-name="nationalId"
+                  placeholder={t("ph.nationalId")}
+                  data-parsley-rc=""
+                  type="text"
+                  id="nationalId"
+                  bind:value={values.nationalId}
+                />
+              </div>
+            {/if}
+
+            {#if values.applyAsCompany === "NE" && values.country !== t("select.placeholder.country") && values.country !== "CZ"}
+              <div in:fade class="input-wrap">
+                <label for="passportOrId" class="field-label"
+                  >{t("labels.passportOrId")}
+                </label><input
+                  data-parsley-error-message={t("errors.passportOrId")}
+                  class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
+                  maxlength="256"
+                  name="passportOrId"
+                  data-name="passportOrId"
+                  placeholder={t("ph.passportOrId")}
+                  data-parsley-rc=""
+                  type="text"
+                  id="passportOrId"
+                  bind:value={values.passportOrId}
+                />
+              </div>
+            {/if}
+
             <div class="input-group-wrap">
               <div class="input-wrap">
                 <label for="street" class="field-label"
@@ -467,7 +512,7 @@
                       required
                       bind:value={values.bank.code}
                     >
-                      <option value={t("select.placeholder.bank")} disabled
+                      <option value="" disabled
                         >{t("select.placeholder.bank")}</option
                       >
                       <option value="0100">0100 – Komerční banka</option>
@@ -774,8 +819,7 @@
                 class="input-2 w-select"
                 bind:value={values.deliveryCity}
               >
-                <option value={t("select.placeholder.city")} disabled
-                  >{t("select.placeholder.city")}</option
+                <option value="" disabled>{t("select.placeholder.city")}</option
                 >
                 {#await getCities(locale) then cities}
                   {#each cities as city}
@@ -796,7 +840,7 @@
                     required
                     bind:value={values.transport}
                   >
-                    <option value={t("select.placeholder.transport")} disabled
+                    <option value="" disabled
                       >{t("select.placeholder.transport")}</option
                     >
                     <option value="auto">{t("options.transport.car")}</option>
@@ -811,18 +855,69 @@
                 </div>
               </div>
             </div>
+            <div class="input-group-wrap">
+              <div class="input-wrap">
+                <label for="St-tn-ob-anstv" class="field-label"
+                  ><strong>{t("labels.gender")}</strong></label
+                >
+
+                <select
+                  name="gender"
+                  id="gender"
+                  class="input-2"
+                  required
+                  autocomplete="off"
+                  bind:value={values.gender}
+                >
+                  <option value="" disabled
+                    >{t("select.placeholder.gender")}</option
+                  >
+                  <option value="samec">{t("options.gender.male")}</option>
+                  <option value="zena">{t("options.gender.female")}</option>
+                  <option value="ostatní">{t("options.gender.other")}</option>
+                </select>
+              </div>
+              <div class="input-wrap">
+                <label for="birthDate" class="field-label"
+                  >{t("labels.birthDate")}</label
+                ><input
+                  class="input-2 w-input"
+                  maxlength="256"
+                  name="birthDate"
+                  data-name="birthDate"
+                  type="date"
+                  id="birthDate"
+                  bind:value={values.birthDate}
+                />
+              </div>
+              {#if values.country !== t("select.placeholder.country") && !isEu(values.country)}
+                <div class="input-wrap">
+                  <label for="passportExpiryDate" class="field-label"
+                    >{t("labels.passportExpiryDate")}</label
+                  ><input
+                    class="input-2 w-input"
+                    maxlength="256"
+                    name="passportExpiryDate"
+                    data-name="passportExpiryDate"
+                    type="date"
+                    id="passportExpiryDate"
+                    bind:value={values.passportExpiryDate}
+                  />
+                </div>
+              {/if}
+            </div>
             <div class="input-wrap">
               <label for="Pojistovna" class="field-label"
                 >{t("labels.insurance")}</label
               >
               <div class="w-embed">
                 <select
-                  name="zdravotni-pojistovna"
+                  name="insurance"
                   class="input-2"
                   required
                   bind:value={values.insurance}
                 >
-                  <option value={t("select.placeholder.insurance")} disabled
+                  <option value="" disabled
                     >{t("select.placeholder.insurance")}</option
                   >
                   {#await getInsuranceOptions(locale) then insuranceOptions}
@@ -835,7 +930,7 @@
             </div>
             <div class="input-wrap">
               <label for="field" class="field-label"
-                >Chcete uplatnit růžové prohlášení?</label
+                >{t("labels.pinkStatement")}</label
               >
               <div class="input-group-wrap">
                 <label
@@ -844,31 +939,34 @@
                 >
                   <div
                     class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
+                    class:w--redirected-checked={values.pinkStatement === true}
                   ></div>
                   <input
                     type="radio"
-                    name="ruzove-prohlaseni"
+                    name="pinkStatement"
                     id="ANO-2"
-                    data-name="ruzove-prohlaseni"
-                    required=""
+                    data-name="pinkStatement"
                     style="opacity:0;position:absolute;z-index:-1"
-                    value="ANO"
-                  /><span class="w-form-label" for="ANO-2">ANO</span>
+                    value={true}
+                    bind:group={values.pinkStatement}
+                  /><span class="w-form-label">{t("answer.yes")}</span>
                 </label><label
-                  id="ruzove-prohlaseni-ne"
+                  id="pinkStatement-ne"
                   class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089de2-d6eb4364 w-radio"
                 >
                   <div
                     class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
+                    class:w--redirected-checked={values.pinkStatement === false}
                   ></div>
                   <input
                     type="radio"
-                    name="ruzove-prohlaseni"
+                    name="pinkStatement"
                     id="NE"
-                    data-name="ruzove-prohlaseni"
+                    data-name="pinkStatement"
                     style="opacity:0;position:absolute;z-index:-1"
-                    value="NE"
-                  /><span class="w-form-label" for="NE">NE</span>
+                    value={false}
+                    bind:group={values.pinkStatement}
+                  /><span class="w-form-label">{t("answer.no")}</span>
                 </label>
               </div>
             </div>
