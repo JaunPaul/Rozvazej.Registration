@@ -39,7 +39,7 @@ function makeStepSchema(visibleIds: string[], requiredIds: string[]) {
  * Validate current step only.
  * - Returns { ok: true } or { ok: false, issues, fieldErrors }
  */
-function validateStep(stepId: "step1" | "step2" | "step3", data: any) {
+export function validateStep(stepId: "step1" | "step2" | "step3", data: any) {
   const visible = getVisibleIds(stepId, data);
   visible.forEach((id) => everVisible.add(id)); // record what the user actually saw
   const required = getRequiredIds(visible, data);
@@ -60,7 +60,7 @@ function validateStep(stepId: "step1" | "step2" | "step3", data: any) {
  *  - Option B (policy-driven): recompute visibility from final data and validate those.
  * Pick one and stick to it; below uses everVisible.
  */
-function validateFinal(data: any) {
+export function validateFinal(data: any) {
   const visible = Array.from(everVisible); // union across the journey
   const required = visible.filter((id) => fields[id].requiredWhen(data));
   const finalSchema = makeStepSchema(visible, required);

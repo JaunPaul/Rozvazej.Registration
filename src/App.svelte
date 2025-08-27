@@ -5,14 +5,14 @@
   import { isEu } from "./lib/i18n/euCountriesFilter";
   import { getCities } from "./lib/i18n/citiesGetter";
   import { getInsuranceOptions } from "./lib/i18n/insuranceGetter";
-  import { getVisibleIds } from "./lib/utils/validation";
+  import { getRequiredIds, getVisibleIds } from "./lib/utils/validation";
   let locale: Locale = "cs";
   setLocale(locale);
 
   const Steps = {
     step1: "step1",
     step2: "step2",
-    step3: "step2",
+    step3: "step3",
   };
 
   abstract class PageHelper {
@@ -22,13 +22,25 @@
       const newUrl = `${window.location.pathname}?${params.toString()}`;
       window.history.replaceState({}, "", newUrl);
     }
+
+    static validate = async (path: "step" | "final") => {};
+    static next = (step: "step2" | "step3") => {
+      const visible = getVisibleIds(currentStep, values);
+      const required = getRequiredIds(visible, values);
+      currentStep = Steps[step];
+      console.log(visible, required);
+    };
+    static prev = (step: "step1" | "step2") => {
+      currentStep = Steps[step];
+    };
+    static submit = async () => {};
   }
-  const validate = async (path: string) => {};
 
   const params = new URLSearchParams(window.location.search);
   const formStep = params.get("state");
+  let errors = $state({});
 
-  let currentStep = $state(Steps.step1);
+  let currentStep = $state(Steps.step2);
   if (formStep) {
     currentStep = Steps[formStep];
   }
@@ -148,15 +160,7 @@
 </script>
 
 <div>
-  <form
-    id="wf-form-Registrace"
-    name="wf-form-Registrace"
-    data-name="Registrace"
-    method="post"
-    class="form"
-    data-wf-page-id="68a31b8e75b63d43d6eb4364"
-    data-wf-element-id="bbf84c42-1309-ca45-9ba6-1cbc04e602c1"
-  >
+  <div class="form">
     {#if currentStep === Steps.step1}
       <div class="form-step is-active">
         <div class="box has-24-gap">
@@ -292,7 +296,9 @@
         </div>
         <div class="form-nav">
           <div></div>
-          <button class="button w-button" onclick={() => (currentStep = 2)}
+          <button
+            class="button w-button"
+            onclick={() => PageHelper.next("step2")}
             >{t("nav.next")}
           </button>
         </div>
@@ -313,7 +319,7 @@
             <p class="body-text">{t("step2.lead")}</p>
           </div>
           <div class="box has-8-gap">
-            {#if values.applyAsCompany === "ANO"}
+            {#if values.applyAsCompany === true}
               <div in:fade class="input-wrap">
                 <label for="companyId" class="field-label"
                   >{t("labels.companyId")}
@@ -331,7 +337,7 @@
                 />
               </div>
             {/if}
-            {#if values.applyAsCompany === "NE"}
+            {#if values.applyAsCompany === false}
               <div class="input-wrap">
                 <label for="St-tn-ob-anstv" class="field-label"
                   ><strong>{t("labels.citizenship")}</strong></label
@@ -360,7 +366,7 @@
               </div>
             {/if}
 
-            {#if values.applyAsCompany === "NE" && values.country === "CZ"}
+            {#if values.applyAsCompany === true && values.country === "CZ"}
               <div in:fade class="input-wrap">
                 <label for="nationalId" class="field-label"
                   >{t("labels.nationalId")}
@@ -379,7 +385,7 @@
               </div>
             {/if}
 
-            {#if values.applyAsCompany === "NE" && values.country !== t("select.placeholder.country") && values.country !== "CZ"}
+            {#if values.applyAsCompany === false && values.country.length > 0 && values.country !== "CZ"}
               <div in:fade class="input-wrap">
                 <label for="passportOrId" class="field-label"
                   >{t("labels.passportOrId")}
@@ -659,7 +665,7 @@
                 </div>
               {/if}
 
-              {#if values.country !== t("select.placeholder.country") && isEu(values.country) && values.country !== "CZ"}
+              {#if values.country.length > 0 && isEu(values.country) && values.country !== "CZ"}
                 <div class="upload">
                   <label for="Ulice" class="field-label"
                     >{@html t("labels.doc.euPassport")}</label
@@ -722,7 +728,7 @@
                 </div>
               {/if}
 
-              {#if values.country !== t("select.placeholder.country") && !isEu(values.country)}
+              {#if values.country.length > 0 && !isEu(values.country)}
                 <div class="upload">
                   <label for="Ulice" class="field-label"
                     >{@html t("labels.doc.nonEu")}</label
@@ -788,8 +794,14 @@
           </div>
         </div>
         <div class="form-nav">
-          <button class="button is-ghost w-button">{t("nav.prev")}</button>
-          <button class="button w-button">{t("nav.next")}</button>
+          <button
+            class="button is-ghost w-button"
+            onclick={() => PageHelper.prev("step1")}>{t("nav.prev")}</button
+          >
+          <button
+            class="button w-button"
+            onclick={() => PageHelper.next("step3")}>{t("nav.next")}</button
+          >
         </div>
       </div>
     {/if}
@@ -815,7 +827,6 @@
                 id="deliveryCity"
                 name="deliveryCity"
                 data-name="Misto rozvazeni"
-                required
                 class="input-2 w-select"
                 bind:value={values.deliveryCity}
               >
@@ -837,7 +848,6 @@
                   <select
                     name="transport"
                     class="input-2"
-                    required
                     bind:value={values.transport}
                   >
                     <option value="" disabled
@@ -865,7 +875,6 @@
                   name="gender"
                   id="gender"
                   class="input-2"
-                  required
                   autocomplete="off"
                   bind:value={values.gender}
                 >
@@ -890,7 +899,7 @@
                   bind:value={values.birthDate}
                 />
               </div>
-              {#if values.country !== t("select.placeholder.country") && !isEu(values.country)}
+              {#if values.country.length > 0 && !isEu(values.country)}
                 <div class="input-wrap">
                   <label for="passportExpiryDate" class="field-label"
                     >{t("labels.passportExpiryDate")}</label
@@ -914,7 +923,6 @@
                 <select
                   name="insurance"
                   class="input-2"
-                  required
                   bind:value={values.insurance}
                 >
                   <option value="" disabled
@@ -973,14 +981,15 @@
           </div>
         </div>
         <div class="form-nav">
-          <button class="button is-ghost w-button">{t("nav.prev")}</button>
-          <button type="submit" class="button w-button"
-            >{t("nav.submit")}</button
+          <button
+            class="button is-ghost w-button"
+            onclick={() => PageHelper.prev("step2")}>{t("nav.prev")}</button
           >
+          <button class="button w-button">{t("nav.submit")}</button>
         </div>
       </div>
     {/if}
-  </form>
+  </div>
   <div class="success-message-5 w-form-done">
     <div>{t("result.success")}</div>
   </div>
