@@ -11,7 +11,9 @@
     validateStep,
   } from "./lib/utils/validation";
   import Errors from "./lib/components/Errors.svelte";
-  let locale: Locale = "cs";
+  import { debounce, searchLocations, validateEmail } from "./lib/foxentry";
+
+  let locale: Locale = "en";
   setLocale(locale);
 
   const Steps = {
@@ -24,7 +26,7 @@
   const formStep = params.get("state");
   let errors = $state({});
 
-  let currentStep = $state(Steps.step1);
+  let currentStep = $state(Steps.step2);
   if (formStep) {
     currentStep = Steps[formStep];
   }
@@ -124,6 +126,7 @@
     nationalId: "",
     passportOrId: "",
     applyAsCompany: undefined,
+    address: "",
     country: "",
     street: "",
     houseNumber: "",
@@ -177,6 +180,96 @@
     };
     static submit = async () => {};
   }
+  let emailErr = $state("");
+  let emailHint = $state("");
+  async function onBlurEmail() {
+    const r = await validateEmail(values.email, {
+      acceptDisposableEmails: false,
+    });
+    emailErr = r.isValid ? "" : "Invalid email";
+    emailHint =
+      r.suggestion && r.suggestion !== email
+        ? `Did you mean ${r.suggestion}?`
+        : "";
+    if (r.normalized) email = r.normalized;
+  }
+
+  let suggestions = $state([]);
+  let activeType: LocationSearchType | null = $state(null);
+
+  const searchForAddress = debounce(
+    async (type: LocationSearchType, q: string) => {
+      const r = await searchLocations(type, q, "CZ", 10, 0);
+      suggestions = r.items;
+    },
+    200
+  );
+  function apiTypeFor(field: LocationSearchType): LocationSearchType {
+    return field === "street" ? "full" : field; // <-- search FULL when street has focus
+  }
+  function onAddressFocus(type: LocationSearchType) {
+    activeType = type;
+    // optionally trigger first search if field already has enough chars
+    queueSearchForActive();
+  }
+
+  function onAddressBlur() {
+    setTimeout(() => {
+      activeType = null;
+      suggestions = [];
+    }, 120);
+  }
+
+  function currentQueryFor(type: LocationSearchType | null): string {
+    if (!type) return "";
+    if (type === "street") return values.street;
+    if (type === "number.full") return values.houseNumber;
+    if (type === "city") return values.city;
+    if (type === "zip") return values.zip;
+    return "";
+  }
+
+  function minLenFor(type: LocationSearchType): number {
+    if (type === "zip" || type === "number.full") return 1;
+    return 3; // street/city
+  }
+
+  function queueSearchForActive() {
+    if (!activeType) return;
+    const q = currentQueryFor(activeType);
+    if ((q?.trim()?.length ?? 0) < minLenFor(activeType)) {
+      suggestions = [];
+      return;
+    }
+    searchForAddress(apiTypeFor(activeType), q);
+  }
+
+  $effect(() => {
+    if (!activeType) return;
+    // track just the active field’s value
+    const q = currentQueryFor(activeType);
+    void q; // establish reactive read
+    queueSearchForActive();
+  });
+
+  // apply the picked suggestion into your form
+  function applySuggestion(s: FxLocation) {
+    // Fill the structured fields. Keep existing if not present in suggestion.
+    console.log(s);
+    values.street = s.street ?? values.street;
+    values.houseNumber = s.streetNumber ?? values.hosueNumber;
+    values.city = s.city ?? values.city;
+    values.zip = s.postalCode ?? values.zip;
+
+    // optionally set a nice single-line address too
+    values.address = s.full ?? s.streetWithNumber ?? values.address;
+
+    // close panel
+    suggestions = [];
+    activeType = null;
+  }
+
+  $inspect(activeType, apiTypeFor(activeType));
 </script>
 
 <div>
@@ -267,6 +360,7 @@
                   id="email"
                   required
                   bind:value={values.email}
+                  onblur={onBlurEmail}
                 />
                 <div class="text-explain">
                   {@html t("hints.useRealEmail")}
@@ -436,7 +530,7 @@
             {/if}
 
             <div class="input-group-wrap">
-              <div class="input-wrap">
+              <div class="input-wrap relative">
                 <label for="street" class="field-label"
                   >{t("labels.street")}</label
                 ><input
@@ -450,9 +544,27 @@
                   id="street"
                   required
                   bind:value={values.street}
+                  onfocus={() => onAddressFocus("street")}
+                  onblur={onAddressBlur}
                 />
+                {#if activeType === "street" && suggestions.length}
+                  <ul class="sugg" role="listbox">
+                    {#each suggestions as s}
+                      <li role="option" onmousedown={() => applySuggestion(s)}>
+                        {s.streetWithNumber || s.full}
+                        {#if s.city || s.postalCode}
+                          <small>
+                            — {s.city}{s.postalCode
+                              ? `, ${s.postalCode}`
+                              : ""}</small
+                          >
+                        {/if}
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
               </div>
-              <div class="input-wrap">
+              <div class="input-wrap relative">
                 <label for="houseNumber" class="field-label"
                   >{t("labels.houseNumber")}</label
                 ><input
@@ -466,11 +578,29 @@
                   id="houseNumber"
                   required
                   bind:value={values.houseNumber}
+                  onfocus={() => onAddressFocus("number.full")}
+                  onblur={onAddressBlur}
                 />
+                {#if activeType === "number.full" && suggestions.length}
+                  <ul class="sugg" role="listbox">
+                    {#each suggestions as s}
+                      <li role="option" onmousedown={() => applySuggestion(s)}>
+                        {s.streetWithNumber || s.full}
+                        {#if s.city || s.postalCode}
+                          <small>
+                            — {s.city}{s.postalCode
+                              ? `, ${s.postalCode}`
+                              : ""}</small
+                          >
+                        {/if}
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
               </div>
             </div>
             <div class="input-group-wrap">
-              <div class="input-wrap">
+              <div class="input-wrap relative">
                 <label for="city" class="field-label">{t("labels.city")}</label
                 ><input
                   data-parsley-error-message={t("errors.city")}
@@ -483,9 +613,27 @@
                   id="city"
                   required
                   bind:value={values.city}
+                  onfocus={() => onAddressFocus("city")}
+                  onblur={onAddressBlur}
                 />
+                {#if activeType === "city" && suggestions.length}
+                  <ul class="sugg" role="listbox">
+                    {#each suggestions as s}
+                      <li role="option" onmousedown={() => applySuggestion(s)}>
+                        {s.streetWithNumber || s.full}
+                        {#if s.city || s.postalCode}
+                          <small>
+                            — {s.city}{s.postalCode
+                              ? `, ${s.postalCode}`
+                              : ""}</small
+                          >
+                        {/if}
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
               </div>
-              <div class="input-wrap">
+              <div class="input-wrap relative">
                 <label for="zip" class="field-label">{t("labels.zip")}</label
                 ><input
                   data-parsley-error-message={t("errors.zip")}
@@ -498,7 +646,25 @@
                   id="zip"
                   required
                   bind:value={values.zip}
+                  onfocus={() => onAddressFocus("zip")}
+                  onblur={onAddressBlur}
                 />
+                {#if activeType === "zip" && suggestions.length}
+                  <ul class="sugg" role="listbox">
+                    {#each suggestions as s}
+                      <li role="option" onmousedown={() => applySuggestion(s)}>
+                        {s.streetWithNumber || s.full}
+                        {#if s.city || s.postalCode}
+                          <small>
+                            — {s.city}{s.postalCode
+                              ? `, ${s.postalCode}`
+                              : ""}</small
+                          >
+                        {/if}
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
               </div>
             </div>
             <div class="input-group-wrap">
@@ -532,7 +698,7 @@
                     name="bankNumber"
                     data-name="Číslo účtu"
                     placeholder=""
-                    type="number"
+                    type="text"
                     id="bankNumber"
                     required
                     bind:value={values.bankNumber}
@@ -1054,5 +1220,71 @@
 
   .field-error {
     border-color: indianred;
+  }
+
+  .input-wrap.relative {
+    position: relative; /* anchor for the dropdown */
+    overflow: visible; /* avoid clipping */
+  }
+
+  /* 2) The floating suggestion panel */
+  .sugg {
+    position: absolute;
+    top: calc(100% + 6px); /* 6px gap below the input */
+    left: 0;
+    right: 0; /* match input width */
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    box-shadow:
+      0 10px 20px rgba(0, 0, 0, 0.08),
+      0 2px 6px rgba(0, 0, 0, 0.06);
+
+    max-height: 260px; /* scroll if many items */
+    overflow: auto;
+    z-index: 1000; /* sit above other UI */
+  }
+
+  /* hide if empty (defensive) */
+  .sugg:empty {
+    display: none;
+  }
+
+  /* 3) Items */
+  .sugg li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    line-height: 1.25;
+  }
+
+  .sugg li + li {
+    margin-top: 2px;
+  }
+
+  .sugg li:hover,
+  .sugg li[aria-selected="true"] {
+    background: #f6f7f9;
+  }
+
+  .sugg li small {
+    color: #6b7280; /* muted */
+    font-size: 0.85em;
+  }
+
+  /* 4) Make sure the input sits above borders while focused */
+  .input-2.w-input:focus {
+    position: relative;
+    z-index: 1001;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25); /* nice focus ring */
+    border-color: rgba(99, 102, 241, 0.4);
   }
 </style>

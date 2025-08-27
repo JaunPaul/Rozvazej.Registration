@@ -18,6 +18,7 @@
     "vite": "^7.1.2"
   },
   "dependencies": {
+    "@foxentry/js-sdk": "^1.1.1",
     "zod": "^4.1.3"
   }
 }
