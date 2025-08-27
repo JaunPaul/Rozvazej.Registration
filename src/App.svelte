@@ -5,7 +5,12 @@
   import { isEu } from "./lib/i18n/euCountriesFilter";
   import { getCities } from "./lib/i18n/citiesGetter";
   import { getInsuranceOptions } from "./lib/i18n/insuranceGetter";
-  import { getRequiredIds, getVisibleIds } from "./lib/utils/validation";
+  import {
+    getRequiredIds,
+    getVisibleIds,
+    validateStep,
+  } from "./lib/utils/validation";
+  import Errors from "./lib/components/Errors.svelte";
   let locale: Locale = "cs";
   setLocale(locale);
 
@@ -15,32 +20,11 @@
     step3: "step3",
   };
 
-  abstract class PageHelper {
-    static updateParamsWithState(state: string): void {
-      const params = new URLSearchParams(window.location.search);
-      params.set("state", state);
-      const newUrl = `${window.location.pathname}?${params.toString()}`;
-      window.history.replaceState({}, "", newUrl);
-    }
-
-    static validate = async (path: "step" | "final") => {};
-    static next = (step: "step2" | "step3") => {
-      const visible = getVisibleIds(currentStep, values);
-      const required = getRequiredIds(visible, values);
-      currentStep = Steps[step];
-      console.log(visible, required);
-    };
-    static prev = (step: "step1" | "step2") => {
-      currentStep = Steps[step];
-    };
-    static submit = async () => {};
-  }
-
   const params = new URLSearchParams(window.location.search);
   const formStep = params.get("state");
   let errors = $state({});
 
-  let currentStep = $state(Steps.step2);
+  let currentStep = $state(Steps.step1);
   if (formStep) {
     currentStep = Steps[formStep];
   }
@@ -134,29 +118,65 @@
   const values = $state({
     firstName: "",
     lastName: "",
+    email: "",
     phone: "",
     companyId: "",
     nationalId: "",
     passportOrId: "",
-    applyAsCompany: "",
+    applyAsCompany: undefined,
     country: "",
     street: "",
     houseNumber: "",
     city: "",
     zip: "",
-    bank: {
-      prefix: "",
-      number: null,
-      code: "",
-    },
+    bankPrefix: "",
+    bankNumber: "",
+    bankCode: "",
     deliveryCity: "",
     transport: "",
     insurance: "",
-    pinkStatement: "",
+    pinkStatement: undefined,
     gender: "",
     birthDate: "",
     passportExpiryDate: "",
+    filesNationalId: [],
+    filesEuPassport: [],
+    filesNonEu: [],
   });
+
+  abstract class PageHelper {
+    static updateParamsWithState(state: string): void {
+      const params = new URLSearchParams(window.location.search);
+      params.set("state", state);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, "", newUrl);
+    }
+    static toFiles = (v?: FileList | File[] | null) =>
+      Array.isArray(v) ? v : v ? Array.from(v) : [];
+
+    static validate = async (path: "step" | "final") => {};
+    static next = (step: "step2" | "step3") => {
+      const valuesToValidate = {
+        ...values,
+        filesNationalId: this.toFiles(filesNationalId),
+        filesEuPassport: this.toFiles(filesEuPassport),
+        filesNonEu: this.toFiles(filesNonEu),
+      };
+
+      const validationResult = validateStep(currentStep, valuesToValidate);
+      if (validationResult.ok) {
+        currentStep = Steps[step];
+        PageHelper.updateParamsWithState(step);
+      }
+      errors = validationResult.fieldErrors;
+      console.log(validationResult);
+    };
+    static prev = (step: "step1" | "step2") => {
+      currentStep = Steps[step];
+      PageHelper.updateParamsWithState(step);
+    };
+    static submit = async () => {};
+  }
 </script>
 
 <div>
@@ -191,6 +211,7 @@
                   required
                   bind:value={values.firstName}
                 />
+                <Errors {errors} path="firstName"></Errors>
               </div>
               <div class="input-wrap">
                 <label for="lastName" class="field-label"
@@ -207,6 +228,7 @@
                   required
                   bind:value={values.lastName}
                 />
+                <Errors {errors} path="lastName"></Errors>
               </div>
             </div>
             <div class="input-group-wrap">
@@ -229,6 +251,7 @@
                 <div class="text-explain">
                   {@html t("hints.czPhone")}
                 </div>
+                <Errors {errors} path="phone"></Errors>
               </div>
               <div class="input-wrap">
                 <label for="email" class="field-label"
@@ -243,10 +266,12 @@
                   type="email"
                   id="email"
                   required
+                  bind:value={values.email}
                 />
                 <div class="text-explain">
                   {@html t("hints.useRealEmail")}
                 </div>
+                <Errors {errors} path="email"></Errors>
               </div>
             </div>
             <div class="input-wrap">
@@ -291,9 +316,11 @@
                   /><span class="w-form-label">{t("answer.no")}</span>
                 </label>
               </div>
+              <Errors {errors} path="applyAsCompany"></Errors>
             </div>
           </div>
         </div>
+
         <div class="form-nav">
           <div></div>
           <button
@@ -335,6 +362,7 @@
                   id="companyId"
                   bind:value={values.companyId}
                 />
+                <Errors {errors} path="companyId"></Errors>
               </div>
             {/if}
             {#if values.applyAsCompany === false}
@@ -363,6 +391,7 @@
                     {/await}
                   </select>
                 </div>
+                <Errors {errors} path="country"></Errors>
               </div>
             {/if}
 
@@ -382,6 +411,7 @@
                   id="nationalId"
                   bind:value={values.nationalId}
                 />
+                <Errors {errors} path="nationalId"></Errors>
               </div>
             {/if}
 
@@ -401,6 +431,7 @@
                   id="passportOrId"
                   bind:value={values.passportOrId}
                 />
+                <Errors {errors} path="passporOrId"></Errors>
               </div>
             {/if}
 
@@ -486,9 +517,10 @@
                       pattern="\d*"
                       inputmode="numeric"
                       placeholder={t("ph.bank.prefix")}
-                      bind:value={values.bank.prefix}
+                      bind:value={values.bankPrefix}
                     />
                   </div>
+                  <Errors {errors} path="bankPrefix"></Errors>
                 </div>
                 <div class="bank-number">
                   <label for="bankNumber" class="field-label"
@@ -503,8 +535,9 @@
                     type="number"
                     id="bankNumber"
                     required
-                    bind:value={values.bank.number}
+                    bind:value={values.bankNumber}
                   />
+                  <Errors {errors} path="bankNumber"></Errors>
                 </div>
                 <div class="bank-code">
                   <label for="bankCode" class="field-label"
@@ -516,7 +549,7 @@
                       id="bankCode"
                       class="input-2"
                       required
-                      bind:value={values.bank.code}
+                      bind:value={values.bankCode}
                     >
                       <option value="" disabled
                         >{t("select.placeholder.bank")}</option
@@ -581,6 +614,7 @@
                       <option value="6363">6363 – Partners banka</option>
                     </select>
                   </div>
+                  <Errors {errors} path="bankCode"></Errors>
                 </div>
               </div>
             </div>
@@ -662,6 +696,7 @@
                   <div class="text-explain">
                     {@html t("hints.doc.nationalId")}
                   </div>
+                  <Errors {errors} path="filesNationalId"></Errors>
                 </div>
               {/if}
 
@@ -725,6 +760,7 @@
                   <div class="text-explain">
                     {@html t("hints.doc.euPassport")}
                   </div>
+                  <Errors {errors} path="filesEuPassport"></Errors>
                 </div>
               {/if}
 
@@ -788,6 +824,7 @@
                   <div class="text-explain">
                     {@html t("hints.doc.nonEu")}
                   </div>
+                  <Errors {errors} path="filesNonEu"></Errors>
                 </div>
               {/if}
             </div>
@@ -1013,5 +1050,9 @@
 
   .block {
     display: block;
+  }
+
+  .field-error {
+    border-color: indianred;
   }
 </style>
