@@ -295,7 +295,8 @@ export async function searchLocations(
   value: string,
   countryCode?: string,
   limit = 10,
-  offset = 0
+  offset = 0,
+  extraFilter: Record<string, any> = {} // 👈 allow callers to add filter
 ): Promise<{ items: FxLocation[]; total: number; offset: number }> {
   if (!value?.trim()) return { items: [], total: 0, offset: 0 };
 
@@ -308,7 +309,10 @@ export async function searchLocations(
     .search({
       type, // <-- important
       value,
-      filter: { country: countryCode },
+      filter: {
+        country: countryCode,
+        ...extraFilter,
+      },
     });
 
   const payload: any = res;

@@ -461,6 +461,14 @@
     }
     if (r.normalized) values.lastName = r.normalized;
   }
+  // App.svelte
+  type AddressCtx = {
+    street?: string;
+    streetId?: string; // from Foxentry
+    city?: string;
+    zip?: string;
+  };
+  let addrCtx: AddressCtx = $state({});
 
   let suggestions = $state([]);
   let companySuggestions = $state([]);
@@ -469,11 +477,34 @@
 
   const searchForAddress = debounce(
     async (type: LocationSearchType, q: string) => {
-      const r = await searchLocations(type, q, "CZ", 10, 0);
+      const r = await searchLocations(
+        type,
+        q,
+        "CZ",
+        10,
+        0,
+        buildFilterFor(type)
+      );
       suggestions = r.items;
     },
-    200
+    100
   );
+
+  function buildFilterFor(type: LocationSearchType) {
+    const base = { country: "CZ" };
+    if (type === "number.full") {
+      // Best: scope by streetId if we have it
+      if (addrCtx.streetId) return { ...base, streetId: addrCtx.streetId };
+      // Fallbacks if no ID (user typed their own street)
+      return {
+        ...base,
+        street: values.street || undefined,
+        city: values.city || undefined,
+        zip: (values.zip || "").replace(/\s/g, "") || undefined,
+      };
+    }
+    return base;
+  }
 
   const searchForCompany = debounce(async (q: string) => {
     const r = await searchCompanies(q);
@@ -568,6 +599,17 @@
   });
 
   $effect(() => {
+    const streetNow = values.street;
+    void streetNow; // reactive read
+    // If user wipes or changes street, drop streetId so number search won’t be overly constrained
+    if (!streetNow?.trim()) {
+      addrCtx.streetId = undefined;
+      addrCtx.city = undefined;
+      addrCtx.zip = undefined;
+    }
+  });
+
+  $effect(() => {
     if (!companyActive) return;
     // track just the active field’s value
     const q = values.companyId;
@@ -586,6 +628,11 @@
 
     // optionally set a nice single-line address too
     values.address = s.full ?? s.streetWithNumber ?? values.address;
+
+    addrCtx.street = s.street ?? addrCtx.street;
+    addrCtx.streetId = s.streetId ?? addrCtx.streetId; // 👈 critical
+    addrCtx.city = s.city ?? addrCtx.city;
+    addrCtx.zip = s.postalCode ?? addrCtx.zip;
 
     // close panel
     suggestions = [];
