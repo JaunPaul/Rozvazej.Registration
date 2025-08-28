@@ -47,8 +47,6 @@ export type FxLocation = {
 export type FxCompany = {
   name?: string;
   registrationId?: string; // IČO / national ID
-  vatId?: string;
-  address?: FxLocation;
   raw?: unknown;
 };
 
@@ -174,8 +172,6 @@ export async function validateCompany(query: {
     name: result?.normalized?.name ?? result?.name,
     registrationId:
       result?.normalized?.registrationId ?? result?.registrationId,
-    vatId: result?.normalized?.vatId ?? result?.vatId,
-    address: mapLocation(result?.address),
     suggestion: result?.correction?.name,
     raw: result,
   };
@@ -186,22 +182,36 @@ export async function searchCompanies(
   term: string,
   limit = 10
 ): Promise<FxCompany[]> {
-  if (!term?.trim()) return [];
+  if (term.length === 0) return [];
   const res = await fox
     .company()
     .setCustomId("company-search")
-    .setClientIP(DEFAULTS.clientIP)
     .setClientCountry(DEFAULTS.clientCountry)
+    .setOptions({
+      dataScope: "basic",
+      dataSource: ["CZ"],
+      includeTerminatedSubjects: false,
+      zipFormat: false,
+      cityFormat: "basic",
+      countryFormat: "alpha2",
+      legalFormType: "any",
+      filterMode: "limit",
+      resultsLimit: limit,
+      filterAcceptFormat: true,
+      filterAcceptAlternatives: true,
+      filterExactMatch: true,
+    })
     .includeRequestDetails(false)
-    .search({ term, limit });
+    .search({
+      type: "registrationNumber",
+      filter: { country: "CZ" },
+      value: term,
+    });
 
   const items: any[] = unwrap(res) ?? [];
   return items.map((it) => ({
-    name: it?.name,
-    registrationId: it?.registrationId,
-    vatId: it?.vatId,
-    address: mapLocation(it?.address),
-    raw: it,
+    name: it?.data?.name,
+    registrationId: it?.data?.registrationNumber,
   }));
 }
 

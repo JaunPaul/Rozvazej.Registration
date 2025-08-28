@@ -13,6 +13,8 @@
   import Errors from "./lib/components/Errors.svelte";
   import {
     debounce,
+    type FxCompany,
+    searchCompanies,
     searchLocations,
     validateEmail,
     validateName,
@@ -129,9 +131,10 @@
     email: "",
     phone: "",
     companyId: "",
+    companyName: "",
     nationalId: "",
     passportOrId: "",
-    applyAsCompany: undefined,
+    applyAsCompany: true,
     address: "",
     country: "",
     street: "",
@@ -178,7 +181,6 @@
         PageHelper.updateParamsWithState(step);
       }
       errors = validationResult.fieldErrors;
-      console.log(validationResult);
     };
     static prev = (step: "step1" | "step2") => {
       currentStep = Steps[step];
@@ -220,7 +222,7 @@
   async function onBlurFirstName() {
     if (values.firstName.length == 0) return;
     const r = await validateName(values.firstName, "name");
-    console.log(r);
+
     if (!r.isValid) {
       errors.firstName = [t("errors.fox.firstName")];
     } else {
@@ -232,7 +234,7 @@
   async function onBlurLastName() {
     if (values.lastName.length == 0) return;
     const r = await validateName(values.lastName, "surname");
-    console.log(r);
+
     if (!r.isValid) {
       errors.lastName = [t("errors.fox.lastName")];
     } else {
@@ -241,10 +243,10 @@
     if (r.normalized) values.lastName = r.normalized;
   }
 
-  $inspect(errors);
-
   let suggestions = $state([]);
+  let companySuggestions = $state([]);
   let activeType: LocationSearchType | null = $state(null);
+  let companyActive = $state(false);
 
   const searchForAddress = debounce(
     async (type: LocationSearchType, q: string) => {
@@ -253,6 +255,17 @@
     },
     200
   );
+
+  const searchForCompany = debounce(async (q: string) => {
+    const r = await searchCompanies(q);
+
+    companySuggestions = Array.isArray(r?.items)
+      ? r.items
+      : Array.isArray(r)
+        ? r
+        : [];
+  }, 200);
+
   function apiTypeFor(field: LocationSearchType): LocationSearchType {
     return field === "street" ? "full" : field; // <-- search FULL when street has focus
   }
@@ -269,12 +282,25 @@
     }, 120);
   }
 
+  function onCompaniesFocus(type: LocationSearchType) {
+    companyActive = true;
+    queueCompanySearchForActive();
+  }
+
+  function onCompaniesBlur() {
+    setTimeout(() => {
+      companyActive = false;
+      companySuggestions = [];
+    }, 120);
+  }
+
   function currentQueryFor(type: LocationSearchType | null): string {
     if (!type) return "";
     if (type === "street") return values.street;
     if (type === "number.full") return values.houseNumber;
     if (type === "city") return values.city;
     if (type === "zip") return values.zip;
+
     return "";
   }
 
@@ -293,6 +319,16 @@
     searchForAddress(apiTypeFor(activeType), q);
   }
 
+  function queueCompanySearchForActive() {
+    const q = values.companyId;
+    if (q?.length === 0) {
+      // ← truthy length clears & returns
+      companySuggestions = [];
+      return;
+    }
+    searchForCompany(q);
+  }
+
   $effect(() => {
     if (!activeType) return;
     // track just the active field’s value
@@ -301,12 +337,20 @@
     queueSearchForActive();
   });
 
+  $effect(() => {
+    if (!companyActive) return;
+    // track just the active field’s value
+    const q = values.companyId;
+    void q; // establish reactive read
+    queueCompanySearchForActive();
+  });
+
   // apply the picked suggestion into your form
   function applySuggestion(s: FxLocation) {
     // Fill the structured fields. Keep existing if not present in suggestion.
-    console.log(s);
+
     values.street = s.street ?? values.street;
-    values.houseNumber = s.streetNumber ?? values.hosueNumber;
+    values.houseNumber = s.streetNumber ?? values.houseNumber;
     values.city = s.city ?? values.city;
     values.zip = s.postalCode ?? values.zip;
 
@@ -317,6 +361,17 @@
     suggestions = [];
     activeType = null;
   }
+
+  function applyCompanySuggestion(s: FxCompany) {
+    values.companyName = s.name ?? values.companyName;
+    values.companyId = s.registrationId ?? values.companyId;
+
+    // close panel
+    companySuggestions = [];
+    companyActive = false;
+  }
+
+  $inspect(errors, companySuggestions, values);
 </script>
 
 <div>
@@ -491,7 +546,7 @@
           </div>
           <div class="box has-8-gap">
             {#if values.applyAsCompany === true}
-              <div in:fade class="input-wrap">
+              <div in:fade class="input-wrap relative">
                 <label for="companyId" class="field-label"
                   >{t("labels.companyId")}
                 </label><input
@@ -505,7 +560,24 @@
                   type="text"
                   id="companyId"
                   bind:value={values.companyId}
+                  onfocus={() => onCompaniesFocus()}
+                  onblur={onCompaniesBlur}
                 />
+                {#if companyActive && companySuggestions.length}
+                  <ul class="sugg" role="listbox">
+                    {#each companySuggestions as s}
+                      <li
+                        role="option"
+                        onmousedown={() => applyCompanySuggestion(s)}
+                      >
+                        {s.name}
+                        {#if s.registrationId}
+                          <small> — {s.registrationId}</small>
+                        {/if}
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
                 <Errors {errors} path="companyId"></Errors>
               </div>
             {/if}
