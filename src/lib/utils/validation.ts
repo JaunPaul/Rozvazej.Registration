@@ -4,6 +4,7 @@ import { formSchema } from "../schema";
 import {
   validateCompany,
   validateEmail,
+  validateLocation,
   validateName,
   validatePhone,
 } from "../foxentry";
@@ -47,6 +48,92 @@ const fxValidators: Record<string, FxChecker> = {
   // You can add address-related checks if you have a single-line API:
   // address: async (d) => { ... }
 };
+type FieldErrors = Record<string, string[]>;
+type FxGroupChecker = (data: any, visible: string[]) => Promise<FieldErrors>;
+
+const FOX_TO_LOCAL: Record<string, string[]> = {
+  street: ["street"],
+  "number.full": ["houseNumber"],
+  streetWithNumber: ["street", "houseNumber"],
+  city: ["city"],
+  zip: ["zip"],
+  country: ["country"],
+  region: [],
+  district: [],
+  state: [],
+};
+
+const collectInvalidFoxKeys = (raw: any): string[] => {
+  const set = new Set<string>();
+  const inv = raw?.dataTypes?.invalid;
+  if (Array.isArray(inv)) inv.forEach((k: string) => set.add(k));
+  const errs = raw?.errors;
+  if (Array.isArray(errs)) {
+    for (const e of errs) {
+      (e?.relatedTo ?? []).forEach((k: string) => set.add(k));
+    }
+  }
+  return [...set];
+};
+
+const addressGroupValidator: FxGroupChecker = async (d, visible) => {
+  const errs: FieldErrors = {};
+
+  // If the user picked from suggestions, trust it
+  if (d.__addressFromSuggestion) return errs;
+
+  const street = d.street?.trim();
+  const num = d.houseNumber?.trim();
+  const city = d.city?.trim();
+  const zip = d.zip?.replace(/\s/g, "");
+  const countryCode = d.country || "CZ";
+
+  // Require both street & number to attempt validation
+  if (!street || !num) return errs;
+
+  const r = await validateLocation({
+    street,
+    streetNumber: street + " " + num,
+    houseNumber: num,
+    city,
+    postalCode: zip,
+    countryCode,
+  });
+
+  if (!r.isValid) {
+    const raw: any = r.raw;
+    const foxKeys = collectInvalidFoxKeys(raw);
+    const msgGeneric = t("errors.fox.address"); // fallback
+
+    // If Foxentry didn’t specify anything, fall back to a generic address error
+    if (foxKeys.length === 0) {
+      errs.houseNumber = [msgGeneric];
+    } else {
+      for (const k of foxKeys) {
+        const locals = FOX_TO_LOCAL[k] ?? [];
+        if (locals.length === 0) continue; // ignore unmapped keys like region/state
+        for (const fld of locals) {
+          const msg =
+            // if you have per-field messages, prefer them; else generic
+            t?.(`errors.fox.${fld}` as any) ?? msgGeneric;
+          (errs[fld] ??= []).push(msg);
+        }
+      }
+    }
+  } else if (r.location) {
+    // Normalize fields when valid
+    d.street = r.location.street ?? d.street;
+    d.houseNumber = r.location.streetNumber ?? d.houseNumber;
+    d.city = r.location.city ?? d.city;
+    d.zip = r.location.postalCode ?? d.zip;
+    d.__addressFromSuggestion = true;
+  }
+
+  return errs;
+};
+
+// register any group validators here
+const fxGroupValidators: FxGroupChecker[] = [addressGroupValidator];
 
 const everVisible = new Set<string>();
 const root = formSchema;
@@ -98,38 +185,30 @@ export async function validateStepAsync(
   const stepSchema = makeStepSchema(visible, required);
   const payload = pick(data, visible);
 
-  // 1) Zod (structural & requiredness)
+  // 1) Zod
   const zres = await stepSchema.safeParseAsync(payload);
-
-  // flatten to { field: string[] }
   let mergedErrors: FieldErrors = zres.success
     ? {}
     : (zres.error.flatten().fieldErrors as FieldErrors);
 
-  // 2) Foxentry on visible fields that have checkers and no Zod error for that field
+  // 2) Field-level Foxentry (only for visible keys that have a validator)
   const toCheck = visible.filter((k) => k in fxValidators);
-  const checks = await Promise.all(
-    toCheck.map(async (k) => {
-      // optional: skip external if Zod already has an error for k
-      if (Array.isArray(mergedErrors[k]) && mergedErrors[k]!.length > 0) {
-        return { k, msg: undefined as string | undefined };
-      }
-      try {
-        const msg = await fxValidators[k](data);
-        return { k, msg };
-      } catch (e) {
-        // network or SDK error → treat as a validation failure with a generic message
-        return { k, msg: "Validation service unavailable. Try again." };
-      }
-    })
+  const fieldMsgs = await Promise.all(
+    toCheck.map(async (k) => ({ k, msg: await fxValidators[k](data) }))
   );
-
-  for (const { k, msg } of checks) {
+  for (const { k, msg } of fieldMsgs) {
     if (msg) mergedErrors[k] = (mergedErrors[k] ?? []).concat(msg);
-    else if (mergedErrors[k]?.length === 0) delete mergedErrors[k]; // tidy
   }
 
-  const ok = hasNoKeys(mergedErrors);
+  // 3) Group-level Foxentry (address)
+  for (const run of fxGroupValidators) {
+    const g = await run(data, visible);
+    for (const [k, list] of Object.entries(g)) {
+      if (list?.length) mergedErrors[k] = (mergedErrors[k] ?? []).concat(list);
+    }
+  }
+
+  const ok = Object.keys(mergedErrors).length === 0;
   return { ok, fieldErrors: mergedErrors };
 }
 

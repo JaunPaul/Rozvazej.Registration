@@ -140,6 +140,7 @@
     nationalId: "",
     passportOrId: "",
     applyAsCompany: undefined,
+    __addressFromSuggestion: false,
     address: "",
     country: "",
     street: "",
@@ -469,7 +470,11 @@
     zip?: string;
   };
   let addrCtx: AddressCtx = $state({});
-
+  function setAddrCtxFromPick(s: FxLocation) {
+    addrCtx.street = s.street ?? addrCtx.street;
+    addrCtx.city = s.city ?? addrCtx.city;
+    addrCtx.zip = s.postalCode ?? addrCtx.zip;
+  }
   let suggestions = $state([]);
   let companySuggestions = $state([]);
   let activeType: LocationSearchType | null = $state(null);
@@ -483,27 +488,47 @@
         "CZ",
         10,
         0,
-        buildFilterFor(type)
+        buildFilterFor(type),
+        { allowEmpty: hasContextFor(type) } // 👈 key change
       );
       suggestions = r.items;
     },
     100
   );
+  const clean = <T extends Record<string, any>>(o: T): T =>
+    Object.fromEntries(
+      Object.entries(o).filter(([, v]) => v != null && v !== "")
+    ) as T;
 
+  const normZip = (z?: string) => (z ? z.replace(/\s/g, "") : undefined);
   function buildFilterFor(type: LocationSearchType) {
+    // prefer current form values, then ctx
+    const street = (values.street || addrCtx.street || "").trim() || undefined;
+    const city = (values.city || addrCtx.city || "").trim() || undefined;
+    const zip = normZip(values.zip) ?? addrCtx.zip;
     const base = { country: "CZ" };
-    if (type === "number.full") {
-      // Best: scope by streetId if we have it
-      if (addrCtx.streetId) return { ...base, streetId: addrCtx.streetId };
-      // Fallbacks if no ID (user typed their own street)
-      return {
-        ...base,
-        street: values.street || undefined,
-        city: values.city || undefined,
-        zip: (values.zip || "").replace(/\s/g, "") || undefined,
-      };
+
+    switch (type) {
+      case "full":
+      case "street":
+        // when searching street, narrow by city/zip if we know them
+        return clean({ ...base, city, zip });
+
+      case "number.full":
+        // house number should be limited to a street — use street + (city|zip) for scope
+        return clean({ ...base, street, city, zip });
+
+      case "city":
+        // city suggestions should respect typed/known zip or street if present
+        return clean({ ...base, zip, street });
+
+      case "zip":
+        // zip suggestions should respect city/street if present
+        return clean({ ...base, city, street });
+
+      default:
+        return base;
     }
-    return base;
   }
 
   const searchForCompany = debounce(async (q: string) => {
@@ -565,18 +590,82 @@
     return "";
   }
 
+  const hasContextFor = (type: LocationSearchType) => {
+    const street = (values.street || addrCtx.street || "").trim();
+    const city = (values.city || addrCtx.city || "").trim();
+    const zip = (values.zip || addrCtx.zip || "").replace(/\s/g, "");
+
+    if (type === "number.full") {
+      return !!(addrCtx.streetId || (street && (city || zip)));
+    }
+    if (type === "city") return !!(street || zip);
+    if (type === "zip") return !!(street || city);
+    if (type === "street" || type === "full") return !!(city || zip);
+    return false;
+  };
+
   function minLenFor(type: LocationSearchType): number {
+    // with context, we can suggest on focus
+    if (hasContextFor(type)) return 0;
+
+    // no context yet → require some typing
     if (type === "zip" || type === "number.full") return 1;
-    return 3; // street/city
+    if (type === "city") return 2;
+    return 3; // street/full
   }
 
   function queueSearchForActive() {
     if (!activeType) return;
-    const q = currentQueryFor(activeType);
-    if ((q?.trim()?.length ?? 0) < minLenFor(activeType)) {
-      suggestions = [];
-      return;
+
+    const q = (currentQueryFor(activeType) || "").trim();
+
+    // FOCUS with empty value → seed the request instead of sending empty value
+    if (q.length === 0) {
+      if (activeType === "number.full") {
+        const street = (values.street || addrCtx.street || "").trim();
+        if (!street) {
+          suggestions = [];
+          return;
+        }
+
+        // Seed with the street + space → "Bílkova "
+        // Foxentry 'full' search will return addresses on that street (with numbers)
+        searchForAddress("full", `${street} `);
+        return;
+      }
+
+      if (activeType === "city") {
+        const street = (values.street || addrCtx.street || "").trim();
+        const zip = (values.zip || addrCtx.zip || "").replace(/\s/g, "");
+        if (street) {
+          searchForAddress("full", `${street} `);
+          return;
+        }
+        if (zip) {
+          searchForAddress("zip", zip);
+          return;
+        }
+        suggestions = [];
+        return;
+      }
+
+      if (activeType === "zip") {
+        const street = (values.street || addrCtx.street || "").trim();
+        const city = (values.city || addrCtx.city || "").trim();
+        if (street) {
+          searchForAddress("full", `${street} `);
+          return;
+        }
+        if (city) {
+          searchForAddress("city", city.slice(0, 3));
+          return;
+        }
+        suggestions = [];
+        return;
+      }
     }
+
+    // Regular path: user has typed something → use normal mapping
     searchForAddress(apiTypeFor(activeType), q);
   }
 
@@ -610,6 +699,19 @@
   });
 
   $effect(() => {
+    void values.street;
+    addrCtx.street = values.street?.trim() || undefined;
+  });
+  $effect(() => {
+    void values.city;
+    addrCtx.city = values.city?.trim() || undefined;
+  });
+  $effect(() => {
+    void values.zip;
+    addrCtx.zip = normZip(values.zip) || undefined;
+  });
+
+  $effect(() => {
     if (!companyActive) return;
     // track just the active field’s value
     const q = values.companyId;
@@ -619,22 +721,18 @@
 
   // apply the picked suggestion into your form
   function applySuggestion(s: FxLocation) {
-    // Fill the structured fields. Keep existing if not present in suggestion.
-
     values.street = s.street ?? values.street;
     values.houseNumber = s.streetNumber ?? values.houseNumber;
     values.city = s.city ?? values.city;
     values.zip = s.postalCode ?? values.zip;
-
-    // optionally set a nice single-line address too
     values.address = s.full ?? s.streetWithNumber ?? values.address;
 
     addrCtx.street = s.street ?? addrCtx.street;
-    addrCtx.streetId = s.streetId ?? addrCtx.streetId; // 👈 critical
+    addrCtx.streetId = s.streetId ?? addrCtx.streetId;
     addrCtx.city = s.city ?? addrCtx.city;
     addrCtx.zip = s.postalCode ?? addrCtx.zip;
 
-    // close panel
+    values.__addressFromSuggestion = true;
     suggestions = [];
     activeType = null;
   }

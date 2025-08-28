@@ -70,8 +70,13 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.bank.code": "Vyberte možnost",
     "errors.applyAsCompany": "Vyberte možnost",
     "errors.files": "Požadované soubory: ",
+    "errors.fox.address": "Neplatné umístění",
     "errors.fox.company":
       "We could not find this company. Please search and select your company using the registration number.",
+    "errors.fox.city": "Invalid city",
+    "errors.fox.street": "Invalid street",
+    "errors.fox.zip": "Invalid zip code",
+    "errors.fox.houseNumber": "Invalid house number",
 
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat",
@@ -185,6 +190,12 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.bank.code": "Please select an option",
     "errors.applyAsCompany": "Please select an option",
     "errors.files": "Files required: ",
+    "errors.fox.address": "Neplatné umístění",
+    "errors.fox.city": "",
+    "errors.fox.street": "",
+    "errors.fox.zip": "",
+    "errors.fox.houseNumber": "",
+
     "errors.fox.company":
       "We could not find this company. Please search and select your company using the registration number.",
 

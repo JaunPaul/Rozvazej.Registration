@@ -221,6 +221,7 @@ export async function validateLocation(
     full: string;
     street: string;
     streetNumber: string;
+    houseNumber: string;
     city: string;
     postalCode: string;
     region: string;
@@ -242,14 +243,16 @@ export async function validateLocation(
       // API 2.0 accepts partials; pass what's present
       full: q.full,
       street: q.street,
-      streetNumber: q.streetNumber,
-      postalCode: q.postalCode,
+      streetWithNumber: q.streetNumber,
+      "number.full": q.houseNumber,
+      zip: q.postalCode,
       city: q.city,
       region: q.region,
-      countryCode: q.countryCode,
+      country: q.countryCode,
     });
 
   const result: any = unwrap(res);
+  console.log(result);
   return {
     isValid: !!result?.isValid,
     location: mapLocation(result?.normalized ?? result),
@@ -290,29 +293,36 @@ export type LocationSearchType =
   | "zip"
   | "full";
 // Search locations (autocomplete for address fields)
+// api/locations.ts
 export async function searchLocations(
   type: LocationSearchType,
   value: string,
   countryCode?: string,
   limit = 10,
   offset = 0,
-  extraFilter: Record<string, any> = {} // 👈 allow callers to add filter
+  extraFilter: Record<string, any> = {},
+  opts: { allowEmpty?: boolean } = {}
 ): Promise<{ items: FxLocation[]; total: number; offset: number }> {
-  if (!value?.trim()) return { items: [], total: 0, offset: 0 };
+  const q = value?.trim() ?? "";
+  const allowEmpty = !!opts.allowEmpty;
+
+  // ✅ allow empty query when the caller explicitly asks for it
+  if (!q && !allowEmpty) return { items: [], total: 0, offset: 0 };
 
   const res = await fox
     .location()
     .setCustomId(`location-search-${type}`)
-    .setClientCountry(countryCode ?? DEFAULTS.clientCountry) // optional in browser
+    .setClientCountry(countryCode ?? DEFAULTS.clientCountry)
     .includeRequestDetails(false)
-    .setOptions({ resultsLimit: limit, resultsOffset: offset })
+    .setOptions({
+      resultsLimit: limit,
+      resultsOffset: offset,
+      dataScope: "full",
+    })
     .search({
-      type, // <-- important
-      value,
-      filter: {
-        country: countryCode,
-        ...extraFilter,
-      },
+      type,
+      value: q, // may be ""
+      filter: { country: countryCode, ...extraFilter },
     });
 
   const payload: any = res;
