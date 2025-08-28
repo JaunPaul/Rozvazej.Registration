@@ -21,6 +21,7 @@
     validateName,
     validatePhone,
   } from "./lib/foxentry";
+  import { getEndpoint } from "./lib/utils/getEndpoints";
 
   let locale: Locale = "cs";
   setLocale(locale);
@@ -35,6 +36,8 @@
   const formStep = params.get("state");
   let errors = $state({});
   let validating = $state(false);
+  let disable = $state(false);
+  let submitting = $state(false);
 
   let currentStep = $state(Steps.step1);
   if (formStep) {
@@ -235,6 +238,9 @@
       errors = fieldErrors;
       validating = false;
       if (ok && PageHelper.hasNoCustomErrors(errors)) {
+        if (currentStep === Steps.step1) {
+          const partial = await PageHelper.partialSubmit();
+        }
         currentStep = Steps[step];
         PageHelper.updateParamsWithState(step);
       }
@@ -243,7 +249,149 @@
       currentStep = Steps[step];
       PageHelper.updateParamsWithState(step);
     };
-    static submit = async () => {};
+    static submit = async () => {
+      disable = true;
+      submitting = true;
+      const endpoint = getEndpoint("final");
+
+      // Build a clean snapshot with files as File[]
+      const snapshot = {
+        ...values,
+        filesNationalId: PageHelper.toFiles(filesNationalId),
+        filesEuPassport: PageHelper.toFiles(filesEuPassport),
+        filesNonEu: PageHelper.toFiles(filesNonEu),
+        submitLocation: window.location.href,
+      };
+
+      // ---- FormData ----
+      const fd = new FormData();
+
+      // 1) Append scalar fields (string/number/boolean). JSON-encode any objects just in case.
+      for (const [k, v] of Object.entries(snapshot)) {
+        if (
+          k === "filesNationalId" ||
+          k === "filesEuPassport" ||
+          k === "filesNonEu"
+        )
+          continue;
+        if (v === undefined || v === null) continue;
+
+        if (
+          typeof v === "string" ||
+          typeof v === "number" ||
+          typeof v === "boolean"
+        ) {
+          fd.append(k, String(v));
+        } else {
+          // Nested objects (if any): send as JSON string
+          fd.append(k, JSON.stringify(v));
+        }
+      }
+
+      // 2) Append files. Choose ONE of the patterns below:
+
+      // (A) Single consolidated array 'files[]' with per-file metadata (bucket)
+      const appendFiles = (arr: File[], bucket: string) => {
+        arr?.forEach((file, idx) => {
+          fd.append("files[]", file, file.name);
+          // optional: parallel metadata so Make can tell which bucket this file came from
+          fd.append(
+            "files_meta[]",
+            JSON.stringify({
+              bucket,
+              idx,
+              name: file.name,
+              size: file.size,
+              type: file.type,
+            })
+          );
+        });
+      };
+
+      // (B) Separate arrays per bucket (if your Make scenario prefers distinct keys)
+      snapshot.filesNationalId?.forEach((f) =>
+        fd.append("filesNationalId[]", f, f.name)
+      );
+      snapshot.filesEuPassport?.forEach((f) =>
+        fd.append("filesEuPassport[]", f, f.name)
+      );
+      snapshot.filesNonEu?.forEach((f) => fd.append("filesNonEu[]", f, f.name));
+
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          body: fd, // ✅ browser sets multipart/form-data boundary
+          // mode: "cors",  // optional; usually not needed
+        });
+
+        const text = await res.text(); // Make usually returns JSON, but text keeps logging simple
+        console.log("Submit:", res.status, text);
+        if (!res.ok) {
+          console.error("Submit failed");
+        } else {
+          // success UI here if you want
+        }
+      } catch (err) {
+        console.error("Network error:", err);
+      }
+      disable = false;
+      submitting = false;
+    };
+    static partialSubmit = async () => {
+      disable = true;
+      const endpoint = getEndpoint("partial");
+
+      // Build a clean snapshot with files as File[]
+      const snapshot = {
+        ...values,
+        submitLocation: window.location.href,
+      };
+
+      // ---- FormData ----
+      const fd = new FormData();
+
+      // 1) Append scalar fields (string/number/boolean). JSON-encode any objects just in case.
+      for (const [k, v] of Object.entries(snapshot)) {
+        if (
+          k === "filesNationalId" ||
+          k === "filesEuPassport" ||
+          k === "filesNonEu"
+        )
+          continue;
+        if (v === undefined || v === null) continue;
+
+        if (
+          typeof v === "string" ||
+          typeof v === "number" ||
+          typeof v === "boolean"
+        ) {
+          fd.append(k, String(v));
+        } else {
+          // Nested objects (if any): send as JSON string
+          fd.append(k, JSON.stringify(v));
+        }
+      }
+
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          body: fd, // ✅ browser sets multipart/form-data boundary
+          // mode: "cors",  // optional; usually not needed
+        });
+
+        const text = await res.text(); // Make usually returns JSON, but text keeps logging simple
+        console.log("Submit:", res.status, text);
+        if (!res.ok) {
+          console.error("Submit failed");
+        } else {
+          // success UI here if you want
+        }
+      } catch (err) {
+        console.error("Network error:", err);
+      }
+
+      disable = false;
+    };
   }
 
   let emailHint = $state("");
@@ -453,7 +601,7 @@
     companyActive = false;
   }
 
-  $inspect(errors, values);
+  $inspect(errors);
 </script>
 
 <div>
@@ -465,7 +613,9 @@
             <div class="form-steps">
               <div class="step is-active"><div>{t("steps.1")}</div></div>
               <div class="step"><div>{t("steps.2")}</div></div>
-              <div class="step"><div>{t("steps.3")}</div></div>
+              {#if !values.applyAsCompany}
+                <div class="step"><div>{t("steps.3")}</div></div>
+              {/if}
             </div>
 
             <h2 class="heading is-regular">{t("step1.title")}</h2>
@@ -606,6 +756,7 @@
           <div></div>
           <button
             class="button w-button"
+            disabled={disable}
             onclick={() => PageHelper.next("step2")}
             >{validating ? t("nav.validate") : t("nav.next")}
           </button>
@@ -620,7 +771,9 @@
             <div class="form-steps">
               <div class="step"><div>{t("steps.1")}</div></div>
               <div class="step is-active"><div>{t("steps.2")}</div></div>
-              <div class="step"><div>{t("steps.3")}</div></div>
+              {#if !values.applyAsCompany}
+                <div class="step"><div>{t("steps.3")}</div></div>
+              {/if}
             </div>
 
             <h2 class="heading is-regular">{t("step2.title")}</h2>
@@ -736,7 +889,7 @@
                   id="passportOrId"
                   bind:value={values.passportOrId}
                 />
-                <Errors {errors} path="passporOrId"></Errors>
+                <Errors {errors} path="passportOrId"></Errors>
               </div>
             {/if}
 
@@ -1214,13 +1367,24 @@
         <div class="form-nav">
           <button
             class="button is-ghost w-button"
+            disabled={disable}
             onclick={() => PageHelper.prev("step1")}>{t("nav.prev")}</button
           >
-          <button
-            class="button w-button"
-            onclick={() => PageHelper.next("step3")}
-            >{validating ? t("nav.validate") : t("nav.next")}</button
-          >
+          {#if values.applyAsCompany}
+            <button
+              class="button w-button"
+              onclick={PageHelper.submit}
+              disabled={disable}
+              >{validating ? t("nav.validate") : t("nav.submit")}</button
+            >
+          {:else}
+            <button
+              class="button w-button"
+              onclick={() => PageHelper.next("step3")}
+              disabled={disable}
+              >{validating ? t("nav.validate") : t("nav.next")}</button
+            >
+          {/if}
         </div>
       </div>
     {/if}
@@ -1401,10 +1565,18 @@
         <div class="form-nav">
           <button
             class="button is-ghost w-button"
+            disabled={disable}
             onclick={() => PageHelper.prev("step2")}>{t("nav.prev")}</button
           >
-          <button class="button w-button"
-            >{validating ? t("nav.validate") : t("nav.submit")}</button
+          <button
+            class="button w-button"
+            onclick={PageHelper.submit}
+            disabled={disable}
+            >{validating
+              ? t("nav.validate")
+              : submitting
+                ? t("nav.wait")
+                : t("nav.submit")}</button
           >
         </div>
       </div>
