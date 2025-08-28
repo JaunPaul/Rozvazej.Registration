@@ -462,6 +462,8 @@
     }
     if (r.normalized) values.lastName = r.normalized;
   }
+
+  /* Address search */
   // App.svelte
   type AddressCtx = {
     street?: string;
@@ -476,9 +478,7 @@
     addrCtx.zip = s.postalCode ?? addrCtx.zip;
   }
   let suggestions = $state([]);
-  let companySuggestions = $state([]);
   let activeType: LocationSearchType | null = $state(null);
-  let companyActive = $state(false);
 
   const searchForAddress = debounce(
     async (type: LocationSearchType, q: string) => {
@@ -493,7 +493,7 @@
       );
       suggestions = r.items;
     },
-    100
+    50
   );
   const clean = <T extends Record<string, any>>(o: T): T =>
     Object.fromEntries(
@@ -531,16 +531,6 @@
     }
   }
 
-  const searchForCompany = debounce(async (q: string) => {
-    const r = await searchCompanies(q);
-
-    companySuggestions = Array.isArray(r?.items)
-      ? r.items
-      : Array.isArray(r)
-        ? r
-        : [];
-  }, 200);
-
   function apiTypeFor(field: LocationSearchType): LocationSearchType {
     return field === "street" ? "full" : field; // <-- search FULL when street has focus
   }
@@ -554,30 +544,7 @@
     setTimeout(() => {
       activeType = null;
       suggestions = [];
-    }, 120);
-  }
-
-  function onCompaniesFocus(type: LocationSearchType) {
-    companyActive = true;
-    queueCompanySearchForActive();
-  }
-
-  async function onCompaniesBlur() {
-    setTimeout(async () => {
-      companyActive = false;
-      companySuggestions = [];
-      const v = await validateCompany({
-        name: values.companName,
-        country: "CZ",
-        registrationNumber: values.companyId,
-      });
-      if (!v.isValid) {
-        errors.companyId = [t("errors.fox.company")];
-      } else {
-        delete errors.companyId;
-      }
-      console.log(v);
-    }, 120);
+    }, 200);
   }
 
   function currentQueryFor(type: LocationSearchType | null): string {
@@ -669,16 +636,6 @@
     searchForAddress(apiTypeFor(activeType), q);
   }
 
-  function queueCompanySearchForActive() {
-    const q = values.companyId;
-    if (q?.length === 0) {
-      // ← truthy length clears & returns
-      companySuggestions = [];
-      return;
-    }
-    searchForCompany(q);
-  }
-
   $effect(() => {
     if (!activeType) return;
     // track just the active field’s value
@@ -687,36 +644,23 @@
     queueSearchForActive();
   });
 
-  $effect(() => {
-    const streetNow = values.street;
-    void streetNow; // reactive read
-    // If user wipes or changes street, drop streetId so number search won’t be overly constrained
-    if (!streetNow?.trim()) {
-      addrCtx.streetId = undefined;
-      addrCtx.city = undefined;
-      addrCtx.zip = undefined;
-    }
-  });
+  values.__addressFromSuggestion ??= false;
 
   $effect(() => {
     void values.street;
-    addrCtx.street = values.street?.trim() || undefined;
+    values.__addressFromSuggestion = false;
+  });
+  $effect(() => {
+    void values.houseNumber;
+    values.__addressFromSuggestion = false;
   });
   $effect(() => {
     void values.city;
-    addrCtx.city = values.city?.trim() || undefined;
+    values.__addressFromSuggestion = false;
   });
   $effect(() => {
     void values.zip;
-    addrCtx.zip = normZip(values.zip) || undefined;
-  });
-
-  $effect(() => {
-    if (!companyActive) return;
-    // track just the active field’s value
-    const q = values.companyId;
-    void q; // establish reactive read
-    queueCompanySearchForActive();
+    values.__addressFromSuggestion = false;
   });
 
   // apply the picked suggestion into your form
@@ -735,6 +679,62 @@
     values.__addressFromSuggestion = true;
     suggestions = [];
     activeType = null;
+  }
+
+  $effect(() => {
+    if (!companyActive) return;
+    // track just the active field’s value
+    const q = values.companyId;
+    void q; // establish reactive read
+    queueCompanySearchForActive();
+  });
+  /* Address search end */
+
+  /* Company search */
+  let companySuggestions = $state([]);
+  let companyActive = $state(false);
+
+  const searchForCompany = debounce(async (q: string) => {
+    const r = await searchCompanies(q);
+
+    companySuggestions = Array.isArray(r?.items)
+      ? r.items
+      : Array.isArray(r)
+        ? r
+        : [];
+  }, 200);
+
+  function onCompaniesFocus(type: LocationSearchType) {
+    companyActive = true;
+    queueCompanySearchForActive();
+  }
+
+  async function onCompaniesBlur() {
+    setTimeout(async () => {
+      companyActive = false;
+      companySuggestions = [];
+      const v = await validateCompany({
+        name: values.companName,
+        country: "CZ",
+        registrationNumber: values.companyId,
+      });
+      if (!v.isValid) {
+        errors.companyId = [t("errors.fox.company")];
+      } else {
+        delete errors.companyId;
+      }
+      console.log(v);
+    }, 120);
+  }
+
+  function queueCompanySearchForActive() {
+    const q = values.companyId;
+    if (q?.length === 0) {
+      // ← truthy length clears & returns
+      companySuggestions = [];
+      return;
+    }
+    searchForCompany(q);
   }
 
   function applyCompanySuggestion(s: FxCompany) {

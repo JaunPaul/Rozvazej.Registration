@@ -58,9 +58,6 @@ const FOX_TO_LOCAL: Record<string, string[]> = {
   city: ["city"],
   zip: ["zip"],
   country: ["country"],
-  region: [],
-  district: [],
-  state: [],
 };
 
 const collectInvalidFoxKeys = (raw: any): string[] => {
@@ -69,67 +66,51 @@ const collectInvalidFoxKeys = (raw: any): string[] => {
   if (Array.isArray(inv)) inv.forEach((k: string) => set.add(k));
   const errs = raw?.errors;
   if (Array.isArray(errs)) {
-    for (const e of errs) {
+    for (const e of errs)
       (e?.relatedTo ?? []).forEach((k: string) => set.add(k));
-    }
   }
   return [...set];
 };
 
-const addressGroupValidator: FxGroupChecker = async (d, visible) => {
-  const errs: FieldErrors = {};
+const addressGroupValidator = async (d: any, visible: string[]) => {
+  const out: Record<string, string[]> = {};
+  const needs =
+    visible.includes("street") &&
+    visible.includes("houseNumber") &&
+    !d.applyAsCompany;
+  if (!needs) return out;
 
-  // If the user picked from suggestions, trust it
-  if (d.__addressFromSuggestion) return errs;
-
-  const street = d.street?.trim();
-  const num = d.houseNumber?.trim();
-  const city = d.city?.trim();
-  const zip = d.zip?.replace(/\s/g, "");
-  const countryCode = d.country || "CZ";
-
-  // Require both street & number to attempt validation
-  if (!street || !num) return errs;
+  if (d.__addressFromSuggestion) return out;
 
   const r = await validateLocation({
-    street,
-    streetNumber: street + " " + num,
-    houseNumber: num,
-    city,
-    postalCode: zip,
-    countryCode,
+    street: d.street,
+    houseNumber: d.houseNumber,
+    city: d.city,
+    postalCode: d.zip,
+    countryCode: d.country || "CZ",
   });
 
   if (!r.isValid) {
-    const raw: any = r.raw;
-    const foxKeys = collectInvalidFoxKeys(raw);
-    const msgGeneric = t("errors.fox.address"); // fallback
-
-    // If Foxentry didn’t specify anything, fall back to a generic address error
+    const foxKeys = collectInvalidFoxKeys(r.raw);
+    const generic = t("errors.fox.address");
     if (foxKeys.length === 0) {
-      errs.houseNumber = [msgGeneric];
+      out.houseNumber = [generic];
     } else {
       for (const k of foxKeys) {
-        const locals = FOX_TO_LOCAL[k] ?? [];
-        if (locals.length === 0) continue; // ignore unmapped keys like region/state
-        for (const fld of locals) {
-          const msg =
-            // if you have per-field messages, prefer them; else generic
-            t?.(`errors.fox.${fld}` as any) ?? msgGeneric;
-          (errs[fld] ??= []).push(msg);
-        }
+        const locals = FOX_TO_LOCAL[k] || [];
+        for (const f of locals)
+          (out[f] ??= []).push(t(`errors.fox.${f}`) ?? generic);
       }
     }
   } else if (r.location) {
-    // Normalize fields when valid
+    // normalize if you want
     d.street = r.location.street ?? d.street;
     d.houseNumber = r.location.streetNumber ?? d.houseNumber;
     d.city = r.location.city ?? d.city;
     d.zip = r.location.postalCode ?? d.zip;
     d.__addressFromSuggestion = true;
   }
-
-  return errs;
+  return out;
 };
 
 // register any group validators here

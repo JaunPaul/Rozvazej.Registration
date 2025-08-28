@@ -216,43 +216,47 @@ export async function searchCompanies(
 
 // --- LOCATION / ADDRESS ---
 // Validate a (partial or full) address. You can pass whatever you have; API will infer/correct.
-export async function validateLocation(
-  q: Partial<{
-    full: string;
-    street: string;
-    streetNumber: string;
-    houseNumber: string;
-    city: string;
-    postalCode: string;
-    region: string;
-    countryCode: string; // "CZ","SK","PL", etc.
-  }>
-): Promise<{
+type ValidateLocationInput = Partial<{
+  full: string;
+  street: string;
+  houseNumber: string; // e.g. "132/4"
+  city: string;
+  postalCode: string;
+  region: string;
+  countryCode: string; // ISO-3166-1 alpha-2 (e.g., "CZ")
+}>;
+
+export async function validateLocation(q: ValidateLocationInput): Promise<{
   isValid: boolean;
   location?: FxLocation;
   suggestion?: FxLocation;
   raw?: unknown;
 }> {
+  const street = q.street?.trim();
+  const house = q.houseNumber?.trim();
+  const city = q.city?.trim();
+  const zip = q.postalCode ? q.postalCode.replace(/\s/g, "") : undefined;
+  const country = q.countryCode ?? DEFAULTS.clientCountry;
+
+  // Build the correct payload
+  const payload: any = {
+    street: street || undefined,
+    streetWithNumber: street && house ? `${street} ${house}` : undefined,
+    "number.full": house ? house : undefined,
+    city: city || undefined,
+    zip: zip || undefined,
+    region: q.region || undefined,
+    country,
+  };
+
   const res = await fox
     .location()
     .setCustomId("location-validate")
-    .setClientIP(DEFAULTS.clientIP)
-    .setClientCountry(q.countryCode ?? DEFAULTS.clientCountry)
-    .includeRequestDetails(DEFAULTS.includeRequestDetails)
-    .validate({
-      // API 2.0 accepts partials; pass what's present
-      full: q.full,
-      street: q.street,
-      streetWithNumber: q.streetNumber,
-      "number.full": q.houseNumber,
-      zip: q.postalCode,
-      city: q.city,
-      region: q.region,
-      country: q.countryCode,
-    });
+    .setClientCountry(country)
+    .includeRequestDetails(false)
+    .validate(payload); // ✅ nested number / proper keys
 
   const result: any = unwrap(res);
-  console.log(result);
   return {
     isValid: !!result?.isValid,
     location: mapLocation(result?.normalized ?? result),
