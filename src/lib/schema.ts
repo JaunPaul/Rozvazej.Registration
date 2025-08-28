@@ -1,40 +1,39 @@
 import { z } from "zod";
+import { t } from "./i18n/i18n.svelte";
 
 // helper for file arrays
 const fileArray = (min: number) =>
   z
-    .array(z.instanceof(File), { error: "These files are required" })
+    .array(z.instanceof(File), { error: t("errors.files") })
     .min(min, { message: `At least ${min} files required` });
 
 export const formSchema = z.object({
   // step1
   firstName: z
-    .string({ error: "You must input a name" })
-    .min(1, { error: "First name is required" }),
-  lastName: z.string().min(1, { error: "Last name is required" }),
-  phone: z.string().min(1, { error: "Phone number is required" }),
+    .string({ error: t("errors.firstName") })
+    .min(1, { error: t("errors.firstName") }),
+  lastName: z.string().min(1, { error: t("errors.lastName") }),
+  phone: z.string().min(1, { error: t("errors.phone") }),
   email: z
-    .email({ error: "Email is invalid" })
-    .min(1, { error: "Email is required" }),
-  applyAsCompany: z.boolean({ error: "You must select an option" }),
+    .email({ error: t("errors.email") })
+    .min(1, { error: t("errors.email") }),
+  applyAsCompany: z.boolean({ error: t("errors.applyAsCompany") }),
 
   // step2
-  companyId: z
-    .string()
-    .min(1, { error: "Company registration number is required" }),
-  country: z.string().min(1, { error: "Citizensship is required" }),
-  nationalId: z.string().min(1, { error: "National ID is required" }),
-  passportOrId: z.string().min(1, { error: "Document ID is required" }),
-  street: z.string(),
-  houseNumber: z.string(),
-  city: z.string(),
-  zip: z.string(),
+  companyId: z.string().min(1, { error: t("errors.companyId") }),
+  country: z.string().min(1, { error: t("errors.country") }),
+  nationalId: z.string().min(1, { error: t("errors.nationalId") }),
+  passportOrId: z.string().min(1, { error: t("errors.passportOrId") }),
+  street: z.string().min(1, { error: t("errors.street") }),
+  houseNumber: z.string().min(1, { error: t("errors.houseNumber") }),
+  city: z.string().min(1, { error: t("errors.city") }),
+  zip: z.string().min(1, { error: t("errors.zip") }),
   bankPrefix: z
     .string()
-    .min(5, { error: "Bank prefix has 5 numbers" })
-    .max(5, { error: "Bank prefix has 5 numbers" }),
-  bankNumber: z.string().min(1, { error: "Bank account number is required" }),
-  bankCode: z.string().min(1, { error: "You must choose a bank code" }),
+    .min(5, { error: t("errors.bank.prefix") })
+    .max(5, { error: t("errors.bank.prefix") }),
+  bankNumber: z.string().min(1, { error: t("errors.bank.number") }),
+  bankCode: z.string().min(1, { error: t("errors.bank.code") }),
 
   filesNationalId: fileArray(2),
   filesEuPassport: fileArray(2),

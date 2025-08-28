@@ -403,13 +403,13 @@
     companyActive = false;
   }
 
-  $inspect(errors, companySuggestions, values);
+  $inspect(errors, values);
 </script>
 
 <div>
   <div class="form">
     {#if currentStep === Steps.step1}
-      <div class="form-step is-active">
+      <div in:fade class="form-step is-active">
         <div class="box has-24-gap">
           <div class="box has-8-gap">
             <div class="form-steps">
@@ -564,7 +564,7 @@
     {/if}
 
     {#if currentStep === Steps.step2}
-      <div class="form-step is-active">
+      <div in:fade class="form-step is-active">
         <div class="box has-24-gap">
           <div class="box has-8-gap">
             <div class="form-steps">
@@ -650,7 +650,7 @@
               </div>
             {/if}
 
-            {#if values.applyAsCompany === true && values.country === "CZ"}
+            {#if values.applyAsCompany === false && values.country === "CZ"}
               <div in:fade class="input-wrap">
                 <label for="nationalId" class="field-label"
                   >{t("labels.nationalId")}
@@ -708,6 +708,7 @@
                   onfocus={() => onAddressFocus("street")}
                   onblur={onAddressBlur}
                 />
+                <Errors {errors} path="street"></Errors>
                 {#if activeType === "street" && suggestions.length}
                   <ul class="sugg" role="listbox">
                     {#each suggestions as s}
@@ -742,6 +743,7 @@
                   onfocus={() => onAddressFocus("number.full")}
                   onblur={onAddressBlur}
                 />
+                <Errors {errors} path="houseNumber"></Errors>
                 {#if activeType === "number.full" && suggestions.length}
                   <ul class="sugg" role="listbox">
                     {#each suggestions as s}
@@ -777,6 +779,7 @@
                   onfocus={() => onAddressFocus("city")}
                   onblur={onAddressBlur}
                 />
+                <Errors {errors} path="city"></Errors>
                 {#if activeType === "city" && suggestions.length}
                   <ul class="sugg" role="listbox">
                     {#each suggestions as s}
@@ -810,6 +813,7 @@
                   onfocus={() => onAddressFocus("zip")}
                   onblur={onAddressBlur}
                 />
+                <Errors {errors} path="zip"></Errors>
                 {#if activeType === "zip" && suggestions.length}
                   <ul class="sugg" role="listbox">
                     {#each suggestions as s}
@@ -1172,7 +1176,7 @@
     {/if}
 
     {#if currentStep === Steps.step3}
-      <div class="form-step is-active">
+      <div in:fade class="form-step is-active">
         <div class="box has-24-gap">
           <div class="box has-8-gap">
             <div class="form-steps">
