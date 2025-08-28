@@ -29,9 +29,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.bank.prefix": "Předčíslí",
     "labels.bank.number": "Číslo bankovního účtu",
     "labels.bank.code": "Kód banky",
-    "labels.doc.nationalId": `Nahrajte ID/ jiný platný doklad. <br /><span class="bold-green">PŘEDNÍ STRANA</span><br /><span class="bold-green">ZADNÍ STRANA</span>`,
-    "labels.doc.euPassport": `Nahrajte svůj občanský průkaz nebo cestovní pas. <br /><span class="bold-green">PŘEDNÍ STRANA</span><br /><span class="bold-green">ZADNÍ STRANA</span>`,
-    "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">Průkaz totožnosti nebo cestovní pas</span><br /><span class="bold-green">Vízum NEBO povolení k pobytu NEBO Potvrzení o</span><br /><span class="bold-green">studiu nebo pracovní povolení</span>`,
+    "labels.doc.nationalId": `Nahrajte ID/ jiný platný doklad. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
+    "labels.doc.euPassport": `Nahrajte svůj občanský průkaz nebo cestovní pas. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
+    "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">1. Průkaz totožnosti nebo cestovní pas</span><br /><span class="bold-green">2. Vízum NEBO povolení k pobytu NEBO Potvrzení o</span><br /><span class="bold-green">2. studiu nebo pracovní povolení</span>`,
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
