@@ -17,10 +17,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.lastName": "Přijmení",
     "labels.phone": "Telefonní číslo",
     "labels.email": "Email",
-    "labels.companyId": "Číslo firmy",
+    "labels.companyId": "IČO",
     "labels.nationalId": "Rodné číslo",
-    "labels.applyAsCompany": "Podáváte žádost jako firma?",
-    "labels.passportOrId": "občanský průkaz nebo cestovní pas",
+    "labels.applyAsCompany": "Budete jezdit na IČO?",
+    "labels.passportOrId": "Číslo občanského průkazu nebo cestovního pasu",
     "labels.citizenship": "Státní občanství",
     "labels.street": "Ulice",
     "labels.houseNumber": "Číslo popisné",
@@ -46,12 +46,13 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "ph.firstName": "Zde napište své křestní jméno",
     "ph.lastName": "Zde napište své přijmení",
-    "ph.phone": "775111222",
+    "ph.phone": "777111222",
     "ph.email": "Zadejte svou e-mailovou adresu",
     "ph.nationalId": "Zadejte prosím číslo cestovního dokladu",
-    "ph.companyId": "Zadejte číslo vaší společnosti",
+    "ph.companyId": "Zadejte prosím IČO",
     "ph.bank.prefix": "Např. 12345",
-    "ph.passportOrId": "Zadejte ID nebo pas",
+    "ph.passportOrId":
+      "Zadejte číslo vašeho osobního dokladu nebo cestovního pasu",
 
     "errors.firstName": "Zadejte prosím své jméno",
     "errors.lastName": "Zadejte prosím své přijmení",
@@ -108,7 +109,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "options.transport.bike": "Kolo",
     "options.transport.motorcycle": "Motorka / Skútr",
     "options.transport.electricScooter": "Elektrická koloběžka",
-    "options.gender.male": "Samec",
+    "options.gender.male": "Muž",
     "options.gender.female": "Žena",
     "options.gender.other": "Ostatní",
 
@@ -165,7 +166,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.email": "Enter your email address",
     "ph.nationalId": "Your social security number",
     "ph.companyId": "Enter your company number",
-    "ph.bank.prefix": "Např. 12345",
+    "ph.bank.prefix": "12345",
     "ph.passportOrId": "Enter ID or passport number",
 
     "errors.firstName": "Please enter your first name",
