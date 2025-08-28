@@ -22,7 +22,7 @@
     validatePhone,
   } from "./lib/foxentry";
 
-  let locale: Locale = "en";
+  let locale: Locale = "cs";
   setLocale(locale);
 
   const Steps = {
