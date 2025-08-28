@@ -8,7 +8,7 @@
   import {
     getRequiredIds,
     getVisibleIds,
-    validateStep,
+    validateStepAsync,
   } from "./lib/utils/validation";
   import Errors from "./lib/components/Errors.svelte";
   import {
@@ -34,6 +34,7 @@
   const params = new URLSearchParams(window.location.search);
   const formStep = params.get("state");
   let errors = $state({});
+  let validating = $state(false);
 
   let currentStep = $state(Steps.step1);
   if (formStep) {
@@ -135,7 +136,7 @@
     companyName: "",
     nationalId: "",
     passportOrId: "",
-    applyAsCompany: true,
+    applyAsCompany: undefined,
     address: "",
     country: "",
     street: "",
@@ -180,7 +181,8 @@
       Array.isArray(v) ? v : v ? Array.from(v) : [];
 
     static validate = async (path: "step" | "final") => {};
-    static next = (step: "step2" | "step3") => {
+    static next = async (step: "step2" | "step3") => {
+      validating = true;
       const valuesToValidate = {
         ...values,
         filesNationalId: PageHelper.toFiles(filesNationalId),
@@ -188,12 +190,18 @@
         filesNonEu: PageHelper.toFiles(filesNonEu),
       };
 
-      const validationResult = validateStep(currentStep, valuesToValidate);
-      if (validationResult.ok && PageHelper.hasNoCustomErrors(errors)) {
+      const { ok, fieldErrors } = await validateStepAsync(
+        currentStep,
+        valuesToValidate
+      );
+
+      // merge with any preexisting custom errors you maintain elsewhere
+      errors = fieldErrors;
+      validating = false;
+      if (ok && PageHelper.hasNoCustomErrors(errors)) {
         currentStep = Steps[step];
         PageHelper.updateParamsWithState(step);
       }
-      errors = { ...errors, ...validationResult.fieldErrors };
     };
     static prev = (step: "step1" | "step2") => {
       currentStep = Steps[step];
@@ -549,7 +557,7 @@
           <button
             class="button w-button"
             onclick={() => PageHelper.next("step2")}
-            >{t("nav.next")}
+            >{validating ? t("nav.validate") : t("nav.next")}
           </button>
         </div>
       </div>
@@ -1156,7 +1164,8 @@
           >
           <button
             class="button w-button"
-            onclick={() => PageHelper.next("step3")}>{t("nav.next")}</button
+            onclick={() => PageHelper.next("step3")}
+            >{validating ? t("nav.validate") : t("nav.next")}</button
           >
         </div>
       </div>
@@ -1341,7 +1350,9 @@
             class="button is-ghost w-button"
             onclick={() => PageHelper.prev("step2")}>{t("nav.prev")}</button
           >
-          <button class="button w-button">{t("nav.submit")}</button>
+          <button class="button w-button"
+            >{validating ? t("nav.validate") : t("nav.submit")}</button
+          >
         </div>
       </div>
     {/if}

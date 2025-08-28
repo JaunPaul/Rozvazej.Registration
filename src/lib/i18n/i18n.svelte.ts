@@ -71,6 +71,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat",
     "nav.submit": "Odeslat",
+    "nav.validate": "Validating...",
     "nav.wait": "Prosím čekejte..",
 
     "step2.title": "Už jen pár údajů",
@@ -182,6 +183,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "nav.next": "Continue",
     "nav.submit": "Submit",
     "nav.wait": "Please wait…",
+    "nav.validate": "Validating...",
 
     "step2.title": "Just a few more details",
     "step2.lead":
