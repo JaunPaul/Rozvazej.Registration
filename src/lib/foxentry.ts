@@ -118,14 +118,31 @@ export async function validatePhone(
 }
 
 // --- NAME ---
-export async function validateName(name: string): Promise<FxValidity> {
+type ValidateNameOptions = {
+  dataScope?: "basic";
+  acceptDegrees?: boolean;
+  acceptContext?: boolean;
+  validationDepth?: "minimal" | "deep";
+  smartMode?: boolean;
+};
+
+export async function validateName(
+  value: string,
+  type: "name" | "surname",
+  opts: ValidateNameOptions = {
+    dataScope: "basic",
+    acceptDegrees: false,
+    acceptContext: false,
+    validationDepth: "minimal",
+    smartMode: true,
+  }
+): Promise<FxValidity> {
   const res = await fox
     .name()
     .setCustomId("name-check")
-    .setClientIP(DEFAULTS.clientIP)
-    .setClientCountry(DEFAULTS.clientCountry)
+    .setOptions(opts)
     .includeRequestDetails(DEFAULTS.includeRequestDetails)
-    .validate({ name });
+    .validate({ [type]: value });
 
   const result: any = unwrap(res);
   return {

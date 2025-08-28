@@ -15,6 +15,7 @@
     debounce,
     searchLocations,
     validateEmail,
+    validateName,
     validatePhone,
   } from "./lib/foxentry";
 
@@ -204,7 +205,6 @@
     if (r.normalized) values.email = r.normalized;
   }
 
-  let phoneErr = $state("");
   async function onBlurPhone() {
     if (values.phone.length == 0) return;
     const r = await validatePhone(values.phone);
@@ -215,6 +215,30 @@
       delete errors.phone;
     }
     if (r.normalized) values.phone = r.normalized;
+  }
+
+  async function onBlurFirstName() {
+    if (values.firstName.length == 0) return;
+    const r = await validateName(values.firstName, "name");
+    console.log(r);
+    if (!r.isValid) {
+      errors.firstName = [t("errors.fox.firstName")];
+    } else {
+      delete errors.firstName;
+    }
+    if (r.normalized) values.firstName = r.normalized;
+  }
+
+  async function onBlurLastName() {
+    if (values.lastName.length == 0) return;
+    const r = await validateName(values.lastName, "surname");
+    console.log(r);
+    if (!r.isValid) {
+      errors.lastName = [t("errors.fox.lastName")];
+    } else {
+      delete errors.lastName;
+    }
+    if (r.normalized) values.lastName = r.normalized;
   }
 
   $inspect(errors);
@@ -326,6 +350,7 @@
                   id="firstName"
                   required
                   bind:value={values.firstName}
+                  onblur={onBlurFirstName}
                 />
                 <Errors {errors} path="firstName"></Errors>
               </div>
@@ -343,6 +368,7 @@
                   id="lastName"
                   required
                   bind:value={values.lastName}
+                  onblur={onBlurLastName}
                 />
                 <Errors {errors} path="lastName"></Errors>
               </div>

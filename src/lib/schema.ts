@@ -31,7 +31,7 @@ export const formSchema = z.object({
   zip: z.string(),
   bankPrefix: z
     .string()
-    .min(1, { error: "Bank prefix is required" })
+    .min(5, { error: "Bank prefix has 5 numbers" })
     .max(5, { error: "Bank prefix has 5 numbers" }),
   bankNumber: z.string().min(1, { error: "Bank account number is required" }),
   bankCode: z.string().min(1, { error: "You must choose a bank code" }),
