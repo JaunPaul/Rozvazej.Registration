@@ -169,6 +169,42 @@
   >;
 
   abstract class PageHelper {
+    static normalizeCzPhone(input: string): string | null {
+      const s = (input ?? "").trim();
+      if (!s) return null;
+
+      const digits = s.replace(/\D/g, ""); // keep digits only
+
+      // Case 1: already +E.164
+      if (s.startsWith("+")) {
+        // must be +420 followed by 9 digits
+        if (digits.startsWith("420") && digits.length === 12)
+          return `+${digits}`;
+        return null; // not a CZ E.164 number
+      }
+
+      // Case 2: international 00 prefix
+      if (digits.startsWith("00420") && digits.length === 14) {
+        return `+420${digits.slice(5)}`;
+      }
+
+      // Case 3: national forms
+      //   - 10 digits starting with 0: drop the 0 and prefix +420
+      if (digits.length === 10 && digits.startsWith("0")) {
+        return `+420${digits.slice(1)}`;
+      }
+      //   - 9 digits (typical CZ local): prefix +420
+      if (digits.length === 9) {
+        return `+420${digits}`;
+      }
+
+      // Case 4: already 420xxxxxxxxx without plus
+      if (digits.startsWith("420") && digits.length === 12) {
+        return `+${digits}`;
+      }
+
+      return null; // unsupported shape
+    }
     static hasNoCustomErrors = (err?: CustomErrors | null): boolean =>
       !err || Object.keys(err).length === 0;
     static updateParamsWithState(state: string): void {
@@ -229,15 +265,29 @@
   }
 
   async function onBlurPhone() {
-    if (values.phone.length == 0) return;
-    const r = await validatePhone(values.phone);
+    const raw = values.phone;
+    if (!raw || raw.trim().length === 0) return;
 
+    const normalized = PageHelper.normalizeCzPhone(raw);
+    if (!normalized) {
+      errors.phone = [t("errors.phone")]; // "Enter a valid CZ number"
+      return;
+    }
+
+    values.phone = normalized;
+
+    // Optional: confirm with Foxentry
+    const r = await validatePhone(values.phone, { country: "CZ" });
     if (!r.isValid) {
       errors.phone = [t("errors.phone")];
     } else {
       delete errors.phone;
     }
-    if (r.normalized) values.phone = r.normalized;
+
+    // If Foxentry returns a nicer canonical form, adopt it
+    if (r.normalized && r.normalized !== values.phone) {
+      values.phone = r.normalized;
+    }
   }
 
   async function onBlurFirstName() {
@@ -1252,7 +1302,6 @@
                   >
                   <option value="samec">{t("options.gender.male")}</option>
                   <option value="zena">{t("options.gender.female")}</option>
-                  <option value="ostatní">{t("options.gender.other")}</option>
                 </select>
               </div>
               <div class="input-wrap">

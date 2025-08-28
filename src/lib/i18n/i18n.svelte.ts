@@ -31,7 +31,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.bank.code": "Kód banky",
     "labels.doc.nationalId": `Nahrajte ID/ jiný platný doklad. <br /><span class="bold-green">PŘEDNÍ STRANA</span><br /><span class="bold-green">ZADNÍ STRANA</span>`,
     "labels.doc.euPassport": `Nahrajte svůj občanský průkaz nebo cestovní pas. <br /><span class="bold-green">PŘEDNÍ STRANA</span><br /><span class="bold-green">ZADNÍ STRANA</span>`,
-    "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">OBČANSKÝ PRŮKAZ NEBO CESTOVNÍ PAS</span><br /><span class="bold-green">VÍZUM NEBO POVOLENÍ K POBYTU</span><br /><span class="bold-green">STUDIE NEBO POVOLENÍ</span>`,
+    "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">Průkaz totožnosti nebo cestovní pas</span><br /><span class="bold-green">Vízum NEBO povolení k pobytu NEBO Potvrzení o</span><br /><span class="bold-green">studiu nebo pracovní povolení</span>`,
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
@@ -48,7 +48,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.lastName": "Zde napište své přijmení",
     "ph.phone": "0775111222",
     "ph.email": "Zadejte svou e-mailovou adresu",
-    "ph.nationalId": "Vaše rodné číslo",
+    "ph.nationalId": "Zadejte prosím číslo cestovního dokladu",
     "ph.companyId": "Zadejte číslo vaší společnosti",
     "ph.bank.prefix": "Např. 12345",
     "ph.passportOrId": "Zadejte ID nebo pas",
@@ -65,7 +65,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.city": "Zadejte prosím město či obec",
     "errors.zip": "Zadejte prosím poštovní směrovací číslo",
     "errors.bank.number": "Zadejte prosím vaše číslo účtu",
+    "errors.bank.code": "Vyberte možnost",
     "errors.applyAsCompany": "Vyberte možnost",
+    "errors.files": "Požadované soubory: ",
     "errors.fox.company":
       "We could not find this company. Please search and select your company using the registration number.",
 
@@ -133,7 +135,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.email": "Email",
     "labels.companyId": "Company ID Number",
     "labels.passportOrId": "ID card or passport",
-    "labels.nationalId": "National ID number",
+    "labels.nationalId": "Social Security number",
     "labels.applyAsCompany": "Are you applying as a company?",
     "labels.citizenship": "Citizenship",
     "labels.street": "Street",
@@ -160,7 +162,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.lastName": "Type your last name",
     "ph.phone": "0775111222",
     "ph.email": "Enter your email address",
-    "ph.nationalId": "Your national ID number",
+    "ph.nationalId": "Your social security number",
     "ph.companyId": "Enter your company number",
     "ph.bank.prefix": "Např. 12345",
     "ph.passportOrId": "Enter ID or passport number",
@@ -171,13 +173,15 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.fox.lastName": "Please enter a valid last name",
     "errors.phone": "Enter a Czech phone number in the format XXX XXX XXXX.",
     "errors.email": "Please enter your email",
-    "errors.nationalId": "Enter a valid national ID number.",
+    "errors.nationalId": "Enter a valid national social security number.",
     "errors.street": "Please enter the street name",
     "errors.houseNumber": "Please enter the house number",
     "errors.city": "Please enter the city or town",
     "errors.zip": "Please enter the postal code",
     "errors.bank.number": "Please enter your bank account number",
+    "errors.bank.code": "Please select an option",
     "errors.applyAsCompany": "Please select an option",
+    "errors.files": "Files required: ",
     "errors.fox.company":
       "We could not find this company. Please search and select your company using the registration number.",
 

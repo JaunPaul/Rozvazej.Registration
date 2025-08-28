@@ -92,7 +92,6 @@ export async function validatePhone(
     allowedPrefixes: ["+420"];
   }
 ): Promise<FxValidity> {
-  const strippedNumber = phone.replace(/\s+/g, "").replace(/^0+/, "");
   const res = await fox
     .phone()
     .setCustomId("phone-check")
@@ -104,7 +103,7 @@ export async function validatePhone(
       correctionMode: opts?.correctionMode ?? "full",
       allowedPrefixes: opts?.allowedPrefixes ?? ["+420"],
     })
-    .validate({ numberWithPrefix: "+420" + strippedNumber });
+    .validate({ numberWithPrefix: phone });
 
   const result: any = unwrap(res);
   return {
