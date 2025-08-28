@@ -87,28 +87,26 @@ export async function validateEmail(
 export async function validatePhone(
   phone: string,
   opts?: {
-    // see API docs: formatNumber, allowFormattedWithSpaces, preferredCallingCodes, validationType
-    formatNumber?: "E164" | "INTERNATIONAL" | "NATIONAL";
-    allowSpaces?: boolean;
-    preferredCallingCodes?: string[]; // e.g. ["+27","+420"]
-    validationType?: "basic" | "extended"; // extended checks line existence where supported
-    defaultCountryCode?: string; // if user types national format
+    validationType: "basic";
+    preferredPrefixes: ["+420"];
+    formatNumber: false;
+    correctionMode: "full";
+    allowedPrefixes: ["+420"];
   }
 ): Promise<FxValidity> {
+  const strippedNumber = phone.replace(/\s+/g, "").replace(/^0+/, "");
   const res = await fox
     .phone()
     .setCustomId("phone-check")
-    .setClientIP(DEFAULTS.clientIP)
-    .setClientCountry(opts?.defaultCountryCode ?? DEFAULTS.clientCountry)
     .includeRequestDetails(DEFAULTS.includeRequestDetails)
     .setOptions({
-      formatNumber: opts?.formatNumber ?? "E164",
-      allowFormattedWithSpaces: opts?.allowSpaces ?? true,
-      preferredCallingCodes: opts?.preferredCallingCodes,
-      validationType: opts?.validationType ?? "extended",
-      defaultCountryCode: opts?.defaultCountryCode, // helps disambiguate national numbers
+      validationType: opts?.validationType ?? "basic",
+      preferredPrefixes: opts?.preferredPrefixes ?? ["+420"],
+      formatNumber: opts?.formatNumber ?? false,
+      correctionMode: opts?.correctionMode ?? "full",
+      allowedPrefixes: opts?.allowedPrefixes ?? ["+420"],
     })
-    .validate({ phone });
+    .validate({ numberWithPrefix: "+420" + strippedNumber });
 
   const result: any = unwrap(res);
   return {

@@ -45,7 +45,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "ph.firstName": "Zde napište své křestní jméno",
     "ph.lastName": "Zde napište své přijmení",
-    "ph.phone": "+420",
+    "ph.phone": "0775111222",
     "ph.email": "Zadejte svou e-mailovou adresu",
     "ph.nationalId": "Vaše rodné číslo",
     "ph.companyId": "Zadejte číslo vaší společnosti",
@@ -53,8 +53,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "errors.firstName": "Zadejte prosím své jméno",
     "errors.lastName": "Zadejte prosím své přijmení",
-    "errors.phone":
-      "Zadejte české telefonní číslo ve formátu +420 XXX XXX XXX.",
+    "errors.phone": "Zadejte české telefonní číslo ve formátu XXX XXX XXXX.",
     "errors.email": "Zadejte prosím svůj email",
     "errors.nationalId": "Zadejte platné rodné číslo.",
     "errors.street": "Zadejte prosím název ulice",
@@ -150,7 +149,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "ph.firstName": "Type your first name",
     "ph.lastName": "Type your last name",
-    "ph.phone": "+420",
+    "ph.phone": "0775111222",
     "ph.email": "Enter your email address",
     "ph.nationalId": "Your national ID number",
     "ph.companyId": "Enter your company number",
@@ -158,8 +157,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "errors.firstName": "Please enter your first name",
     "errors.lastName": "Please enter your last name",
-    "errors.phone":
-      "Enter a Czech phone number in the format +420 XXX XXX XXX.",
+    "errors.phone": "Enter a Czech phone number in the format XXX XXX XXXX.",
     "errors.email": "Please enter your email",
     "errors.nationalId": "Enter a valid national ID number.",
     "errors.street": "Please enter the street name",

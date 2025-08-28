@@ -11,7 +11,12 @@
     validateStep,
   } from "./lib/utils/validation";
   import Errors from "./lib/components/Errors.svelte";
-  import { debounce, searchLocations, validateEmail } from "./lib/foxentry";
+  import {
+    debounce,
+    searchLocations,
+    validateEmail,
+    validatePhone,
+  } from "./lib/foxentry";
 
   let locale: Locale = "en";
   setLocale(locale);
@@ -26,7 +31,7 @@
   const formStep = params.get("state");
   let errors = $state({});
 
-  let currentStep = $state(Steps.step2);
+  let currentStep = $state(Steps.step1);
   if (formStep) {
     currentStep = Steps[formStep];
   }
@@ -180,19 +185,39 @@
     };
     static submit = async () => {};
   }
-  let emailErr = $state("");
+
   let emailHint = $state("");
   async function onBlurEmail() {
     const r = await validateEmail(values.email, {
       acceptDisposableEmails: false,
     });
-    emailErr = r.isValid ? "" : "Invalid email";
+
+    if (!r.isValid) {
+      errors.email = [t("errors.email")];
+    } else {
+      delete errors.email;
+    }
     emailHint =
-      r.suggestion && r.suggestion !== email
+      r.suggestion && r.suggestion !== values.email
         ? `Did you mean ${r.suggestion}?`
         : "";
-    if (r.normalized) email = r.normalized;
+    if (r.normalized) values.email = r.normalized;
   }
+
+  let phoneErr = $state("");
+  async function onBlurPhone() {
+    if (values.phone.length == 0) return;
+    const r = await validatePhone(values.phone);
+
+    if (!r.isValid) {
+      errors.phone = [t("errors.phone")];
+    } else {
+      delete errors.phone;
+    }
+    if (r.normalized) values.phone = r.normalized;
+  }
+
+  $inspect(errors);
 
   let suggestions = $state([]);
   let activeType: LocationSearchType | null = $state(null);
@@ -268,8 +293,6 @@
     suggestions = [];
     activeType = null;
   }
-
-  $inspect(activeType, apiTypeFor(activeType));
 </script>
 
 <div>
@@ -340,6 +363,7 @@
                   id="phone"
                   required
                   bind:value={values.phone}
+                  onblur={onBlurPhone}
                 />
                 <div class="text-explain">
                   {@html t("hints.czPhone")}
