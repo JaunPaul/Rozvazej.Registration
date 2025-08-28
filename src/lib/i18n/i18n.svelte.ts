@@ -65,6 +65,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.city": "Zadejte prosím město či obec",
     "errors.zip": "Zadejte prosím poštovní směrovací číslo",
     "errors.bank.number": "Zadejte prosím vaše číslo účtu",
+    "errors.fox.company":
+      "We could not find this company. Please search and select your company using the registration number.",
 
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat",
@@ -173,6 +175,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.city": "Please enter the city or town",
     "errors.zip": "Please enter the postal code",
     "errors.bank.number": "Please enter your bank account number",
+    "errors.fox.company":
+      "We could not find this company. Please search and select your company using the registration number.",
 
     "nav.prev": "Back",
     "nav.next": "Continue",

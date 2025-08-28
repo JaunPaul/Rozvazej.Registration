@@ -155,8 +155,8 @@ export async function validateName(
 // Validate a specific company string (name, reg id, etc.)
 export async function validateCompany(query: {
   name?: string;
-  registrationId?: string;
-  vatId?: string;
+  country?: string;
+  registrationNumber?: string;
 }): Promise<FxCompany & FxValidity> {
   const res = await fox
     .company()

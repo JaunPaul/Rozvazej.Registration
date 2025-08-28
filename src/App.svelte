@@ -16,6 +16,7 @@
     type FxCompany,
     searchCompanies,
     searchLocations,
+    validateCompany,
     validateEmail,
     validateName,
     validatePhone,
@@ -156,7 +157,19 @@
     filesNonEu: [],
   });
 
+  type CustomErrors = Record<
+    string,
+    | undefined
+    | null
+    | string
+    | string[]
+    | Record<string, any>
+    | Array<string | Record<string, any>>
+  >;
+
   abstract class PageHelper {
+    static hasNoCustomErrors = (err?: CustomErrors | null): boolean =>
+      !err || Object.keys(err).length === 0;
     static updateParamsWithState(state: string): void {
       const params = new URLSearchParams(window.location.search);
       params.set("state", state);
@@ -170,17 +183,17 @@
     static next = (step: "step2" | "step3") => {
       const valuesToValidate = {
         ...values,
-        filesNationalId: this.toFiles(filesNationalId),
-        filesEuPassport: this.toFiles(filesEuPassport),
-        filesNonEu: this.toFiles(filesNonEu),
+        filesNationalId: PageHelper.toFiles(filesNationalId),
+        filesEuPassport: PageHelper.toFiles(filesEuPassport),
+        filesNonEu: PageHelper.toFiles(filesNonEu),
       };
 
       const validationResult = validateStep(currentStep, valuesToValidate);
-      if (validationResult.ok) {
+      if (validationResult.ok && PageHelper.hasNoCustomErrors(errors)) {
         currentStep = Steps[step];
         PageHelper.updateParamsWithState(step);
       }
-      errors = validationResult.fieldErrors;
+      errors = { ...errors, ...validationResult.fieldErrors };
     };
     static prev = (step: "step1" | "step2") => {
       currentStep = Steps[step];
@@ -287,10 +300,21 @@
     queueCompanySearchForActive();
   }
 
-  function onCompaniesBlur() {
-    setTimeout(() => {
+  async function onCompaniesBlur() {
+    setTimeout(async () => {
       companyActive = false;
       companySuggestions = [];
+      const v = await validateCompany({
+        name: values.companName,
+        country: "CZ",
+        registrationNumber: values.companyId,
+      });
+      if (!v.isValid) {
+        errors.companyId = [t("errors.fox.company")];
+      } else {
+        delete errors.companyId;
+      }
+      console.log(v);
     }, 120);
   }
 
@@ -578,6 +602,13 @@
                     {/each}
                   </ul>
                 {/if}
+                {#if !companyActive}
+                  <div class="text-explain">
+                    {values.companyName}
+                    {values.companyId}
+                  </div>
+                {/if}
+
                 <Errors {errors} path="companyId"></Errors>
               </div>
             {/if}
