@@ -46,7 +46,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "ph.firstName": "Zde napište své křestní jméno",
     "ph.lastName": "Zde napište své přijmení",
-    "ph.phone": "0775111222",
+    "ph.phone": "775111222",
     "ph.email": "Zadejte svou e-mailovou adresu",
     "ph.nationalId": "Zadejte prosím číslo cestovního dokladu",
     "ph.companyId": "Zadejte číslo vaší společnosti",
@@ -160,7 +160,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "ph.firstName": "Type your first name",
     "ph.lastName": "Type your last name",
-    "ph.phone": "0775111222",
+    "ph.phone": "775111222",
     "ph.email": "Enter your email address",
     "ph.nationalId": "Your social security number",
     "ph.companyId": "Enter your company number",
