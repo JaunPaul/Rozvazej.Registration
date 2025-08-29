@@ -16,28 +16,28 @@ type FxChecker = (data: any) => Promise<string | undefined>;
 // Map only the fields Foxentry can validate
 const fxValidators: Record<string, FxChecker> = {
   firstName: async (d) => {
-    if (!d.firstName) return t("errors.firstName");
+    if (!d.firstName) return;
     const r = await validateName(d.firstName, "name");
     return r.isValid ? undefined : t("errors.fox.firstName");
   },
   lastName: async (d) => {
-    if (!d.lastName) return t("errors.lastName");
+    if (!d.lastName) return;
     const r = await validateName(d.lastName, "surname");
     return r.isValid ? undefined : t("errors.fox.lastName");
   },
   email: async (d) => {
-    if (!d.email) return t("errors.email");
+    if (!d.email) return;
     const r = await validateEmail(d.email);
     return r.isValid ? undefined : t("errors.fox.email");
   },
   phone: async (d) => {
-    if (!d.phone) return t("errors.phone");
+    if (!d.phone) return;
     const r = await validatePhone(d.phone);
     return r.isValid ? undefined : t("errors.fox.phone");
   },
   companyId: async (d) => {
     if (d.applyAsCompany !== true) return; // not visible/required in this branch
-    if (!d.companyId) return t("errors.companyId");
+    if (!d.companyId) return;
     const r = await validateCompany({
       name: d.companyName, // optional if you have it
       country: "CZ",

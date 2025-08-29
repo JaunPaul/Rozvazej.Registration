@@ -75,9 +75,7 @@ export const formSchema = z.object({
     .min(1, { error: t("errors.firstName") }),
   lastName: z.string().min(1, { error: t("errors.lastName") }),
   phone: z.string().min(1, { error: t("errors.phone") }),
-  email: z
-    .email({ error: t("errors.email") })
-    .min(1, { error: t("errors.email") }),
+  email: z.email({ error: t("errors.email") }),
   applyAsCompany: z.boolean({ error: t("errors.applyAsCompany") }),
 
   // step2
