@@ -331,6 +331,8 @@
           console.error("Submit failed");
         } else {
           // success UI here if you want
+          const welcome = "/vitejte";
+          window.location.replace(welcome);
         }
       } catch (err) {
         console.error("Network error:", err);
