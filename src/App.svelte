@@ -1297,24 +1297,24 @@
                 </div>
               </div>
             </div>
-            <div class="input-group-wrap">
-              {#snippet fileItem(f: File, b: Bucket)}
-                <div tabindex="-1" class="w-file-upload-success mt-4 mr-2">
-                  <div class="w-file-upload-file">
-                    <div class="w-file-upload-file-name">
-                      {f.name}
-                    </div>
-                    <button
-                      aria-label="Remove file"
-                      tabindex="0"
-                      class="w-file-remove-link"
-                      onclick={() => removeFileFrom(b, f)}
-                    >
-                      <div class="w-icon-file-upload-remove"></div>
-                    </button>
+            {#snippet fileItem(f: File, b: Bucket)}
+              <div tabindex="-1" class="w-file-upload-success mt-4 mr-2">
+                <div class="w-file-upload-file">
+                  <div class="w-file-upload-file-name">
+                    {f.name}
                   </div>
+                  <button
+                    aria-label="Remove file"
+                    tabindex="0"
+                    class="w-file-remove-link"
+                    onclick={() => removeFileFrom(b, f)}
+                  >
+                    <div class="w-icon-file-upload-remove"></div>
+                  </button>
                 </div>
-              {/snippet}
+              </div>
+            {/snippet}
+            <div class="input-group-wrap">
               {#if values.country === "CZ"}
                 <div class="upload">
                   <label for="Ulice" class="field-label"
@@ -1735,7 +1735,7 @@
   </div>
 </div>
 
-<style>
+<!-- <style>
   .upload-button {
     background-color: transparent;
   }
@@ -1813,12 +1813,4 @@
     font-size: 0.85em;
   }
 
-  /* 4) Make sure the input sits above borders while focused */
-  .input-2.w-input:focus {
-    position: relative;
-    z-index: 1001;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25); /* nice focus ring */
-    border-color: rgba(99, 102, 241, 0.4);
-  }
-</style>
+</style> -->

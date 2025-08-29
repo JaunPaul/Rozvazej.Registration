@@ -9,7 +9,7 @@ fox.setAuth(FOXENTRY_API_KEY);
 // Optional defaults applied to all requests (tweak as needed)
 const DEFAULTS = {
   clientIP: "127.0.0.1",
-  clientCountry: "CZ", // JP is in South Africa; set to user's country code dynamically if you have it
+  clientCountry: "CZ", // set to user's country code dynamically if you have it
   includeRequestDetails: false,
 };
 

@@ -14,11 +14,11 @@
   </ul>
 {/if}
 
-<style>
+<!-- <style>
   .errors {
     list-style-type: none;
     margin: 8px 0px 0px 0px;
     padding: 0px 0px 8px 0px;
     color: indianred;
   }
-</style>
+</style> -->
