@@ -452,6 +452,7 @@
       utm_medium: undefined,
       utm_id: undefined,
     },
+    language: locale,
   });
 
   $effect(() => {
