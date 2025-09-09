@@ -141,7 +141,7 @@
     static submit = async () => {
       disable = true;
       submitting = true;
-      const endpoint = getEndpoint("final");
+      const endpoint = getEndpoint("dev");
 
       // Build a clean snapshot with files as File[]
       const snapshot = {
@@ -149,6 +149,7 @@
         filesNationalId: PageHelper.toFiles(filesNationalId),
         filesEuPassport: PageHelper.toFiles(filesEuPassport),
         filesNonEu: PageHelper.toFiles(filesNonEu),
+        filesDriversLicense: PageHelper.toFiles(filesDriversLicense),
         submitLocation: window.location.href,
       };
 
@@ -160,7 +161,8 @@
         if (
           k === "filesNationalId" ||
           k === "filesEuPassport" ||
-          k === "filesNonEu"
+          k === "filesNonEu" ||
+          k === "filesDriversLicense"
         )
           continue;
         if (v === undefined || v === null) continue;
@@ -205,6 +207,9 @@
         fd.append("filesEuPassport[]", f, f.name)
       );
       snapshot.filesNonEu?.forEach((f) => fd.append("filesNonEu[]", f, f.name));
+      snapshot.filesDriversLicense?.forEach((f) =>
+        fd.append("filesDriversLicense[]", f, f.name)
+      );
 
       try {
         const res = await fetch(endpoint, {
@@ -246,7 +251,8 @@
         if (
           k === "filesNationalId" ||
           k === "filesEuPassport" ||
-          k === "filesNonEu"
+          k === "filesNonEu" ||
+          k === "filesDriversLicense"
         )
           continue;
         if (v === undefined || v === null) continue;
@@ -317,8 +323,10 @@
   let filesNationalIdInput: HTMLInputElement | undefined = $state();
   let filesEuPassportInput: HTMLInputElement | undefined = $state();
   let filesNonEuInput: HTMLInputElement | undefined = $state();
+  let filesDriversLicense: FileList | undefined = $state();
+  let filesDriversLicenseInput: HTMLInputElement | undefined = $state();
 
-  type Bucket = "nationalId" | "euPassport" | "nonEu";
+  type Bucket = "nationalId" | "euPassport" | "nonEu" | "driversLicense";
 
   function toFileList(files: File[]): FileList {
     const dt = new DataTransfer();
@@ -331,11 +339,14 @@
         ? filesNationalId
         : w === "euPassport"
           ? filesEuPassport
-          : filesNonEu;
+          : w === "driversLicense"
+            ? filesDriversLicense
+            : filesNonEu;
 
     const set = (w: Bucket, fl: FileList | undefined) => {
       if (w === "nationalId") filesNationalId = fl;
       else if (w === "euPassport") filesEuPassport = fl;
+      else if (w === "driversLicense") filesDriversLicense = fl;
       else filesNonEu = fl;
     };
 
@@ -357,7 +368,9 @@
         ? filesNationalIdInput
         : which === "euPassport"
           ? filesEuPassportInput
-          : filesNonEuInput;
+          : which === "driversLicense"
+            ? filesDriversLicenseInput
+            : filesNonEuInput;
     if (node) node.value = "";
   }
 
@@ -367,7 +380,9 @@
         ? filesNationalId
         : which === "euPassport"
           ? filesEuPassport
-          : filesNonEu;
+          : which === "driversLicense"
+            ? filesDriversLicense
+            : filesNonEu;
 
     const set = (fl: FileList) => {
       if (which === "nationalId") {
@@ -376,6 +391,8 @@
       } else if (which === "euPassport") {
         filesEuPassport = fl;
         if (filesEuPassportInput) (filesEuPassportInput as any).files = fl;
+      } else if (which === "driversLicense") {
+        filesDriversLicense = fl;
       } else {
         filesNonEu = fl;
         if (filesNonEuInput) (filesNonEuInput as any).files = fl;
@@ -428,6 +445,7 @@
     filesNationalId: [],
     filesEuPassport: [],
     filesNonEu: [],
+    filesDriversLicense: [],
     utmParams: {
       utm_source: undefined,
       utm_campaign: undefined,
@@ -808,6 +826,23 @@
 </script>
 
 <div>
+  {#snippet fileItem(f: File, b: Bucket)}
+    <div tabindex="-1" class="w-file-upload-success mt-4 mr-2">
+      <div class="w-file-upload-file">
+        <div class="w-file-upload-file-name">
+          {f.name}
+        </div>
+        <button
+          aria-label="Remove file"
+          tabindex="0"
+          class="w-file-remove-link"
+          onclick={() => removeFileFrom(b, f)}
+        >
+          <div class="w-icon-file-upload-remove"></div>
+        </button>
+      </div>
+    </div>
+  {/snippet}
   <div class="form">
     {#if currentStep === Steps.step1}
       <div in:fade class="form-step is-active">
@@ -1422,23 +1457,7 @@
                 </div>
               </div>
             </div>
-            {#snippet fileItem(f: File, b: Bucket)}
-              <div tabindex="-1" class="w-file-upload-success mt-4 mr-2">
-                <div class="w-file-upload-file">
-                  <div class="w-file-upload-file-name">
-                    {f.name}
-                  </div>
-                  <button
-                    aria-label="Remove file"
-                    tabindex="0"
-                    class="w-file-remove-link"
-                    onclick={() => removeFileFrom(b, f)}
-                  >
-                    <div class="w-icon-file-upload-remove"></div>
-                  </button>
-                </div>
-              </div>
-            {/snippet}
+
             <div class="input-group-wrap">
               {#if values.country === "CZ"}
                 <div class="upload">
@@ -1718,6 +1737,72 @@
                 </div>
               </div>
             </div>
+            {#if values.transport === "auto"}
+              <div class="input-group-wrap">
+                <div class="upload">
+                  <label for="DriversLicense" class="field-label"
+                    >{@html t("labels.doc.driversLicense")}</label
+                  >
+                  <div id="file-1" class="w-file-upload">
+                    <div class="default-state-2 w-file-upload-default">
+                      <input
+                        class="w-file-upload-input"
+                        accept=""
+                        name="filesDriversLicense"
+                        data-name="filesdriversLicense"
+                        aria-hidden="true"
+                        type="file"
+                        id="filesDriversLicense"
+                        tabindex="-1"
+                        multiple
+                        onchange={(e) => {
+                          console.log(e);
+                          const files = (e.currentTarget as HTMLInputElement)
+                            .files;
+                          if (files) appendFilesTo("driversLicense", files);
+                          console.log(files);
+                        }}
+                        bind:this={filesDriversLicenseInput}
+                      />
+                      <button
+                        class="upload-button"
+                        onclick={() => filesDriversLicenseInput?.click()}
+                      >
+                        <label for="File-1-2" class="w-file-upload-label">
+                          <div class="w-icon-file-upload-icon"></div>
+                          <div class="w-inline-block">{t("upload.button")}</div>
+                        </label></button
+                      >
+
+                      <div class="w-file-upload-info">{t("upload.max")}</div>
+                    </div>
+
+                    {#if filesDriversLicense && filesDriversLicense?.length > 0}
+                      <div>
+                        {#each filesDriversLicense as file}
+                          {@render fileItem(file, "driversLicense")}
+                        {/each}
+                      </div>
+                    {/if}
+
+                    <div tabindex="-1" class="w-file-upload-error w-hidden">
+                      <div
+                        class="w-file-upload-error-msg"
+                        data-w-size-error="Upload failed. Max size for files is 10 MB."
+                        data-w-type-error="Upload failed. Invalid file type."
+                        data-w-generic-error="Upload failed. Something went wrong. Please retry."
+                      >
+                        Upload failed. Max size for files is 10 MB.
+                      </div>
+                    </div>
+                  </div>
+                  <!--  <div class="text-explain">
+                    {@html t("hints.doc.driversLicense")}
+                  </div> -->
+                  <Errors {errors} path="filesDriversLicense"></Errors>
+                </div>
+              </div>
+            {/if}
             <div class="input-group-wrap">
               <div class="input-wrap">
                 <label for="St-tn-ob-anstv" class="field-label"
