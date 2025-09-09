@@ -22,146 +22,6 @@
     validatePhone,
   } from "./lib/foxentry";
   import { getEndpoint } from "./lib/utils/getEndpoints";
-
-  let locale: Locale = "cs";
-  setLocale(locale);
-
-  const Steps = {
-    step1: "step1",
-    step2: "step2",
-    step3: "step3",
-  };
-
-  const params = new URLSearchParams(window.location.search);
-  const formStep = params.get("state");
-  let errors = $state({});
-  let validating = $state(false);
-  let disable = $state(false);
-  let submitting = $state(false);
-
-  let currentStep = $state(Steps.step1);
-  if (formStep) {
-    currentStep = Steps[formStep];
-  }
-
-  let filesNationalId: FileList | undefined = $state();
-  let filesEuPassport: FileList | undefined = $state();
-  let filesNonEu: FileList | undefined = $state();
-  let filesNationalIdInput: HTMLInputElement | undefined = $state();
-  let filesEuPassportInput: HTMLInputElement | undefined = $state();
-  let filesNonEuInput: HTMLInputElement | undefined = $state();
-
-  type Bucket = "nationalId" | "euPassport" | "nonEu";
-
-  function toFileList(files: File[]): FileList {
-    const dt = new DataTransfer();
-    files.forEach((f) => dt.items.add(f));
-    return dt.files;
-  }
-  function appendFilesTo(which: Bucket, incoming: FileList | File[]) {
-    const get = (w: Bucket) =>
-      w === "nationalId"
-        ? filesNationalId
-        : w === "euPassport"
-          ? filesEuPassport
-          : filesNonEu;
-
-    const set = (w: Bucket, fl: FileList | undefined) => {
-      if (w === "nationalId") filesNationalId = fl;
-      else if (w === "euPassport") filesEuPassport = fl;
-      else filesNonEu = fl;
-    };
-
-    const current = Array.from(get(which) ?? []);
-    const add = Array.isArray(incoming) ? incoming : Array.from(incoming);
-
-    // de-dupe by (name, size, lastModified)
-    const byKey = new Map<string, File>();
-    for (const f of [...current, ...add]) {
-      byKey.set(`${f.name}|${f.size}|${f.lastModified}`, f);
-    }
-
-    const next = toFileList([...byKey.values()]);
-    set(which, next);
-
-    // clear the input so selecting the same file again triggers change
-    const node =
-      which === "nationalId"
-        ? filesNationalIdInput
-        : which === "euPassport"
-          ? filesEuPassportInput
-          : filesNonEuInput;
-    if (node) node.value = "";
-  }
-
-  function removeFileFrom(which: Bucket, target: File | string) {
-    const get = () =>
-      which === "nationalId"
-        ? filesNationalId
-        : which === "euPassport"
-          ? filesEuPassport
-          : filesNonEu;
-
-    const set = (fl: FileList) => {
-      if (which === "nationalId") {
-        filesNationalId = fl;
-        if (filesNationalIdInput) (filesNationalIdInput as any).files = fl; // TS says readonly; runtime works
-      } else if (which === "euPassport") {
-        filesEuPassport = fl;
-        if (filesEuPassportInput) (filesEuPassportInput as any).files = fl;
-      } else {
-        filesNonEu = fl;
-        if (filesNonEuInput) (filesNonEuInput as any).files = fl;
-      }
-    };
-
-    const current = get();
-    if (!current) return;
-
-    const keep = (f: File) =>
-      typeof target === "string"
-        ? f.name !== target
-        : !(
-            f === target ||
-            (f.name === target.name && f.lastModified === target.lastModified)
-          );
-
-    const next = toFileList(Array.from(current).filter(keep));
-    set(next);
-  }
-
-  const values = $state({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    companyId: "",
-    companyName: "",
-    nationalId: "",
-    passportOrId: "",
-    applyAsCompany: undefined,
-    __addressFromSuggestion: false,
-    address: "",
-    country: "",
-    street: "",
-    houseNumber: "",
-    city: "",
-    zip: "",
-    bankPrefix: "",
-    bankNumber: "",
-    bankCode: "",
-    deliveryCity: "",
-    transport: "",
-    insurance: "",
-    pinkStatement: undefined,
-    gender: "",
-    birthDate: "",
-    passportExpiryDate: "",
-    filesNationalId: [],
-    filesEuPassport: [],
-    filesNonEu: [],
-  });
-
   type CustomErrors = Record<
     string,
     | undefined
@@ -172,7 +32,32 @@
     | Array<string | Record<string, any>>
   >;
 
+  type Company = "Wolt" | "Foodora" | "Bolt" | "";
+
   abstract class PageHelper {
+    static domains: Record<string, Company> = {
+      "rozvazej.cz": "Wolt",
+      "rozvazej-foodora.cz": "Foodora",
+      "fofrjidlo.cz": "Foodora",
+      "bleskrozvoz.cz": "Bolt",
+    };
+
+    static getCompanyByDomain(hostname?: string): Company[] {
+      const raw = (
+        hostname ??
+        (typeof window !== "undefined" ? window.location.hostname : "")
+      ).toLowerCase();
+      const host = raw.replace(/^www\./, "");
+
+      const exact = PageHelper.domains[host];
+      if (exact) return [exact];
+
+      const sub = Object.entries(PageHelper.domains).find(([domain]) =>
+        host.endsWith("." + domain)
+      )?.[1];
+
+      return sub ? [sub] : [""];
+    }
     static normalizeCzPhone(input: string): string | null {
       const s = (input ?? "").trim();
       if (!s) return null;
@@ -396,6 +281,145 @@
       disable = false;
     };
   }
+  let locale: Locale = "cs";
+  setLocale(locale);
+
+  const Steps = {
+    step1: "step1",
+    step2: "step2",
+    step3: "step3",
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const formStep = params.get("state");
+  let errors = $state({});
+  let validating = $state(false);
+  let disable = $state(false);
+  let submitting = $state(false);
+
+  let currentStep = $state(Steps.step1);
+  if (formStep) {
+    currentStep = Steps[formStep];
+  }
+
+  let filesNationalId: FileList | undefined = $state();
+  let filesEuPassport: FileList | undefined = $state();
+  let filesNonEu: FileList | undefined = $state();
+  let filesNationalIdInput: HTMLInputElement | undefined = $state();
+  let filesEuPassportInput: HTMLInputElement | undefined = $state();
+  let filesNonEuInput: HTMLInputElement | undefined = $state();
+
+  type Bucket = "nationalId" | "euPassport" | "nonEu";
+
+  function toFileList(files: File[]): FileList {
+    const dt = new DataTransfer();
+    files.forEach((f) => dt.items.add(f));
+    return dt.files;
+  }
+  function appendFilesTo(which: Bucket, incoming: FileList | File[]) {
+    const get = (w: Bucket) =>
+      w === "nationalId"
+        ? filesNationalId
+        : w === "euPassport"
+          ? filesEuPassport
+          : filesNonEu;
+
+    const set = (w: Bucket, fl: FileList | undefined) => {
+      if (w === "nationalId") filesNationalId = fl;
+      else if (w === "euPassport") filesEuPassport = fl;
+      else filesNonEu = fl;
+    };
+
+    const current = Array.from(get(which) ?? []);
+    const add = Array.isArray(incoming) ? incoming : Array.from(incoming);
+
+    // de-dupe by (name, size, lastModified)
+    const byKey = new Map<string, File>();
+    for (const f of [...current, ...add]) {
+      byKey.set(`${f.name}|${f.size}|${f.lastModified}`, f);
+    }
+
+    const next = toFileList([...byKey.values()]);
+    set(which, next);
+
+    // clear the input so selecting the same file again triggers change
+    const node =
+      which === "nationalId"
+        ? filesNationalIdInput
+        : which === "euPassport"
+          ? filesEuPassportInput
+          : filesNonEuInput;
+    if (node) node.value = "";
+  }
+
+  function removeFileFrom(which: Bucket, target: File | string) {
+    const get = () =>
+      which === "nationalId"
+        ? filesNationalId
+        : which === "euPassport"
+          ? filesEuPassport
+          : filesNonEu;
+
+    const set = (fl: FileList) => {
+      if (which === "nationalId") {
+        filesNationalId = fl;
+        if (filesNationalIdInput) (filesNationalIdInput as any).files = fl; // TS says readonly; runtime works
+      } else if (which === "euPassport") {
+        filesEuPassport = fl;
+        if (filesEuPassportInput) (filesEuPassportInput as any).files = fl;
+      } else {
+        filesNonEu = fl;
+        if (filesNonEuInput) (filesNonEuInput as any).files = fl;
+      }
+    };
+
+    const current = get();
+    if (!current) return;
+
+    const keep = (f: File) =>
+      typeof target === "string"
+        ? f.name !== target
+        : !(
+            f === target ||
+            (f.name === target.name && f.lastModified === target.lastModified)
+          );
+
+    const next = toFileList(Array.from(current).filter(keep));
+    set(next);
+  }
+
+  const values = $state({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    companyId: "",
+    companyName: "",
+    nationalId: "",
+    passportOrId: "",
+    deliveryCompany: PageHelper.getCompanyByDomain(),
+    applyAsCompany: undefined,
+    __addressFromSuggestion: false,
+    address: "",
+    country: "",
+    street: "",
+    houseNumber: "",
+    city: "",
+    zip: "",
+    bankPrefix: "",
+    bankNumber: "",
+    bankCode: "",
+    deliveryCity: "",
+    transport: "",
+    insurance: "",
+    pinkStatement: undefined,
+    gender: "",
+    birthDate: "",
+    passportExpiryDate: "",
+    filesNationalId: [],
+    filesEuPassport: [],
+    filesNonEu: [],
+  });
 
   let emailHint = $state("");
   async function onBlurEmail() {
@@ -748,7 +772,7 @@
     companyActive = false;
   }
 
-  $inspect(errors);
+  $inspect(values);
 </script>
 
 <div>
@@ -860,6 +884,7 @@
                 <label
                   id="applyAsCompany-ano"
                   class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089dde-d6eb4364 w-radio"
+                  class:is-checked={values.applyAsCompany === true}
                 >
                   <div
                     class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
@@ -877,6 +902,7 @@
                 </label><label
                   id="applyAsCompany-ne"
                   class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089de2-d6eb4364 w-radio"
+                  class:is-checked={values.applyAsCompany === false}
                 >
                   <div
                     class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
@@ -895,6 +921,69 @@
                 </label>
               </div>
               <Errors {errors} path="applyAsCompany"></Errors>
+            </div>
+            <div class="input-wrap">
+              <label for="field" class="field-label">Deliver company</label>
+              <div class="input-group-wrap">
+                <label
+                  class="w-checkbox registrationtype"
+                  class:is-checked={values.deliveryCompany.includes("Wolt")}
+                >
+                  <div
+                    class="w-checkbox-input w-checkbox-input--inputType-custom check-box"
+                    class:w--redirected-checked={values.deliveryCompany.includes(
+                      "Wolt"
+                    )}
+                  ></div>
+                  <input
+                    type="checkbox"
+                    id="checkbox"
+                    name="checkbox"
+                    data-name="Checkbox"
+                    style="opacity:0;position:absolute;z-index:-1"
+                    value="Wolt"
+                    bind:group={values.deliveryCompany}
+                  /><span class="w-form-label">Wolt</span>
+                </label><label
+                  class="w-checkbox registrationtype"
+                  class:is-checked={values.deliveryCompany.includes("Bolt")}
+                >
+                  <div
+                    class="w-checkbox-input w-checkbox-input--inputType-custom check-box"
+                    class:w--redirected-checked={values.deliveryCompany.includes(
+                      "Bolt"
+                    )}
+                  ></div>
+                  <input
+                    type="checkbox"
+                    id="checkbox"
+                    name="checkbox"
+                    data-name="Checkbox"
+                    style="opacity:0;position:absolute;z-index:-1"
+                    value="Bolt"
+                    bind:group={values.deliveryCompany}
+                  /><span class="w-form-label">Bolt</span>
+                </label><label
+                  class="w-checkbox registrationtype"
+                  class:is-checked={values.deliveryCompany.includes("Foodora")}
+                >
+                  <div
+                    class="w-checkbox-input w-checkbox-input--inputType-custom check-box"
+                    class:w--redirected-checked={values.deliveryCompany.includes(
+                      "Foodora"
+                    )}
+                  ></div>
+                  <input
+                    type="checkbox"
+                    id="checkbox"
+                    name="checkbox"
+                    data-name="Checkbox"
+                    style="opacity:0;position:absolute;z-index:-1"
+                    value="Foodora"
+                    bind:group={values.deliveryCompany}
+                  /><span class="w-form-label">Foodora</span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
