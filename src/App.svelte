@@ -14,6 +14,8 @@
   import {
     debounce,
     type FxCompany,
+    type FxLocation,
+    type LocationSearchType,
     searchCompanies,
     searchLocations,
     validateCompany,
@@ -22,6 +24,7 @@
     validatePhone,
   } from "./lib/foxentry";
   import { getEndpoint } from "./lib/utils/getEndpoints";
+  import { onMount } from "svelte";
   type CustomErrors = Record<
     string,
     | undefined
@@ -280,6 +283,12 @@
 
       disable = false;
     };
+
+    static getUtmParams() {
+      const params = new URLSearchParams(window.location.search);
+      const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_id"];
+      return Object.fromEntries(utmKeys.map((key) => [key, params.get(key)]));
+    }
   }
   let locale: Locale = "cs";
   setLocale(locale);
@@ -419,6 +428,29 @@
     filesNationalId: [],
     filesEuPassport: [],
     filesNonEu: [],
+    utmParams: {
+      utm_source: undefined,
+      utm_campaign: undefined,
+      utm_medium: undefined,
+      utm_id: undefined,
+    },
+  });
+
+  $effect(() => {
+    sessionStorage.setItem("multi-form-session", JSON.stringify(values));
+  });
+
+  onMount(() => {
+    const saved = sessionStorage.getItem("multi-form-session");
+    if (saved) {
+      try {
+        Object.assign(values, JSON.parse(saved));
+        console.log("Restored form values from sessionStorage");
+      } catch (e) {
+        console.error("Failed to parse saved form data", e);
+      }
+    }
+    values.utmParams = PageHelper.getUtmParams();
   });
 
   let emailHint = $state("");
@@ -923,7 +955,9 @@
               <Errors {errors} path="applyAsCompany"></Errors>
             </div>
             <div class="input-wrap">
-              <label for="field" class="field-label">Deliver company</label>
+              <label for="field" class="field-label"
+                >{t("labels.deliveryCompany")}</label
+              >
               <div class="input-group-wrap">
                 <label
                   class="w-checkbox registrationtype"
@@ -1762,6 +1796,7 @@
                 <label
                   id="ruzove-prohlaseni-ano"
                   class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089dde-d6eb4364 w-radio"
+                  class:is-checked={values.pinkStatement === true}
                 >
                   <div
                     class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
@@ -1779,6 +1814,7 @@
                 </label><label
                   id="pinkStatement-ne"
                   class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089de2-d6eb4364 w-radio"
+                  class:is-checked={values.pinkStatement === false}
                 >
                   <div
                     class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
@@ -1794,6 +1830,9 @@
                     bind:group={values.pinkStatement}
                   /><span class="w-form-label">{t("answer.no")}</span>
                 </label>
+              </div>
+              <div class="text-explain">
+                {@html t("hints.pinkstatement")}
               </div>
             </div>
           </div>
@@ -1825,83 +1864,3 @@
     <div>{t("result.fail")}</div>
   </div>
 </div>
-
-<!-- <style>
-  .upload-button {
-    background-color: transparent;
-  }
-
-  .mt-4 {
-    margin-top: 16px;
-  }
-
-  .mr-2 {
-    margin-right: 8px;
-  }
-
-  .block {
-    display: block;
-  }
-
-  .field-error {
-    border-color: indianred;
-  }
-
-  .input-wrap.relative {
-    position: relative; /* anchor for the dropdown */
-    overflow: visible; /* avoid clipping */
-  }
-
-  /* 2) The floating suggestion panel */
-  .sugg {
-    position: absolute;
-    top: calc(100% + 6px); /* 6px gap below the input */
-    left: 0;
-    right: 0; /* match input width */
-    margin: 0;
-    padding: 4px;
-    list-style: none;
-
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    box-shadow:
-      0 10px 20px rgba(0, 0, 0, 0.08),
-      0 2px 6px rgba(0, 0, 0, 0.06);
-
-    max-height: 260px; /* scroll if many items */
-    overflow: auto;
-    z-index: 1000; /* sit above other UI */
-  }
-
-  /* hide if empty (defensive) */
-  .sugg:empty {
-    display: none;
-  }
-
-  /* 3) Items */
-  .sugg li {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    padding: 0.6rem 0.75rem;
-    border-radius: 8px;
-    cursor: pointer;
-    line-height: 1.25;
-  }
-
-  .sugg li + li {
-    margin-top: 2px;
-  }
-
-  .sugg li:hover,
-  .sugg li[aria-selected="true"] {
-    background: #f6f7f9;
-  }
-
-  .sugg li small {
-    color: #6b7280; /* muted */
-    font-size: 0.85em;
-  }
-
-</style> -->

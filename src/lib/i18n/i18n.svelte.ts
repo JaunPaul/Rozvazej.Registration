@@ -32,6 +32,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.doc.nationalId": `Nahrajte ID/ jiný platný doklad. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
     "labels.doc.euPassport": `Nahrajte svůj občanský průkaz nebo cestovní pas. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
     "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">1. Průkaz totožnosti nebo cestovní pas</span><br /><span class="bold-green">2. Vízum NEBO povolení k pobytu NEBO Potvrzení o</span><br /><span class="bold-green">2. studiu nebo pracovní povolení</span>`,
+    "labels.deliveryCompany": "Which company will you deliver for?",
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
@@ -43,6 +44,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "Nahrajte přední i zadní stranu svého občanského průkazu.",
     "hints.doc.nonEu":
       "*Tyto dokumenty jsou vyžadovány. Občanský průkaz (přední i zadní strana) nebo cestovní pas, vízum nebo povolení k pobytu, studijní nebo pracovní povolení.",
+    "hints.pinkstatement":
+      'Pokud zvolíte ANO, uplatníme u Vás slevu na dani a budete dostávat více peněz.<br><br> <strong>POZOR</strong> - "růžové prohlášení o dani" (neboli Prohlášení poplatníka k dani z příjmů fyzických osob) můžete mít vyplněné a uplatněné pouze u jednoho zaměstnavatele. To znamená, že pokud máte více pracovních smluv, nebo kombinujete zaměstnání a brigády, můžete tento nárok využít jen u jedné firmy.',
 
     "ph.firstName": "Zde napište své křestní jméno",
     "ph.lastName": "Zde napište své přijmení",
@@ -156,6 +159,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.doc.nationalId": `Upload ID / other valid document. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
     "labels.doc.euPassport": `Upload your Identity card or passport. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
     "labels.doc.nonEu": `Upload the following valid documents. <br /><span class="bold-green">ID CARD OR PASSPORT</span><br /><span class="bold-green">VISA OR RESIDENCE PERMIT</span><br /><span class="bold-green">STUDY OR PERMIT</span>`,
+    "labels.deliveryCompany": "Which company will you deliver for?",
 
     "hints.czPhone":
       "For deliveries in the Czech Republic you must provide a <strong>Czech phone number.</strong>",
@@ -165,6 +169,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "hints.doc.euPassport": "Upload both front and back of your ID card.",
     "hints.doc.nonEu":
       "*These files are required. ID card (front and back) or passport, Visa or residence permit, Study or work permit",
+    "hints.pinkstatement":
+      '<strong>POZOR</strong> - "růžové prohlášení o dani" (neboli Prohlášení poplatníka k dani z příjmů fyzických osob) můžete mít vyplněné a uplatněné pouze u jednoho zaměstnavatele. To znamená, že pokud máte více pracovních smluv, nebo kombinujete zaměstnání a brigády, můžete tento nárok využít jen u jedné firmy.',
 
     "ph.firstName": "Type your first name",
     "ph.lastName": "Type your last name",
