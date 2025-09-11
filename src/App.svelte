@@ -36,6 +36,16 @@
   >;
 
   type Company = "Wolt" | "Foodora" | "Bolt" | "";
+  type FormStates = "submitting" | "success" | "fail" | "neutral";
+
+  class Form {
+    errors = $state({});
+    state: FormStates = $state("neutral");
+  }
+
+  let form = new Form();
+
+  $inspect(form.state);
 
   abstract class PageHelper {
     static domains: Record<string, Company> = {
@@ -141,7 +151,8 @@
     static submit = async () => {
       disable = true;
       submitting = true;
-      const endpoint = getEndpoint("dev");
+      form.state = "submitting";
+      const endpoint = getEndpoint("final");
 
       // Build a clean snapshot with files as File[]
       const snapshot = {
@@ -210,7 +221,7 @@
       snapshot.filesDriversLicense?.forEach((f) =>
         fd.append("filesDriversLicense[]", f, f.name)
       );
-
+      const _test = "https://httpstat.us/500";
       try {
         const res = await fetch(endpoint, {
           method: "POST",
@@ -221,17 +232,26 @@
         const text = await res.text(); // Make usually returns JSON, but text keeps logging simple
         console.log("Submit:", res.status, text);
         if (!res.ok) {
+          form.state = "fail";
+          form.errors = {
+            error: { status: res.status, message: res.statusText },
+          };
           console.error("Submit failed");
         } else {
           // success UI here if you want
+          form.errors = {};
+          form.state = "success";
           const welcome = "/vitejte";
           window.location.replace(welcome);
         }
-      } catch (err) {
+      } catch (err: any) {
+        form.errors = err;
         console.error("Network error:", err);
       }
       disable = false;
       submitting = false;
+      form.errors = {};
+      form.state = "neutral";
     };
     static partialSubmit = async () => {
       disable = true;
@@ -822,8 +842,6 @@
     companySuggestions = [];
     companyActive = false;
   }
-
-  $inspect(values);
 </script>
 
 <div>
@@ -1943,10 +1961,15 @@
       </div>
     {/if}
   </div>
-  <div class="success-message-5 w-form-done">
-    <div>{t("result.success")}</div>
-  </div>
-  <div class="w-form-fail">
-    <div>{t("result.fail")}</div>
-  </div>
+  {#if form.state === "success"}
+    <div class="success-message-5">
+      <div>{t("result.success")}</div>
+    </div>
+  {/if}
+
+  {#if form.state === "fail"}
+    <div class="">
+      <div>{t("result.fail")}</div>
+    </div>
+  {/if}
 </div>
