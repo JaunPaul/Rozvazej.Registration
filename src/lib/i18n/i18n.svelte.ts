@@ -131,6 +131,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "result.success": "Děkujeme. Pracujeme na tom.",
     "result.fail": "Oops! Something went wrong while submitting the form.",
+    "result.loading.stage1": "Uploading your files...",
+    "result.loading.stage2": "Verifying your information...",
+    "result.loading.stage3": "Finishing up...",
   },
   en: {
     "steps.1": "Step 1",
@@ -258,6 +261,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "result.success": "Thanks. We’re on it.",
     "result.fail": "Oops! Something went wrong while submitting the form.",
+    "result.loading.stage1": "Uploading your files...",
+    "results.loading.stage2": "Verifying your information...",
+    "results.loading.stage3": "Finishing up...",
   },
 });
 

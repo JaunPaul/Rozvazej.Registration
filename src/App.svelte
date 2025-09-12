@@ -25,6 +25,7 @@
   } from "./lib/foxentry";
   import { getEndpoint } from "./lib/utils/getEndpoints";
   import { onMount } from "svelte";
+  import Loader from "./lib/components/Loader.svelte";
   type CustomErrors = Record<
     string,
     | undefined
@@ -862,1105 +863,1139 @@
       </div>
     </div>
   {/snippet}
-  <div class="form">
-    {#if currentStep === Steps.step1}
-      <div in:fade class="form-step is-active">
-        <div class="box has-24-gap">
-          <div class="box has-8-gap">
-            <div class="form-steps">
-              <div class="step is-active"><div>{t("steps.1")}</div></div>
-              <div class="step"><div>{t("steps.2")}</div></div>
-              {#if !values.applyAsCompany}
-                <div class="step"><div>{t("steps.3")}</div></div>
-              {/if}
-            </div>
+  {#if form.state === "submitting"}
+    <Loader></Loader>
+  {:else}
+    <div class="form">
+      {#if currentStep === Steps.step1}
+        <div in:fade class="form-step is-active">
+          <div class="box has-24-gap">
+            <div class="box has-8-gap">
+              <div class="form-steps">
+                <div class="step is-active"><div>{t("steps.1")}</div></div>
+                <div class="step"><div>{t("steps.2")}</div></div>
+                {#if !values.applyAsCompany}
+                  <div class="step"><div>{t("steps.3")}</div></div>
+                {/if}
+              </div>
 
-            <h2 class="heading is-regular">{t("step1.title")}</h2>
-            <p class="body-text">{t("step1.lead")}</p>
-          </div>
-          <div class="box has-8-gap">
-            <div class="input-group-wrap">
-              <div class="input-wrap">
-                <label for="firstName" class="field-label"
-                  >{t("labels.firstName")}</label
-                ><input
-                  data-parsley-error-message={t("errors.firstName")}
-                  class="input-2 w-input"
-                  maxlength="256"
-                  name="firstName"
-                  data-name="firstName"
-                  placeholder={t("ph.firstName")}
-                  type="text"
-                  id="firstName"
-                  required
-                  bind:value={values.firstName}
-                  onblur={onBlurFirstName}
-                />
-                <Errors {errors} path="firstName"></Errors>
-              </div>
-              <div class="input-wrap">
-                <label for="lastName" class="field-label"
-                  >{t("labels.lastName")}</label
-                ><input
-                  data-parsley-error-message={t("errors.lastName")}
-                  class="input-2 w-input"
-                  maxlength="256"
-                  name="lastName"
-                  data-name="lastName"
-                  placeholder={t("ph.lastName")}
-                  type="text"
-                  id="lastName"
-                  required
-                  bind:value={values.lastName}
-                  onblur={onBlurLastName}
-                />
-                <Errors {errors} path="lastName"></Errors>
-              </div>
+              <h2 class="heading is-regular">{t("step1.title")}</h2>
+              <p class="body-text">{t("step1.lead")}</p>
             </div>
-            <div class="input-group-wrap">
-              <div class="input-wrap">
-                <label for="phone" class="field-label"
-                  >{t("labels.phone")}</label
-                ><input
-                  data-parsley-error-message={t("errors.phone")}
-                  class="input-2 w-input"
-                  maxlength="256"
-                  name="phone"
-                  data-name="phone"
-                  placeholder={t("ph.phone")}
-                  data-parsley-czphone=""
-                  type="text"
-                  id="phone"
-                  required
-                  bind:value={values.phone}
-                  onblur={onBlurPhone}
-                />
-                <div class="text-explain">
-                  {@html t("hints.czPhone")}
-                </div>
-                <Errors {errors} path="phone"></Errors>
-              </div>
-              <div class="input-wrap">
-                <label for="email" class="field-label"
-                  >{t("labels.email")}</label
-                ><input
-                  data-parsley-error-message={t("errors.email")}
-                  class="input-2 w-node-_5ce9e5d7-7108-1705-b1ac-8651e86feced-d6eb4364 w-input"
-                  maxlength="256"
-                  name="email"
-                  data-name="email"
-                  placeholder={t("ph.email")}
-                  type="email"
-                  id="email"
-                  required
-                  bind:value={values.email}
-                  onblur={onBlurEmail}
-                />
-                <div class="text-explain">
-                  {@html t("hints.useRealEmail")}
-                </div>
-                <Errors {errors} path="email"></Errors>
-              </div>
-            </div>
-            <div class="input-wrap">
-              <label for="field" class="field-label"
-                >{t("labels.applyAsCompany")}</label
-              >
+            <div class="box has-8-gap">
               <div class="input-group-wrap">
-                <label
-                  id="applyAsCompany-ano"
-                  class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089dde-d6eb4364 w-radio"
-                  class:is-checked={values.applyAsCompany === true}
-                >
-                  <div
-                    class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
-                    class:w--redirected-checked={values.applyAsCompany === true}
-                  ></div>
-                  <input
-                    type="radio"
-                    name="applyAsCompany"
-                    id="apply-as-company-yes"
-                    data-name="applyAsCompany"
-                    style="opacity:0;position:absolute;z-index:-1"
-                    value={true}
-                    bind:group={values.applyAsCompany}
-                  /><span class="w-form-label">{t("answer.yes")}</span>
-                </label><label
-                  id="applyAsCompany-ne"
-                  class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089de2-d6eb4364 w-radio"
-                  class:is-checked={values.applyAsCompany === false}
-                >
-                  <div
-                    class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
-                    class:w--redirected-checked={values.applyAsCompany ===
-                      false}
-                  ></div>
-                  <input
-                    type="radio"
-                    name="applyAsCompany"
-                    id="NE"
-                    data-name="applyAsCompany"
-                    style="opacity:0;position:absolute;z-index:-1"
-                    value={false}
-                    bind:group={values.applyAsCompany}
-                  /><span class="w-form-label">{t("answer.no")}</span>
-                </label>
+                <div class="input-wrap">
+                  <label for="firstName" class="field-label"
+                    >{t("labels.firstName")}</label
+                  ><input
+                    data-parsley-error-message={t("errors.firstName")}
+                    class="input-2 w-input"
+                    maxlength="256"
+                    name="firstName"
+                    data-name="firstName"
+                    placeholder={t("ph.firstName")}
+                    type="text"
+                    id="firstName"
+                    required
+                    bind:value={values.firstName}
+                    onblur={onBlurFirstName}
+                  />
+                  <Errors {errors} path="firstName"></Errors>
+                </div>
+                <div class="input-wrap">
+                  <label for="lastName" class="field-label"
+                    >{t("labels.lastName")}</label
+                  ><input
+                    data-parsley-error-message={t("errors.lastName")}
+                    class="input-2 w-input"
+                    maxlength="256"
+                    name="lastName"
+                    data-name="lastName"
+                    placeholder={t("ph.lastName")}
+                    type="text"
+                    id="lastName"
+                    required
+                    bind:value={values.lastName}
+                    onblur={onBlurLastName}
+                  />
+                  <Errors {errors} path="lastName"></Errors>
+                </div>
               </div>
-              <Errors {errors} path="applyAsCompany"></Errors>
-            </div>
-            <div class="input-wrap">
-              <label for="field" class="field-label"
-                >{t("labels.deliveryCompany")}</label
-              >
               <div class="input-group-wrap">
-                <label
-                  class="w-checkbox registrationtype"
-                  class:is-checked={values.deliveryCompany.includes("Wolt")}
+                <div class="input-wrap">
+                  <label for="phone" class="field-label"
+                    >{t("labels.phone")}</label
+                  ><input
+                    data-parsley-error-message={t("errors.phone")}
+                    class="input-2 w-input"
+                    maxlength="256"
+                    name="phone"
+                    data-name="phone"
+                    placeholder={t("ph.phone")}
+                    data-parsley-czphone=""
+                    type="text"
+                    id="phone"
+                    required
+                    bind:value={values.phone}
+                    onblur={onBlurPhone}
+                  />
+                  <div class="text-explain">
+                    {@html t("hints.czPhone")}
+                  </div>
+                  <Errors {errors} path="phone"></Errors>
+                </div>
+                <div class="input-wrap">
+                  <label for="email" class="field-label"
+                    >{t("labels.email")}</label
+                  ><input
+                    data-parsley-error-message={t("errors.email")}
+                    class="input-2 w-node-_5ce9e5d7-7108-1705-b1ac-8651e86feced-d6eb4364 w-input"
+                    maxlength="256"
+                    name="email"
+                    data-name="email"
+                    placeholder={t("ph.email")}
+                    type="email"
+                    id="email"
+                    required
+                    bind:value={values.email}
+                    onblur={onBlurEmail}
+                  />
+                  <div class="text-explain">
+                    {@html t("hints.useRealEmail")}
+                  </div>
+                  <Errors {errors} path="email"></Errors>
+                </div>
+              </div>
+              <div class="input-wrap">
+                <label for="field" class="field-label"
+                  >{t("labels.applyAsCompany")}</label
                 >
-                  <div
-                    class="w-checkbox-input w-checkbox-input--inputType-custom check-box"
-                    class:w--redirected-checked={values.deliveryCompany.includes(
-                      "Wolt"
-                    )}
-                  ></div>
-                  <input
-                    type="checkbox"
-                    id="checkbox"
-                    name="checkbox"
-                    data-name="Checkbox"
-                    style="opacity:0;position:absolute;z-index:-1"
-                    value="Wolt"
-                    bind:group={values.deliveryCompany}
-                  /><span class="w-form-label">Wolt</span>
-                </label><label
-                  class="w-checkbox registrationtype"
-                  class:is-checked={values.deliveryCompany.includes("Bolt")}
+                <div class="input-group-wrap">
+                  <label
+                    id="applyAsCompany-ano"
+                    class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089dde-d6eb4364 w-radio"
+                    class:is-checked={values.applyAsCompany === true}
+                  >
+                    <div
+                      class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
+                      class:w--redirected-checked={values.applyAsCompany ===
+                        true}
+                    ></div>
+                    <input
+                      type="radio"
+                      name="applyAsCompany"
+                      id="apply-as-company-yes"
+                      data-name="applyAsCompany"
+                      style="opacity:0;position:absolute;z-index:-1"
+                      value={true}
+                      bind:group={values.applyAsCompany}
+                    /><span class="w-form-label">{t("answer.yes")}</span>
+                  </label><label
+                    id="applyAsCompany-ne"
+                    class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089de2-d6eb4364 w-radio"
+                    class:is-checked={values.applyAsCompany === false}
+                  >
+                    <div
+                      class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
+                      class:w--redirected-checked={values.applyAsCompany ===
+                        false}
+                    ></div>
+                    <input
+                      type="radio"
+                      name="applyAsCompany"
+                      id="NE"
+                      data-name="applyAsCompany"
+                      style="opacity:0;position:absolute;z-index:-1"
+                      value={false}
+                      bind:group={values.applyAsCompany}
+                    /><span class="w-form-label">{t("answer.no")}</span>
+                  </label>
+                </div>
+                <Errors {errors} path="applyAsCompany"></Errors>
+              </div>
+              <div class="input-wrap">
+                <label for="field" class="field-label"
+                  >{t("labels.deliveryCompany")}</label
                 >
-                  <div
-                    class="w-checkbox-input w-checkbox-input--inputType-custom check-box"
-                    class:w--redirected-checked={values.deliveryCompany.includes(
-                      "Bolt"
-                    )}
-                  ></div>
-                  <input
-                    type="checkbox"
-                    id="checkbox"
-                    name="checkbox"
-                    data-name="Checkbox"
-                    style="opacity:0;position:absolute;z-index:-1"
-                    value="Bolt"
-                    bind:group={values.deliveryCompany}
-                  /><span class="w-form-label">Bolt</span>
-                </label><label
-                  class="w-checkbox registrationtype"
-                  class:is-checked={values.deliveryCompany.includes("Foodora")}
-                >
-                  <div
-                    class="w-checkbox-input w-checkbox-input--inputType-custom check-box"
-                    class:w--redirected-checked={values.deliveryCompany.includes(
+                <div class="input-group-wrap">
+                  <label
+                    class="w-checkbox registrationtype"
+                    class:is-checked={values.deliveryCompany.includes("Wolt")}
+                  >
+                    <div
+                      class="w-checkbox-input w-checkbox-input--inputType-custom check-box"
+                      class:w--redirected-checked={values.deliveryCompany.includes(
+                        "Wolt"
+                      )}
+                    ></div>
+                    <input
+                      type="checkbox"
+                      id="checkbox"
+                      name="checkbox"
+                      data-name="Checkbox"
+                      style="opacity:0;position:absolute;z-index:-1"
+                      value="Wolt"
+                      bind:group={values.deliveryCompany}
+                    /><span class="w-form-label">Wolt</span>
+                  </label><label
+                    class="w-checkbox registrationtype"
+                    class:is-checked={values.deliveryCompany.includes("Bolt")}
+                  >
+                    <div
+                      class="w-checkbox-input w-checkbox-input--inputType-custom check-box"
+                      class:w--redirected-checked={values.deliveryCompany.includes(
+                        "Bolt"
+                      )}
+                    ></div>
+                    <input
+                      type="checkbox"
+                      id="checkbox"
+                      name="checkbox"
+                      data-name="Checkbox"
+                      style="opacity:0;position:absolute;z-index:-1"
+                      value="Bolt"
+                      bind:group={values.deliveryCompany}
+                    /><span class="w-form-label">Bolt</span>
+                  </label><label
+                    class="w-checkbox registrationtype"
+                    class:is-checked={values.deliveryCompany.includes(
                       "Foodora"
                     )}
-                  ></div>
-                  <input
-                    type="checkbox"
-                    id="checkbox"
-                    name="checkbox"
-                    data-name="Checkbox"
-                    style="opacity:0;position:absolute;z-index:-1"
-                    value="Foodora"
-                    bind:group={values.deliveryCompany}
-                  /><span class="w-form-label">Foodora</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-nav">
-          <div></div>
-          <button
-            class="button w-button"
-            disabled={disable}
-            onclick={() => PageHelper.next("step2")}
-            >{validating ? t("nav.validate") : t("nav.next")}
-          </button>
-        </div>
-      </div>
-    {/if}
-
-    {#if currentStep === Steps.step2}
-      <div in:fade class="form-step is-active">
-        <div class="box has-24-gap">
-          <div class="box has-8-gap">
-            <div class="form-steps">
-              <div class="step"><div>{t("steps.1")}</div></div>
-              <div class="step is-active"><div>{t("steps.2")}</div></div>
-              {#if !values.applyAsCompany}
-                <div class="step"><div>{t("steps.3")}</div></div>
-              {/if}
-            </div>
-
-            <h2 class="heading is-regular">{t("step2.title")}</h2>
-            <p class="body-text">{t("step2.lead")}</p>
-          </div>
-          <div class="box has-8-gap">
-            {#if values.applyAsCompany === true}
-              <div in:fade class="input-wrap relative">
-                <label for="companyId" class="field-label"
-                  >{t("labels.companyId")}
-                </label><input
-                  data-parsley-error-message="Zadejte platné rodné číslo."
-                  class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
-                  maxlength="256"
-                  name="companyId"
-                  data-name="companyId"
-                  placeholder={t("ph.companyId")}
-                  data-parsley-rc=""
-                  type="text"
-                  id="companyId"
-                  bind:value={values.companyId}
-                  onfocus={() => onCompaniesFocus()}
-                  onblur={onCompaniesBlur}
-                />
-                {#if companyActive && companySuggestions.length}
-                  <ul class="sugg" role="listbox">
-                    {#each companySuggestions as s}
-                      <li
-                        role="option"
-                        onmousedown={() => applyCompanySuggestion(s)}
-                      >
-                        {s.name}
-                        {#if s.registrationId}
-                          <small> — {s.registrationId}</small>
-                        {/if}
-                      </li>
-                    {/each}
-                  </ul>
-                {/if}
-                {#if !companyActive}
-                  <div class="text-explain">
-                    {values.companyName}
-                    {values.companyId}
-                  </div>
-                {/if}
-
-                <Errors {errors} path="companyId"></Errors>
-              </div>
-            {/if}
-            {#if values.applyAsCompany === false}
-              <div class="input-wrap">
-                <label for="St-tn-ob-anstv" class="field-label"
-                  ><strong>{t("labels.citizenship")}</strong></label
-                >
-                <div class="w-embed">
-                  <select
-                    name="country"
-                    id="statni-obcanstvi"
-                    class="input-2"
-                    required
-                    autocomplete="off"
-                    bind:value={values.country}
                   >
-                    <option value="" disabled
-                      >{t("select.placeholder.country")}</option
-                    >
-                    {#await getCountries(locale) then countries}
-                      {#each countries as country}
-                        {#each Object.entries(country) as [code, name]}
-                          <option value={code}>{name}</option>
-                        {/each}
-                      {/each}
-                    {/await}
-                  </select>
-                </div>
-                <Errors {errors} path="country"></Errors>
-              </div>
-            {/if}
-
-            {#if values.applyAsCompany === false && values.country === "CZ"}
-              <div in:fade class="input-wrap">
-                <label for="nationalId" class="field-label"
-                  >{t("labels.nationalId")}
-                </label><input
-                  data-parsley-error-message={t("errors.nationalId")}
-                  class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
-                  maxlength="256"
-                  name="nationalId"
-                  data-name="nationalId"
-                  placeholder={t("ph.nationalId")}
-                  data-parsley-rc=""
-                  type="text"
-                  id="nationalId"
-                  bind:value={values.nationalId}
-                />
-                <Errors {errors} path="nationalId"></Errors>
-              </div>
-            {/if}
-
-            {#if values.applyAsCompany === false && values.country.length > 0 && values.country !== "CZ"}
-              <div in:fade class="input-wrap">
-                <label for="passportOrId" class="field-label"
-                  >{t("labels.passportOrId")}
-                </label><input
-                  data-parsley-error-message={t("errors.passportOrId")}
-                  class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
-                  maxlength="256"
-                  name="passportOrId"
-                  data-name="passportOrId"
-                  placeholder={t("ph.passportOrId")}
-                  data-parsley-rc=""
-                  type="text"
-                  id="passportOrId"
-                  bind:value={values.passportOrId}
-                />
-                <Errors {errors} path="passportOrId"></Errors>
-              </div>
-            {/if}
-
-            <div class="input-group-wrap">
-              <div class="input-wrap relative">
-                <label for="street" class="field-label"
-                  >{t("labels.street")}</label
-                ><input
-                  data-parsley-error-message={t("errors.street")}
-                  class="input-2 w-node-_48acfe53-5ca2-1118-0e8c-0cdd22174c3b-d6eb4364 w-input"
-                  maxlength="256"
-                  name="street"
-                  data-name="street"
-                  placeholder=""
-                  type="text"
-                  id="street"
-                  required
-                  bind:value={values.street}
-                  onfocus={() => onAddressFocus("street")}
-                  onblur={onAddressBlur}
-                />
-                <Errors {errors} path="street"></Errors>
-                {#if activeType === "street" && suggestions.length}
-                  <ul class="sugg" role="listbox">
-                    {#each suggestions as s}
-                      <li role="option" onmousedown={() => applySuggestion(s)}>
-                        {s.streetWithNumber || s.full}
-                        {#if s.city || s.postalCode}
-                          <small>
-                            — {s.city}{s.postalCode
-                              ? `, ${s.postalCode}`
-                              : ""}</small
-                          >
-                        {/if}
-                      </li>
-                    {/each}
-                  </ul>
-                {/if}
-              </div>
-              <div class="input-wrap relative">
-                <label for="houseNumber" class="field-label"
-                  >{t("labels.houseNumber")}</label
-                ><input
-                  data-parsley-error-message={t("errors.houseNumber")}
-                  class="input-2 w-node-_75182725-5b9f-8942-268c-668a41ccdfd7-d6eb4364 w-input"
-                  maxlength="256"
-                  name="houseNumber"
-                  data-name="Cislo popisne"
-                  placeholder=""
-                  type="tel"
-                  id="houseNumber"
-                  required
-                  bind:value={values.houseNumber}
-                  onfocus={() => onAddressFocus("number.full")}
-                  onblur={onAddressBlur}
-                />
-                <Errors {errors} path="houseNumber"></Errors>
-                {#if activeType === "number.full" && suggestions.length}
-                  <ul class="sugg" role="listbox">
-                    {#each suggestions as s}
-                      <li role="option" onmousedown={() => applySuggestion(s)}>
-                        {s.streetWithNumber || s.full}
-                        {#if s.city || s.postalCode}
-                          <small>
-                            — {s.city}{s.postalCode
-                              ? `, ${s.postalCode}`
-                              : ""}</small
-                          >
-                        {/if}
-                      </li>
-                    {/each}
-                  </ul>
-                {/if}
-              </div>
-            </div>
-            <div class="input-group-wrap">
-              <div class="input-wrap relative">
-                <label for="city" class="field-label">{t("labels.city")}</label
-                ><input
-                  data-parsley-error-message={t("errors.city")}
-                  class="input-2 w-node-_9b7ed3bb-d228-0d66-fa58-ba76e3894472-d6eb4364 w-input"
-                  maxlength="256"
-                  name="city"
-                  data-name="city"
-                  placeholder=""
-                  type="text"
-                  id="city"
-                  required
-                  bind:value={values.city}
-                  onfocus={() => onAddressFocus("city")}
-                  onblur={onAddressBlur}
-                />
-                <Errors {errors} path="city"></Errors>
-                {#if activeType === "city" && suggestions.length}
-                  <ul class="sugg" role="listbox">
-                    {#each suggestions as s}
-                      <li role="option" onmousedown={() => applySuggestion(s)}>
-                        {s.streetWithNumber || s.full}
-                        {#if s.city || s.postalCode}
-                          <small>
-                            — {s.city}{s.postalCode
-                              ? `, ${s.postalCode}`
-                              : ""}</small
-                          >
-                        {/if}
-                      </li>
-                    {/each}
-                  </ul>
-                {/if}
-              </div>
-              <div class="input-wrap relative">
-                <label for="zip" class="field-label">{t("labels.zip")}</label
-                ><input
-                  data-parsley-error-message={t("errors.zip")}
-                  class="input-2 w-node-_9b7ed3bb-d228-0d66-fa58-ba76e3894476-d6eb4364 w-input"
-                  maxlength="256"
-                  name="zip"
-                  data-name="zip"
-                  placeholder=""
-                  type="tel"
-                  id="zip"
-                  required
-                  bind:value={values.zip}
-                  onfocus={() => onAddressFocus("zip")}
-                  onblur={onAddressBlur}
-                />
-                <Errors {errors} path="zip"></Errors>
-                {#if activeType === "zip" && suggestions.length}
-                  <ul class="sugg" role="listbox">
-                    {#each suggestions as s}
-                      <li role="option" onmousedown={() => applySuggestion(s)}>
-                        {s.streetWithNumber || s.full}
-                        {#if s.city || s.postalCode}
-                          <small>
-                            — {s.city}{s.postalCode
-                              ? `, ${s.postalCode}`
-                              : ""}</small
-                          >
-                        {/if}
-                      </li>
-                    {/each}
-                  </ul>
-                {/if}
-              </div>
-            </div>
-            <div class="input-group-wrap">
-              <div class="input-group-wrap">
-                <div class="prefix">
-                  <label for="bankPrefix" class="field-label"
-                    >{t("labels.bank.prefix")}</label
-                  >
-                  <div class="w-embed">
+                    <div
+                      class="w-checkbox-input w-checkbox-input--inputType-custom check-box"
+                      class:w--redirected-checked={values.deliveryCompany.includes(
+                        "Foodora"
+                      )}
+                    ></div>
                     <input
-                      type="text"
-                      id="bankPrefix"
-                      name="bankPrefix"
-                      class="input-2"
-                      maxlength="5"
-                      pattern="\d*"
-                      inputmode="numeric"
-                      placeholder={t("ph.bank.prefix")}
-                      bind:value={values.bankPrefix}
-                    />
-                  </div>
-                  <Errors {errors} path="bankPrefix"></Errors>
+                      type="checkbox"
+                      id="checkbox"
+                      name="checkbox"
+                      data-name="Checkbox"
+                      style="opacity:0;position:absolute;z-index:-1"
+                      value="Foodora"
+                      bind:group={values.deliveryCompany}
+                    /><span class="w-form-label">Foodora</span>
+                  </label>
                 </div>
-                <div class="bank-number">
-                  <label for="bankNumber" class="field-label"
-                    >{t("labels.bank.number")}</label
-                  ><input
-                    data-parsley-error-message={t("errors.bank.number")}
-                    class="input-2 w-node-_5456f3ba-5ad3-f3cf-d87e-1e89755a0bb4-d6eb4364 w-input"
+              </div>
+            </div>
+          </div>
+
+          <div class="form-nav">
+            <div></div>
+            <button
+              class="button w-button"
+              disabled={disable}
+              onclick={() => PageHelper.next("step2")}
+              >{validating ? t("nav.validate") : t("nav.next")}
+            </button>
+          </div>
+        </div>
+      {/if}
+
+      {#if currentStep === Steps.step2}
+        <div in:fade class="form-step is-active">
+          <div class="box has-24-gap">
+            <div class="box has-8-gap">
+              <div class="form-steps">
+                <div class="step"><div>{t("steps.1")}</div></div>
+                <div class="step is-active"><div>{t("steps.2")}</div></div>
+                {#if !values.applyAsCompany}
+                  <div class="step"><div>{t("steps.3")}</div></div>
+                {/if}
+              </div>
+
+              <h2 class="heading is-regular">{t("step2.title")}</h2>
+              <p class="body-text">{t("step2.lead")}</p>
+            </div>
+            <div class="box has-8-gap">
+              {#if values.applyAsCompany === true}
+                <div in:fade class="input-wrap relative">
+                  <label for="companyId" class="field-label"
+                    >{t("labels.companyId")}
+                  </label><input
+                    data-parsley-error-message="Zadejte platné rodné číslo."
+                    class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
                     maxlength="256"
-                    name="bankNumber"
-                    data-name="Číslo účtu"
-                    placeholder=""
+                    name="companyId"
+                    data-name="companyId"
+                    placeholder={t("ph.companyId")}
+                    data-parsley-rc=""
                     type="text"
-                    id="bankNumber"
-                    required
-                    bind:value={values.bankNumber}
+                    id="companyId"
+                    bind:value={values.companyId}
+                    onfocus={() => onCompaniesFocus()}
+                    onblur={onCompaniesBlur}
                   />
-                  <Errors {errors} path="bankNumber"></Errors>
+                  {#if companyActive && companySuggestions.length}
+                    <ul class="sugg" role="listbox">
+                      {#each companySuggestions as s}
+                        <li
+                          role="option"
+                          onmousedown={() => applyCompanySuggestion(s)}
+                        >
+                          {s.name}
+                          {#if s.registrationId}
+                            <small> — {s.registrationId}</small>
+                          {/if}
+                        </li>
+                      {/each}
+                    </ul>
+                  {/if}
+                  {#if !companyActive}
+                    <div class="text-explain">
+                      {values.companyName}
+                      {values.companyId}
+                    </div>
+                  {/if}
+
+                  <Errors {errors} path="companyId"></Errors>
                 </div>
-                <div class="bank-code">
-                  <label for="bankCode" class="field-label"
-                    >{t("labels.bank.code")}</label
+              {/if}
+              {#if values.applyAsCompany === false}
+                <div class="input-wrap">
+                  <label for="St-tn-ob-anstv" class="field-label"
+                    ><strong>{t("labels.citizenship")}</strong></label
                   >
                   <div class="w-embed">
                     <select
-                      name="bankCode"
-                      id="bankCode"
+                      name="country"
+                      id="statni-obcanstvi"
                       class="input-2"
                       required
-                      bind:value={values.bankCode}
+                      autocomplete="off"
+                      bind:value={values.country}
                     >
                       <option value="" disabled
-                        >{t("select.placeholder.bank")}</option
+                        >{t("select.placeholder.country")}</option
                       >
-                      <option value="0100">0100 – Komerční banka</option>
-                      <option value="0300">0300 – ČSOB</option>
-                      <option value="0600">0600 – MONETA</option>
-                      <option value="0800">0800 – Česká spořitelna</option>
-                      <option value="2010">2010 – Fio banka</option>
-                      <option value="3030">3030 – Air Bank</option>
-                      <option value="5500">5500 – Raiffeisenbank</option>
-                      <option value="6210">6210 – mBank</option>
-                      <option value="2700">2700 – UniCredit Bank</option>
-                      <option value="3050">3050 – Hello bank</option>
-                      <option value="3500">3500 – ING Bank</option>
-                      <option value="6800">6800 – Sberbank</option>
-                      <option value="2250">2250 – Banka Creditas</option>
-                      <option value="2070">2070 – Trinity Bank</option>
-                      <option value="4000">4000 – Expobank</option>
-                      <option value="8040">8040 – Oberbank</option>
-                      <option value="2600">2600 – Citibank</option>
-                      <option value="2020">2020 – MUFG Bank</option>
-                      <option value="2100">2100 – Hypoteční banka</option>
-                      <option value="2060">2060 – Citfin</option>
-                      <option value="2200">2200 – Peněžní dům</option>
-                      <option value="2220">2220 – Artesa</option>
-                      <option value="2260">2260 – NEY</option>
-                      <option value="3060">3060 – PKO BP</option>
-                      <option value="4300"
-                        >4300 – Národní rozvojová banka</option
-                      >
-                      <option value="5800">5800 – J&T BANKA</option>
-                      <option value="6000">6000 – PPF banka</option>
-                      <option value="6200">6200 – COMMERZBANK</option>
-                      <option value="6300">6300 – BNP Paribas</option>
-                      <option value="6700"
-                        >6700 – Všeobecná úvěrová banka</option
-                      >
-                      <option value="7910">7910 – Deutsche Bank</option>
-                      <option value="7950"
-                        >7950 – Raiffeisen stavební spořitelna</option
-                      >
-                      <option value="7960"
-                        >7960 – ČSOB Stavební spořitelna</option
-                      >
-                      <option value="7970"
-                        >7970 – MONETA Stavební Spořitelna</option
-                      >
-                      <option value="7990"
-                        >7990 – Modrá pyramida stavební spořitelna</option
-                      >
-                      <option value="8030"
-                        >8030 – Volksbank Raiffeisenbank Nordoberpfalz</option
-                      >
-                      <option value="8060"
-                        >8060 – Stavební spořitelna České spořitelny</option
-                      >
-                      <option value="8090">8090 – Česká exportní banka</option>
-                      <option value="8150"
-                        >8150 – HSBC Continental Europe</option
-                      >
-                      <option value="6363">6363 – Partners banka</option>
+                      {#await getCountries(locale) then countries}
+                        {#each countries as country}
+                          {#each Object.entries(country) as [code, name]}
+                            <option value={code}>{name}</option>
+                          {/each}
+                        {/each}
+                      {/await}
                     </select>
                   </div>
-                  <Errors {errors} path="bankCode"></Errors>
-                </div>
-              </div>
-            </div>
-
-            <div class="input-group-wrap">
-              {#if values.country === "CZ"}
-                <div class="upload">
-                  <label for="Ulice" class="field-label"
-                    >{@html t("labels.doc.nationalId")}</label
-                  >
-                  <div id="file-1" class="w-file-upload">
-                    <div class="default-state-2 w-file-upload-default">
-                      <input
-                        class="w-file-upload-input"
-                        accept=""
-                        name="filesNationalId"
-                        data-name="filesNationalId"
-                        aria-hidden="true"
-                        type="file"
-                        id="filesNationalId"
-                        tabindex="-1"
-                        required
-                        multiple
-                        onchange={(e) => {
-                          const files = (e.currentTarget as HTMLInputElement)
-                            .files;
-                          if (files) appendFilesTo("nationalId", files);
-                        }}
-                        bind:this={filesNationalIdInput}
-                      />
-                      <button
-                        class="upload-button"
-                        onclick={() => filesNationalIdInput?.click()}
-                      >
-                        <label for="File-1-2" class="w-file-upload-label">
-                          <div class="w-icon-file-upload-icon"></div>
-                          <div class="w-inline-block">{t("upload.button")}</div>
-                        </label></button
-                      >
-
-                      <div class="w-file-upload-info">{t("upload.max")}</div>
-                    </div>
-
-                    {#if filesNationalId && filesNationalId?.length > 0}
-                      <div>
-                        {#each filesNationalId as file}
-                          {@render fileItem(file, "nationalId")}
-                        {/each}
-                      </div>
-                    {/if}
-
-                    <div tabindex="-1" class="w-file-upload-error w-hidden">
-                      <div
-                        class="w-file-upload-error-msg"
-                        data-w-size-error="Upload failed. Max size for files is 10 MB."
-                        data-w-type-error="Upload failed. Invalid file type."
-                        data-w-generic-error="Upload failed. Something went wrong. Please retry."
-                      >
-                        Upload failed. Max size for files is 10 MB.
-                      </div>
-                    </div>
-                  </div>
-                  <div class="text-explain">
-                    {@html t("hints.doc.nationalId")}
-                  </div>
-                  <Errors {errors} path="filesNationalId"></Errors>
+                  <Errors {errors} path="country"></Errors>
                 </div>
               {/if}
 
-              {#if values.country.length > 0 && isEu(values.country) && values.country !== "CZ"}
-                <div class="upload">
-                  <label for="Ulice" class="field-label"
-                    >{@html t("labels.doc.euPassport")}</label
-                  >
-                  <div id="file-2" class="w-file-upload">
-                    <div class="default-state-2 w-file-upload-default">
-                      <input
-                        class="w-file-upload-input"
-                        accept=""
-                        name="filesEuPassport"
-                        data-name="filesEuPassport"
-                        aria-hidden="true"
-                        type="file"
-                        id="filesEuPassport"
-                        tabindex="-1"
-                        required
-                        multiple
-                        onchange={(e) => {
-                          const files = (e.currentTarget as HTMLInputElement)
-                            .files;
-                          if (files) appendFilesTo("euPassport", files);
-                        }}
-                        bind:this={filesEuPassportInput}
-                      />
-                      <button
-                        class="upload-button"
-                        onclick={() => filesEuPassportInput?.click()}
-                      >
-                        <label for="File-1-2" class="w-file-upload-label">
-                          <div class="w-icon-file-upload-icon"></div>
-                          <div class="w-inline-block">{t("upload.button")}</div>
-                        </label></button
-                      >
-
-                      <div class="w-file-upload-info">{t("upload.max")}</div>
-                    </div>
-
-                    {#if filesEuPassport && filesEuPassport?.length > 0}
-                      <div>
-                        {#each filesEuPassport as file}
-                          {@render fileItem(file, "euPassport")}
-                        {/each}
-                      </div>
-                    {/if}
-
-                    <div tabindex="-1" class="w-file-upload-error w-hidden">
-                      <div
-                        class="w-file-upload-error-msg"
-                        data-w-size-error="Upload failed. Max size for files is 10 MB."
-                        data-w-type-error="Upload failed. Invalid file type."
-                        data-w-generic-error="Upload failed. Something went wrong. Please retry."
-                      >
-                        Upload failed. Max size for files is 10 MB.
-                      </div>
-                    </div>
-                  </div>
-                  <div class="text-explain">
-                    {@html t("hints.doc.euPassport")}
-                  </div>
-                  <Errors {errors} path="filesEuPassport"></Errors>
-                </div>
-              {/if}
-
-              {#if values.country.length > 0 && !isEu(values.country)}
-                <div class="upload">
-                  <label for="Ulice" class="field-label"
-                    >{@html t("labels.doc.nonEu")}</label
-                  >
-                  <div id="file-2" class="w-file-upload">
-                    <div class="default-state-2 w-file-upload-default">
-                      <input
-                        class="w-file-upload-input"
-                        accept=""
-                        name="filesNonEu"
-                        data-name="filesNonEu"
-                        aria-hidden="true"
-                        type="file"
-                        id="filesNonEu"
-                        tabindex="-1"
-                        required
-                        multiple
-                        onchange={(e) => {
-                          const files = (e.currentTarget as HTMLInputElement)
-                            .files;
-                          if (files) appendFilesTo("nonEu", files);
-                        }}
-                        bind:this={filesNonEuInput}
-                      />
-                      <button
-                        class="upload-button"
-                        onclick={() => filesNonEuInput?.click()}
-                      >
-                        <label for="File-1-2" class="w-file-upload-label">
-                          <div class="w-icon-file-upload-icon"></div>
-                          <div class="w-inline-block">{t("upload.button")}</div>
-                        </label></button
-                      >
-
-                      <div class="w-file-upload-info">{t("upload.max")}</div>
-                    </div>
-
-                    {#if filesNonEu && filesNonEu?.length > 0}
-                      <div>
-                        {#each filesNonEu as file}
-                          {@render fileItem(file, "nonEu")}
-                        {/each}
-                      </div>
-                    {/if}
-
-                    <div tabindex="-1" class="w-file-upload-error w-hidden">
-                      <div
-                        class="w-file-upload-error-msg"
-                        data-w-size-error="Upload failed. Max size for files is 10 MB."
-                        data-w-type-error="Upload failed. Invalid file type."
-                        data-w-generic-error="Upload failed. Something went wrong. Please retry."
-                      >
-                        Upload failed. Max size for files is 10 MB.
-                      </div>
-                    </div>
-                  </div>
-                  <div class="text-explain">
-                    {@html t("hints.doc.nonEu")}
-                  </div>
-                  <Errors {errors} path="filesNonEu"></Errors>
-                </div>
-              {/if}
-            </div>
-          </div>
-        </div>
-        <div class="form-nav">
-          <button
-            class="button is-ghost w-button"
-            disabled={disable}
-            onclick={() => PageHelper.prev("step1")}>{t("nav.prev")}</button
-          >
-          {#if values.applyAsCompany}
-            <button
-              class="button w-button"
-              onclick={PageHelper.submit}
-              disabled={disable}
-              >{validating ? t("nav.validate") : t("nav.submit")}</button
-            >
-          {:else}
-            <button
-              class="button w-button"
-              onclick={() => PageHelper.next("step3")}
-              disabled={disable}
-              >{validating ? t("nav.validate") : t("nav.next")}</button
-            >
-          {/if}
-        </div>
-      </div>
-    {/if}
-
-    {#if currentStep === Steps.step3}
-      <div in:fade class="form-step is-active">
-        <div class="box has-24-gap">
-          <div class="box has-8-gap">
-            <div class="form-steps">
-              <div class="step"><div>{t("steps.1")}</div></div>
-              <div class="step"><div>{t("steps.2")}</div></div>
-              <div class="step is-active"><div>{t("steps.3")}</div></div>
-            </div>
-            <h2 class="heading is-regular">{t("step3.title")}</h2>
-            <p class="body-text">{t("step3.lead")}</p>
-          </div>
-          <div class="box has-8-gap">
-            <div class="input-wrap">
-              <label for="deliveryCity" class="field-label"
-                >{t("labels.cityToDeliver")}</label
-              >
-              <select
-                id="deliveryCity"
-                name="deliveryCity"
-                data-name="Misto rozvazeni"
-                class="input-2 w-select"
-                bind:value={values.deliveryCity}
-              >
-                <option value="" disabled>{t("select.placeholder.city")}</option
-                >
-                {#await getCities(locale) then cities}
-                  {#each cities as city}
-                    <option value={city}>{city}</option>
-                  {/each}
-                {/await}
-              </select>
-            </div>
-            <div class="input-wrap">
-              <label for="field" class="field-label"
-                >{t("labels.transport")}</label
-              >
-              <div class="input-wrap">
-                <div class="w-embed">
-                  <select
-                    name="transport"
-                    class="input-2"
-                    bind:value={values.transport}
-                  >
-                    <option value="" disabled
-                      >{t("select.placeholder.transport")}</option
-                    >
-                    <option value="auto">{t("options.transport.car")}</option>
-                    <option value="kolo">{t("options.transport.bike")}</option>
-                    <option value="motorka"
-                      >{t("options.transport.motorcycle")}</option
-                    >
-                    <option value="el-kolobezka"
-                      >{t("options.transport.electricScooter")}</option
-                    >
-                  </select>
-                </div>
-              </div>
-            </div>
-            {#if values.transport === "auto"}
-              <div class="input-group-wrap">
-                <div class="upload">
-                  <label for="DriversLicense" class="field-label"
-                    >{@html t("labels.doc.driversLicense")}</label
-                  >
-                  <div id="file-1" class="w-file-upload">
-                    <div class="default-state-2 w-file-upload-default">
-                      <input
-                        class="w-file-upload-input"
-                        accept=""
-                        name="filesDriversLicense"
-                        data-name="filesdriversLicense"
-                        aria-hidden="true"
-                        type="file"
-                        id="filesDriversLicense"
-                        tabindex="-1"
-                        multiple
-                        onchange={(e) => {
-                          console.log(e);
-                          const files = (e.currentTarget as HTMLInputElement)
-                            .files;
-                          if (files) appendFilesTo("driversLicense", files);
-                          console.log(files);
-                        }}
-                        bind:this={filesDriversLicenseInput}
-                      />
-                      <button
-                        class="upload-button"
-                        onclick={() => filesDriversLicenseInput?.click()}
-                      >
-                        <label for="File-1-2" class="w-file-upload-label">
-                          <div class="w-icon-file-upload-icon"></div>
-                          <div class="w-inline-block">{t("upload.button")}</div>
-                        </label></button
-                      >
-
-                      <div class="w-file-upload-info">{t("upload.max")}</div>
-                    </div>
-
-                    {#if filesDriversLicense && filesDriversLicense?.length > 0}
-                      <div>
-                        {#each filesDriversLicense as file}
-                          {@render fileItem(file, "driversLicense")}
-                        {/each}
-                      </div>
-                    {/if}
-
-                    <div tabindex="-1" class="w-file-upload-error w-hidden">
-                      <div
-                        class="w-file-upload-error-msg"
-                        data-w-size-error="Upload failed. Max size for files is 10 MB."
-                        data-w-type-error="Upload failed. Invalid file type."
-                        data-w-generic-error="Upload failed. Something went wrong. Please retry."
-                      >
-                        Upload failed. Max size for files is 10 MB.
-                      </div>
-                    </div>
-                  </div>
-                  <!--  <div class="text-explain">
-                    {@html t("hints.doc.driversLicense")}
-                  </div> -->
-                  <Errors {errors} path="filesDriversLicense"></Errors>
-                </div>
-              </div>
-            {/if}
-            <div class="input-group-wrap">
-              <div class="input-wrap">
-                <label for="St-tn-ob-anstv" class="field-label"
-                  ><strong>{t("labels.gender")}</strong></label
-                >
-
-                <select
-                  name="gender"
-                  id="gender"
-                  class="input-2"
-                  autocomplete="off"
-                  bind:value={values.gender}
-                >
-                  <option value="" disabled
-                    >{t("select.placeholder.gender")}</option
-                  >
-                  <option value="samec">{t("options.gender.male")}</option>
-                  <option value="zena">{t("options.gender.female")}</option>
-                </select>
-              </div>
-              <div class="input-wrap">
-                <label for="birthDate" class="field-label"
-                  >{t("labels.birthDate")}</label
-                ><input
-                  class="input-2 w-input"
-                  maxlength="256"
-                  name="birthDate"
-                  data-name="birthDate"
-                  type="date"
-                  id="birthDate"
-                  bind:value={values.birthDate}
-                />
-              </div>
-              {#if values.country.length > 0 && !isEu(values.country)}
-                <div class="input-wrap">
-                  <label for="passportExpiryDate" class="field-label"
-                    >{t("labels.passportExpiryDate")}</label
-                  ><input
-                    class="input-2 w-input"
+              {#if values.applyAsCompany === false && values.country === "CZ"}
+                <div in:fade class="input-wrap">
+                  <label for="nationalId" class="field-label"
+                    >{t("labels.nationalId")}
+                  </label><input
+                    data-parsley-error-message={t("errors.nationalId")}
+                    class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
                     maxlength="256"
-                    name="passportExpiryDate"
-                    data-name="passportExpiryDate"
-                    type="date"
-                    id="passportExpiryDate"
-                    bind:value={values.passportExpiryDate}
+                    name="nationalId"
+                    data-name="nationalId"
+                    placeholder={t("ph.nationalId")}
+                    data-parsley-rc=""
+                    type="text"
+                    id="nationalId"
+                    bind:value={values.nationalId}
                   />
+                  <Errors {errors} path="nationalId"></Errors>
                 </div>
               {/if}
+
+              {#if values.applyAsCompany === false && values.country.length > 0 && values.country !== "CZ"}
+                <div in:fade class="input-wrap">
+                  <label for="passportOrId" class="field-label"
+                    >{t("labels.passportOrId")}
+                  </label><input
+                    data-parsley-error-message={t("errors.passportOrId")}
+                    class="input-2 w-node-_8d497551-0a0a-68b8-5bf7-6f944b9fc4f1-d6eb4364 w-input"
+                    maxlength="256"
+                    name="passportOrId"
+                    data-name="passportOrId"
+                    placeholder={t("ph.passportOrId")}
+                    data-parsley-rc=""
+                    type="text"
+                    id="passportOrId"
+                    bind:value={values.passportOrId}
+                  />
+                  <Errors {errors} path="passportOrId"></Errors>
+                </div>
+              {/if}
+
+              <div class="input-group-wrap">
+                <div class="input-wrap relative">
+                  <label for="street" class="field-label"
+                    >{t("labels.street")}</label
+                  ><input
+                    data-parsley-error-message={t("errors.street")}
+                    class="input-2 w-node-_48acfe53-5ca2-1118-0e8c-0cdd22174c3b-d6eb4364 w-input"
+                    maxlength="256"
+                    name="street"
+                    data-name="street"
+                    placeholder=""
+                    type="text"
+                    id="street"
+                    required
+                    bind:value={values.street}
+                    onfocus={() => onAddressFocus("street")}
+                    onblur={onAddressBlur}
+                  />
+                  <Errors {errors} path="street"></Errors>
+                  {#if activeType === "street" && suggestions.length}
+                    <ul class="sugg" role="listbox">
+                      {#each suggestions as s}
+                        <li
+                          role="option"
+                          onmousedown={() => applySuggestion(s)}
+                        >
+                          {s.streetWithNumber || s.full}
+                          {#if s.city || s.postalCode}
+                            <small>
+                              — {s.city}{s.postalCode
+                                ? `, ${s.postalCode}`
+                                : ""}</small
+                            >
+                          {/if}
+                        </li>
+                      {/each}
+                    </ul>
+                  {/if}
+                </div>
+                <div class="input-wrap relative">
+                  <label for="houseNumber" class="field-label"
+                    >{t("labels.houseNumber")}</label
+                  ><input
+                    data-parsley-error-message={t("errors.houseNumber")}
+                    class="input-2 w-node-_75182725-5b9f-8942-268c-668a41ccdfd7-d6eb4364 w-input"
+                    maxlength="256"
+                    name="houseNumber"
+                    data-name="Cislo popisne"
+                    placeholder=""
+                    type="tel"
+                    id="houseNumber"
+                    required
+                    bind:value={values.houseNumber}
+                    onfocus={() => onAddressFocus("number.full")}
+                    onblur={onAddressBlur}
+                  />
+                  <Errors {errors} path="houseNumber"></Errors>
+                  {#if activeType === "number.full" && suggestions.length}
+                    <ul class="sugg" role="listbox">
+                      {#each suggestions as s}
+                        <li
+                          role="option"
+                          onmousedown={() => applySuggestion(s)}
+                        >
+                          {s.streetWithNumber || s.full}
+                          {#if s.city || s.postalCode}
+                            <small>
+                              — {s.city}{s.postalCode
+                                ? `, ${s.postalCode}`
+                                : ""}</small
+                            >
+                          {/if}
+                        </li>
+                      {/each}
+                    </ul>
+                  {/if}
+                </div>
+              </div>
+              <div class="input-group-wrap">
+                <div class="input-wrap relative">
+                  <label for="city" class="field-label"
+                    >{t("labels.city")}</label
+                  ><input
+                    data-parsley-error-message={t("errors.city")}
+                    class="input-2 w-node-_9b7ed3bb-d228-0d66-fa58-ba76e3894472-d6eb4364 w-input"
+                    maxlength="256"
+                    name="city"
+                    data-name="city"
+                    placeholder=""
+                    type="text"
+                    id="city"
+                    required
+                    bind:value={values.city}
+                    onfocus={() => onAddressFocus("city")}
+                    onblur={onAddressBlur}
+                  />
+                  <Errors {errors} path="city"></Errors>
+                  {#if activeType === "city" && suggestions.length}
+                    <ul class="sugg" role="listbox">
+                      {#each suggestions as s}
+                        <li
+                          role="option"
+                          onmousedown={() => applySuggestion(s)}
+                        >
+                          {s.streetWithNumber || s.full}
+                          {#if s.city || s.postalCode}
+                            <small>
+                              — {s.city}{s.postalCode
+                                ? `, ${s.postalCode}`
+                                : ""}</small
+                            >
+                          {/if}
+                        </li>
+                      {/each}
+                    </ul>
+                  {/if}
+                </div>
+                <div class="input-wrap relative">
+                  <label for="zip" class="field-label">{t("labels.zip")}</label
+                  ><input
+                    data-parsley-error-message={t("errors.zip")}
+                    class="input-2 w-node-_9b7ed3bb-d228-0d66-fa58-ba76e3894476-d6eb4364 w-input"
+                    maxlength="256"
+                    name="zip"
+                    data-name="zip"
+                    placeholder=""
+                    type="tel"
+                    id="zip"
+                    required
+                    bind:value={values.zip}
+                    onfocus={() => onAddressFocus("zip")}
+                    onblur={onAddressBlur}
+                  />
+                  <Errors {errors} path="zip"></Errors>
+                  {#if activeType === "zip" && suggestions.length}
+                    <ul class="sugg" role="listbox">
+                      {#each suggestions as s}
+                        <li
+                          role="option"
+                          onmousedown={() => applySuggestion(s)}
+                        >
+                          {s.streetWithNumber || s.full}
+                          {#if s.city || s.postalCode}
+                            <small>
+                              — {s.city}{s.postalCode
+                                ? `, ${s.postalCode}`
+                                : ""}</small
+                            >
+                          {/if}
+                        </li>
+                      {/each}
+                    </ul>
+                  {/if}
+                </div>
+              </div>
+              <div class="input-group-wrap">
+                <div class="input-group-wrap">
+                  <div class="prefix">
+                    <label for="bankPrefix" class="field-label"
+                      >{t("labels.bank.prefix")}</label
+                    >
+                    <div class="w-embed">
+                      <input
+                        type="text"
+                        id="bankPrefix"
+                        name="bankPrefix"
+                        class="input-2"
+                        maxlength="5"
+                        pattern="\d*"
+                        inputmode="numeric"
+                        placeholder={t("ph.bank.prefix")}
+                        bind:value={values.bankPrefix}
+                      />
+                    </div>
+                    <Errors {errors} path="bankPrefix"></Errors>
+                  </div>
+                  <div class="bank-number">
+                    <label for="bankNumber" class="field-label"
+                      >{t("labels.bank.number")}</label
+                    ><input
+                      data-parsley-error-message={t("errors.bank.number")}
+                      class="input-2 w-node-_5456f3ba-5ad3-f3cf-d87e-1e89755a0bb4-d6eb4364 w-input"
+                      maxlength="256"
+                      name="bankNumber"
+                      data-name="Číslo účtu"
+                      placeholder=""
+                      type="text"
+                      id="bankNumber"
+                      required
+                      bind:value={values.bankNumber}
+                    />
+                    <Errors {errors} path="bankNumber"></Errors>
+                  </div>
+                  <div class="bank-code">
+                    <label for="bankCode" class="field-label"
+                      >{t("labels.bank.code")}</label
+                    >
+                    <div class="w-embed">
+                      <select
+                        name="bankCode"
+                        id="bankCode"
+                        class="input-2"
+                        required
+                        bind:value={values.bankCode}
+                      >
+                        <option value="" disabled
+                          >{t("select.placeholder.bank")}</option
+                        >
+                        <option value="0100">0100 – Komerční banka</option>
+                        <option value="0300">0300 – ČSOB</option>
+                        <option value="0600">0600 – MONETA</option>
+                        <option value="0800">0800 – Česká spořitelna</option>
+                        <option value="2010">2010 – Fio banka</option>
+                        <option value="3030">3030 – Air Bank</option>
+                        <option value="5500">5500 – Raiffeisenbank</option>
+                        <option value="6210">6210 – mBank</option>
+                        <option value="2700">2700 – UniCredit Bank</option>
+                        <option value="3050">3050 – Hello bank</option>
+                        <option value="3500">3500 – ING Bank</option>
+                        <option value="6800">6800 – Sberbank</option>
+                        <option value="2250">2250 – Banka Creditas</option>
+                        <option value="2070">2070 – Trinity Bank</option>
+                        <option value="4000">4000 – Expobank</option>
+                        <option value="8040">8040 – Oberbank</option>
+                        <option value="2600">2600 – Citibank</option>
+                        <option value="2020">2020 – MUFG Bank</option>
+                        <option value="2100">2100 – Hypoteční banka</option>
+                        <option value="2060">2060 – Citfin</option>
+                        <option value="2200">2200 – Peněžní dům</option>
+                        <option value="2220">2220 – Artesa</option>
+                        <option value="2260">2260 – NEY</option>
+                        <option value="3060">3060 – PKO BP</option>
+                        <option value="4300"
+                          >4300 – Národní rozvojová banka</option
+                        >
+                        <option value="5800">5800 – J&T BANKA</option>
+                        <option value="6000">6000 – PPF banka</option>
+                        <option value="6200">6200 – COMMERZBANK</option>
+                        <option value="6300">6300 – BNP Paribas</option>
+                        <option value="6700"
+                          >6700 – Všeobecná úvěrová banka</option
+                        >
+                        <option value="7910">7910 – Deutsche Bank</option>
+                        <option value="7950"
+                          >7950 – Raiffeisen stavební spořitelna</option
+                        >
+                        <option value="7960"
+                          >7960 – ČSOB Stavební spořitelna</option
+                        >
+                        <option value="7970"
+                          >7970 – MONETA Stavební Spořitelna</option
+                        >
+                        <option value="7990"
+                          >7990 – Modrá pyramida stavební spořitelna</option
+                        >
+                        <option value="8030"
+                          >8030 – Volksbank Raiffeisenbank Nordoberpfalz</option
+                        >
+                        <option value="8060"
+                          >8060 – Stavební spořitelna České spořitelny</option
+                        >
+                        <option value="8090">8090 – Česká exportní banka</option
+                        >
+                        <option value="8150"
+                          >8150 – HSBC Continental Europe</option
+                        >
+                        <option value="6363">6363 – Partners banka</option>
+                      </select>
+                    </div>
+                    <Errors {errors} path="bankCode"></Errors>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-group-wrap">
+                {#if values.country === "CZ"}
+                  <div class="upload">
+                    <label for="Ulice" class="field-label"
+                      >{@html t("labels.doc.nationalId")}</label
+                    >
+                    <div id="file-1" class="w-file-upload">
+                      <div class="default-state-2 w-file-upload-default">
+                        <input
+                          class="w-file-upload-input"
+                          accept=""
+                          name="filesNationalId"
+                          data-name="filesNationalId"
+                          aria-hidden="true"
+                          type="file"
+                          id="filesNationalId"
+                          tabindex="-1"
+                          required
+                          multiple
+                          onchange={(e) => {
+                            const files = (e.currentTarget as HTMLInputElement)
+                              .files;
+                            if (files) appendFilesTo("nationalId", files);
+                          }}
+                          bind:this={filesNationalIdInput}
+                        />
+                        <button
+                          class="upload-button"
+                          onclick={() => filesNationalIdInput?.click()}
+                        >
+                          <label for="File-1-2" class="w-file-upload-label">
+                            <div class="w-icon-file-upload-icon"></div>
+                            <div class="w-inline-block">
+                              {t("upload.button")}
+                            </div>
+                          </label></button
+                        >
+
+                        <div class="w-file-upload-info">{t("upload.max")}</div>
+                      </div>
+
+                      {#if filesNationalId && filesNationalId?.length > 0}
+                        <div>
+                          {#each filesNationalId as file}
+                            {@render fileItem(file, "nationalId")}
+                          {/each}
+                        </div>
+                      {/if}
+
+                      <div tabindex="-1" class="w-file-upload-error w-hidden">
+                        <div
+                          class="w-file-upload-error-msg"
+                          data-w-size-error="Upload failed. Max size for files is 10 MB."
+                          data-w-type-error="Upload failed. Invalid file type."
+                          data-w-generic-error="Upload failed. Something went wrong. Please retry."
+                        >
+                          Upload failed. Max size for files is 10 MB.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-explain">
+                      {@html t("hints.doc.nationalId")}
+                    </div>
+                    <Errors {errors} path="filesNationalId"></Errors>
+                  </div>
+                {/if}
+
+                {#if values.country.length > 0 && isEu(values.country) && values.country !== "CZ"}
+                  <div class="upload">
+                    <label for="Ulice" class="field-label"
+                      >{@html t("labels.doc.euPassport")}</label
+                    >
+                    <div id="file-2" class="w-file-upload">
+                      <div class="default-state-2 w-file-upload-default">
+                        <input
+                          class="w-file-upload-input"
+                          accept=""
+                          name="filesEuPassport"
+                          data-name="filesEuPassport"
+                          aria-hidden="true"
+                          type="file"
+                          id="filesEuPassport"
+                          tabindex="-1"
+                          required
+                          multiple
+                          onchange={(e) => {
+                            const files = (e.currentTarget as HTMLInputElement)
+                              .files;
+                            if (files) appendFilesTo("euPassport", files);
+                          }}
+                          bind:this={filesEuPassportInput}
+                        />
+                        <button
+                          class="upload-button"
+                          onclick={() => filesEuPassportInput?.click()}
+                        >
+                          <label for="File-1-2" class="w-file-upload-label">
+                            <div class="w-icon-file-upload-icon"></div>
+                            <div class="w-inline-block">
+                              {t("upload.button")}
+                            </div>
+                          </label></button
+                        >
+
+                        <div class="w-file-upload-info">{t("upload.max")}</div>
+                      </div>
+
+                      {#if filesEuPassport && filesEuPassport?.length > 0}
+                        <div>
+                          {#each filesEuPassport as file}
+                            {@render fileItem(file, "euPassport")}
+                          {/each}
+                        </div>
+                      {/if}
+
+                      <div tabindex="-1" class="w-file-upload-error w-hidden">
+                        <div
+                          class="w-file-upload-error-msg"
+                          data-w-size-error="Upload failed. Max size for files is 10 MB."
+                          data-w-type-error="Upload failed. Invalid file type."
+                          data-w-generic-error="Upload failed. Something went wrong. Please retry."
+                        >
+                          Upload failed. Max size for files is 10 MB.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-explain">
+                      {@html t("hints.doc.euPassport")}
+                    </div>
+                    <Errors {errors} path="filesEuPassport"></Errors>
+                  </div>
+                {/if}
+
+                {#if values.country.length > 0 && !isEu(values.country)}
+                  <div class="upload">
+                    <label for="Ulice" class="field-label"
+                      >{@html t("labels.doc.nonEu")}</label
+                    >
+                    <div id="file-2" class="w-file-upload">
+                      <div class="default-state-2 w-file-upload-default">
+                        <input
+                          class="w-file-upload-input"
+                          accept=""
+                          name="filesNonEu"
+                          data-name="filesNonEu"
+                          aria-hidden="true"
+                          type="file"
+                          id="filesNonEu"
+                          tabindex="-1"
+                          required
+                          multiple
+                          onchange={(e) => {
+                            const files = (e.currentTarget as HTMLInputElement)
+                              .files;
+                            if (files) appendFilesTo("nonEu", files);
+                          }}
+                          bind:this={filesNonEuInput}
+                        />
+                        <button
+                          class="upload-button"
+                          onclick={() => filesNonEuInput?.click()}
+                        >
+                          <label for="File-1-2" class="w-file-upload-label">
+                            <div class="w-icon-file-upload-icon"></div>
+                            <div class="w-inline-block">
+                              {t("upload.button")}
+                            </div>
+                          </label></button
+                        >
+
+                        <div class="w-file-upload-info">{t("upload.max")}</div>
+                      </div>
+
+                      {#if filesNonEu && filesNonEu?.length > 0}
+                        <div>
+                          {#each filesNonEu as file}
+                            {@render fileItem(file, "nonEu")}
+                          {/each}
+                        </div>
+                      {/if}
+
+                      <div tabindex="-1" class="w-file-upload-error w-hidden">
+                        <div
+                          class="w-file-upload-error-msg"
+                          data-w-size-error="Upload failed. Max size for files is 10 MB."
+                          data-w-type-error="Upload failed. Invalid file type."
+                          data-w-generic-error="Upload failed. Something went wrong. Please retry."
+                        >
+                          Upload failed. Max size for files is 10 MB.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-explain">
+                      {@html t("hints.doc.nonEu")}
+                    </div>
+                    <Errors {errors} path="filesNonEu"></Errors>
+                  </div>
+                {/if}
+              </div>
             </div>
-            <div class="input-wrap">
-              <label for="Pojistovna" class="field-label"
-                >{t("labels.insurance")}</label
+          </div>
+          <div class="form-nav">
+            <button
+              class="button is-ghost w-button"
+              disabled={disable}
+              onclick={() => PageHelper.prev("step1")}>{t("nav.prev")}</button
+            >
+            {#if values.applyAsCompany}
+              <button
+                class="button w-button"
+                onclick={PageHelper.submit}
+                disabled={disable}
+                >{validating ? t("nav.validate") : t("nav.submit")}</button
               >
-              <div class="w-embed">
+            {:else}
+              <button
+                class="button w-button"
+                onclick={() => PageHelper.next("step3")}
+                disabled={disable}
+                >{validating ? t("nav.validate") : t("nav.next")}</button
+              >
+            {/if}
+          </div>
+        </div>
+      {/if}
+
+      {#if currentStep === Steps.step3}
+        <div in:fade class="form-step is-active">
+          <div class="box has-24-gap">
+            <div class="box has-8-gap">
+              <div class="form-steps">
+                <div class="step"><div>{t("steps.1")}</div></div>
+                <div class="step"><div>{t("steps.2")}</div></div>
+                <div class="step is-active"><div>{t("steps.3")}</div></div>
+              </div>
+              <h2 class="heading is-regular">{t("step3.title")}</h2>
+              <p class="body-text">{t("step3.lead")}</p>
+            </div>
+            <div class="box has-8-gap">
+              <div class="input-wrap">
+                <label for="deliveryCity" class="field-label"
+                  >{t("labels.cityToDeliver")}</label
+                >
                 <select
-                  name="insurance"
-                  class="input-2"
-                  bind:value={values.insurance}
+                  id="deliveryCity"
+                  name="deliveryCity"
+                  data-name="Misto rozvazeni"
+                  class="input-2 w-select"
+                  bind:value={values.deliveryCity}
                 >
                   <option value="" disabled
-                    >{t("select.placeholder.insurance")}</option
+                    >{t("select.placeholder.city")}</option
                   >
-                  {#await getInsuranceOptions(locale) then insuranceOptions}
-                    {#each Object.entries(insuranceOptions) as [key, value]}
-                      <option value={key}>{value}</option>
+                  {#await getCities(locale) then cities}
+                    {#each cities as city}
+                      <option value={city}>{city}</option>
                     {/each}
                   {/await}
                 </select>
               </div>
-            </div>
-            <div class="input-wrap">
-              <label for="field" class="field-label"
-                >{t("labels.pinkStatement")}</label
-              >
-              <div class="input-group-wrap">
-                <label
-                  id="ruzove-prohlaseni-ano"
-                  class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089dde-d6eb4364 w-radio"
-                  class:is-checked={values.pinkStatement === true}
+              <div class="input-wrap">
+                <label for="field" class="field-label"
+                  >{t("labels.transport")}</label
                 >
-                  <div
-                    class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
-                    class:w--redirected-checked={values.pinkStatement === true}
-                  ></div>
-                  <input
-                    type="radio"
-                    name="pinkStatement"
-                    id="ANO-2"
-                    data-name="pinkStatement"
-                    style="opacity:0;position:absolute;z-index:-1"
-                    value={true}
-                    bind:group={values.pinkStatement}
-                  /><span class="w-form-label">{t("answer.yes")}</span>
-                </label><label
-                  id="pinkStatement-ne"
-                  class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089de2-d6eb4364 w-radio"
-                  class:is-checked={values.pinkStatement === false}
-                >
-                  <div
-                    class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
-                    class:w--redirected-checked={values.pinkStatement === false}
-                  ></div>
-                  <input
-                    type="radio"
-                    name="pinkStatement"
-                    id="NE"
-                    data-name="pinkStatement"
-                    style="opacity:0;position:absolute;z-index:-1"
-                    value={false}
-                    bind:group={values.pinkStatement}
-                  /><span class="w-form-label">{t("answer.no")}</span>
-                </label>
+                <div class="input-wrap">
+                  <div class="w-embed">
+                    <select
+                      name="transport"
+                      class="input-2"
+                      bind:value={values.transport}
+                    >
+                      <option value="" disabled
+                        >{t("select.placeholder.transport")}</option
+                      >
+                      <option value="auto">{t("options.transport.car")}</option>
+                      <option value="kolo">{t("options.transport.bike")}</option
+                      >
+                      <option value="motorka"
+                        >{t("options.transport.motorcycle")}</option
+                      >
+                      <option value="el-kolobezka"
+                        >{t("options.transport.electricScooter")}</option
+                      >
+                    </select>
+                  </div>
+                </div>
               </div>
-              <div class="text-explain">
-                {@html t("hints.pinkstatement")}
+              {#if values.transport === "auto"}
+                <div class="input-group-wrap">
+                  <div class="upload">
+                    <label for="DriversLicense" class="field-label"
+                      >{@html t("labels.doc.driversLicense")}</label
+                    >
+                    <div id="file-1" class="w-file-upload">
+                      <div class="default-state-2 w-file-upload-default">
+                        <input
+                          class="w-file-upload-input"
+                          accept=""
+                          name="filesDriversLicense"
+                          data-name="filesdriversLicense"
+                          aria-hidden="true"
+                          type="file"
+                          id="filesDriversLicense"
+                          tabindex="-1"
+                          multiple
+                          onchange={(e) => {
+                            console.log(e);
+                            const files = (e.currentTarget as HTMLInputElement)
+                              .files;
+                            if (files) appendFilesTo("driversLicense", files);
+                            console.log(files);
+                          }}
+                          bind:this={filesDriversLicenseInput}
+                        />
+                        <button
+                          class="upload-button"
+                          onclick={() => filesDriversLicenseInput?.click()}
+                        >
+                          <label for="File-1-2" class="w-file-upload-label">
+                            <div class="w-icon-file-upload-icon"></div>
+                            <div class="w-inline-block">
+                              {t("upload.button")}
+                            </div>
+                          </label></button
+                        >
+
+                        <div class="w-file-upload-info">{t("upload.max")}</div>
+                      </div>
+
+                      {#if filesDriversLicense && filesDriversLicense?.length > 0}
+                        <div>
+                          {#each filesDriversLicense as file}
+                            {@render fileItem(file, "driversLicense")}
+                          {/each}
+                        </div>
+                      {/if}
+
+                      <div tabindex="-1" class="w-file-upload-error w-hidden">
+                        <div
+                          class="w-file-upload-error-msg"
+                          data-w-size-error="Upload failed. Max size for files is 10 MB."
+                          data-w-type-error="Upload failed. Invalid file type."
+                          data-w-generic-error="Upload failed. Something went wrong. Please retry."
+                        >
+                          Upload failed. Max size for files is 10 MB.
+                        </div>
+                      </div>
+                    </div>
+                    <!--  <div class="text-explain">
+                    {@html t("hints.doc.driversLicense")}
+                  </div> -->
+                    <Errors {errors} path="filesDriversLicense"></Errors>
+                  </div>
+                </div>
+              {/if}
+              <div class="input-group-wrap">
+                <div class="input-wrap">
+                  <label for="St-tn-ob-anstv" class="field-label"
+                    ><strong>{t("labels.gender")}</strong></label
+                  >
+
+                  <select
+                    name="gender"
+                    id="gender"
+                    class="input-2"
+                    autocomplete="off"
+                    bind:value={values.gender}
+                  >
+                    <option value="" disabled
+                      >{t("select.placeholder.gender")}</option
+                    >
+                    <option value="samec">{t("options.gender.male")}</option>
+                    <option value="zena">{t("options.gender.female")}</option>
+                  </select>
+                </div>
+                <div class="input-wrap">
+                  <label for="birthDate" class="field-label"
+                    >{t("labels.birthDate")}</label
+                  ><input
+                    class="input-2 w-input"
+                    maxlength="256"
+                    name="birthDate"
+                    data-name="birthDate"
+                    type="date"
+                    id="birthDate"
+                    bind:value={values.birthDate}
+                  />
+                </div>
+                {#if values.country.length > 0 && !isEu(values.country)}
+                  <div class="input-wrap">
+                    <label for="passportExpiryDate" class="field-label"
+                      >{t("labels.passportExpiryDate")}</label
+                    ><input
+                      class="input-2 w-input"
+                      maxlength="256"
+                      name="passportExpiryDate"
+                      data-name="passportExpiryDate"
+                      type="date"
+                      id="passportExpiryDate"
+                      bind:value={values.passportExpiryDate}
+                    />
+                  </div>
+                {/if}
+              </div>
+              <div class="input-wrap">
+                <label for="Pojistovna" class="field-label"
+                  >{t("labels.insurance")}</label
+                >
+                <div class="w-embed">
+                  <select
+                    name="insurance"
+                    class="input-2"
+                    bind:value={values.insurance}
+                  >
+                    <option value="" disabled
+                      >{t("select.placeholder.insurance")}</option
+                    >
+                    {#await getInsuranceOptions(locale) then insuranceOptions}
+                      {#each Object.entries(insuranceOptions) as [key, value]}
+                        <option value={key}>{value}</option>
+                      {/each}
+                    {/await}
+                  </select>
+                </div>
+              </div>
+              <div class="input-wrap">
+                <label for="field" class="field-label"
+                  >{t("labels.pinkStatement")}</label
+                >
+                <div class="input-group-wrap">
+                  <label
+                    id="ruzove-prohlaseni-ano"
+                    class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089dde-d6eb4364 w-radio"
+                    class:is-checked={values.pinkStatement === true}
+                  >
+                    <div
+                      class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
+                      class:w--redirected-checked={values.pinkStatement ===
+                        true}
+                    ></div>
+                    <input
+                      type="radio"
+                      name="pinkStatement"
+                      id="ANO-2"
+                      data-name="pinkStatement"
+                      style="opacity:0;position:absolute;z-index:-1"
+                      value={true}
+                      bind:group={values.pinkStatement}
+                    /><span class="w-form-label">{t("answer.yes")}</span>
+                  </label><label
+                    id="pinkStatement-ne"
+                    class="registrationtype w-node-_7a7458f0-b249-90e6-4e96-a52d92089de2-d6eb4364 w-radio"
+                    class:is-checked={values.pinkStatement === false}
+                  >
+                    <div
+                      class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"
+                      class:w--redirected-checked={values.pinkStatement ===
+                        false}
+                    ></div>
+                    <input
+                      type="radio"
+                      name="pinkStatement"
+                      id="NE"
+                      data-name="pinkStatement"
+                      style="opacity:0;position:absolute;z-index:-1"
+                      value={false}
+                      bind:group={values.pinkStatement}
+                    /><span class="w-form-label">{t("answer.no")}</span>
+                  </label>
+                </div>
+                <div class="text-explain">
+                  {@html t("hints.pinkstatement")}
+                </div>
               </div>
             </div>
           </div>
+          <div class="form-nav">
+            <button
+              class="button is-ghost w-button"
+              disabled={disable}
+              onclick={() => PageHelper.prev("step2")}>{t("nav.prev")}</button
+            >
+            <button
+              class="button w-button"
+              onclick={PageHelper.submit}
+              disabled={disable}
+              >{validating
+                ? t("nav.validate")
+                : submitting
+                  ? t("nav.wait")
+                  : t("nav.submit")}</button
+            >
+          </div>
         </div>
-        <div class="form-nav">
-          <button
-            class="button is-ghost w-button"
-            disabled={disable}
-            onclick={() => PageHelper.prev("step2")}>{t("nav.prev")}</button
-          >
-          <button
-            class="button w-button"
-            onclick={PageHelper.submit}
-            disabled={disable}
-            >{validating
-              ? t("nav.validate")
-              : submitting
-                ? t("nav.wait")
-                : t("nav.submit")}</button
-          >
-        </div>
-      </div>
-    {/if}
-  </div>
+      {/if}
+    </div>
+  {/if}
+
   {#if form.state === "success"}
     <div class="success-message-5">
       <div>{t("result.success")}</div>
