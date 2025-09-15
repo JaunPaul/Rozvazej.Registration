@@ -36,7 +36,7 @@
     | Array<string | Record<string, any>>
   >;
 
-  type Company = "Wolt" | "Foodora" | "Bolt" | "";
+  type Company = "Wolt" | "Foodora" | "Bolt" | "Development" | "Staging" | "";
   type FormStates = "submitting" | "success" | "fail" | "neutral";
 
   class Form {
@@ -52,6 +52,7 @@
       "rozvazej-foodora.cz": "Foodora",
       "fofrjidlo.cz": "Foodora",
       "bleskrozvoz.cz": "Bolt",
+      localhost: "Development",
     };
 
     static getCompanyByDomain(hostname?: string): Company[] {
@@ -446,6 +447,9 @@
     nationalId: "",
     passportOrId: "",
     deliveryCompany: PageHelper.getCompanyByDomain(),
+    deliveryCompanyWolt: false,
+    deliveryCompanyFoodora: false,
+    deliveryCompanyBolt: false,
     applyAsCompany: undefined,
     __addressFromSuggestion: false,
     address: "",
@@ -474,6 +478,12 @@
     utm_id: "",
     language: locale,
     submitSource: PageHelper.getCompanyByDomain()[0],
+  });
+
+  $effect(() => {
+    values.deliveryCompanyWolt = values.deliveryCompany.includes("Wolt");
+    values.deliveryCompanyFoodora = values.deliveryCompany.includes("Foodora");
+    values.deliveryCompanyBolt = values.deliveryCompany.includes("Bolt");
   });
 
   $effect(() => {
