@@ -46,8 +46,6 @@
 
   let form = new Form();
 
-  $inspect(form.state);
-
   abstract class PageHelper {
     static domains: Record<string, Company> = {
       "rozvazej.cz": "Wolt",
@@ -314,7 +312,10 @@
     static getUtmParams() {
       const params = new URLSearchParams(window.location.search);
       const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_id"];
-      return Object.fromEntries(utmKeys.map((key) => [key, params.get(key)]));
+
+      return Object.fromEntries(
+        utmKeys.map((key) => [key, params.get(key) ?? ""])
+      );
     }
   }
   let locale: Locale = "cs";
@@ -467,13 +468,12 @@
     filesEuPassport: [],
     filesNonEu: [],
     filesDriversLicense: [],
-    utmParams: {
-      utm_source: undefined,
-      utm_campaign: undefined,
-      utm_medium: undefined,
-      utm_id: undefined,
-    },
+    utm_source: "",
+    utm_campaign: "",
+    utm_medium: "",
+    utm_id: "",
     language: locale,
+    submitSource: PageHelper.getCompanyByDomain()[0],
   });
 
   $effect(() => {
@@ -490,7 +490,8 @@
         console.error("Failed to parse saved form data", e);
       }
     }
-    values.utmParams = PageHelper.getUtmParams();
+    const utmParams = PageHelper.getUtmParams();
+    Object.assign(values, utmParams);
   });
 
   let emailHint = $state("");
