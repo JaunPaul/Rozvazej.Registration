@@ -236,7 +236,7 @@ export async function validateLocation(q: ValidateLocationInput): Promise<{
   const house = q.houseNumber?.trim();
   const city = q.city?.trim();
   const zip = q.postalCode ? q.postalCode.replace(/\s/g, "") : undefined;
-  const country = q.countryCode ?? DEFAULTS.clientCountry;
+  const country = DEFAULTS.clientCountry;
 
   // Build the correct payload
   const payload: any = {
