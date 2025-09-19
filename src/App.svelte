@@ -193,10 +193,10 @@
 			};
 
 			// (B) Separate arrays per bucket (if your Make scenario prefers distinct keys)
-			snapshot.filesNationalId?.forEach((f) => fd.append('filesNationalId[]', f, f.name));
-			snapshot.filesEuPassport?.forEach((f) => fd.append('filesEuPassport[]', f, f.name));
-			snapshot.filesNonEu?.forEach((f) => fd.append('filesNonEu[]', f, f.name));
-			snapshot.filesDriversLicense?.forEach((f) => fd.append('filesDriversLicense[]', f, f.name));
+			snapshot.filesNationalId?.forEach((f) => fd.append('filesNationalId', f, f.name));
+			snapshot.filesEuPassport?.forEach((f) => fd.append('filesEuPassport', f, f.name));
+			snapshot.filesNonEu?.forEach((f) => fd.append('filesNonEu', f, f.name));
+			snapshot.filesDriversLicense?.forEach((f) => fd.append('filesDriversLicense', f, f.name));
 			const _test = 'https://httpstat.us/500';
 			try {
 				const res = await fetch(endpoint, {
