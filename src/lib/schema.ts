@@ -91,8 +91,8 @@ export const formSchema = z.object({
   houseNumber: z.string().min(1, { error: t("errors.houseNumber") }),
   city: z.string().min(1, { error: t("errors.city") }),
   zip: z.string().min(1, { error: t("errors.zip") }),
-  bankPrefix: z.string().max(5, { error: t("errors.bank.prefix") }),
-  bankNumber: z.string().min(1, { error: t("errors.bank.number") }),
+  bankPrefix: z.string().max(6, { error: t("errors.bank.prefix") }),
+  bankNumber: z.string().min(1, { error: t("errors.bank.number") }).max(10, { error: t("errors.bank.number") }),
   bankCode: z.string().min(1, { error: t("errors.bank.code") }),
 
   filesNationalId: fileArray(2),
