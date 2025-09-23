@@ -1299,7 +1299,7 @@
 												id="bankPrefix"
 												name="bankPrefix"
 												class="input-2"
-												maxlength="5"
+												maxlength="6"
 												pattern="\d*"
 												inputmode="numeric"
 												placeholder={t('ph.bank.prefix')}
@@ -1313,7 +1313,7 @@
 										><input
 											data-parsley-error-message={t('errors.bank.number')}
 											class="input-2 w-node-_5456f3ba-5ad3-f3cf-d87e-1e89755a0bb4-d6eb4364 w-input"
-											maxlength="256"
+											maxlength="11"
 											name="bankNumber"
 											data-name="Číslo účtu"
 											placeholder=""
