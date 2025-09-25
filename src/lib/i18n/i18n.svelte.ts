@@ -33,7 +33,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.doc.euPassport": `Nahrajte svůj občanský průkaz nebo cestovní pas. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
     "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">1. Průkaz totožnosti nebo cestovní pas</span><br /><span class="bold-green">2. Vízum NEBO povolení k pobytu NEBO Potvrzení o</span><br /><span class="bold-green">2. studiu nebo pracovní povolení</span>`,
     "labels.doc.driversLicense": `Nahrajte platný řidičský průkaz. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br />`,
-    "labels.deliveryCompany": "Which company will you deliver for?",
+    "labels.deliveryCompany": "Neomezujte se – u nás můžete jezdit pro všechny tři služby najednou: Bolt, Wolt i Foodora. Více platforem = více objednávek = vyšší výdělky. Stačí si zvolit, kde chcete začít!",
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
