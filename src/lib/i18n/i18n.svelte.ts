@@ -164,7 +164,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.doc.euPassport": `Upload your Identity card or passport. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
     "labels.doc.nonEu": `Upload the following valid documents. <br /><span class="bold-green">ID CARD OR PASSPORT</span><br /><span class="bold-green">VISA OR RESIDENCE PERMIT</span><br /><span class="bold-green">STUDY OR PERMIT</span>`,
     "labels.doc.driversLicense": `Upload valid driver's license. <br /><span class="bold-green">1. FRONT SIDE</span><br />`,
-    "labels.deliveryCompany": "Which company will you deliver for?",
+    "labels.deliveryCompany": "Don’t limit yourself – with us you can ride for all three services at once: Bolt, Wolt, and Foodora. More platforms = more orders = higher earnings. Just choose where you want to start!",
 
     "hints.czPhone":
       "For deliveries in the Czech Republic you must provide a <strong>Czech phone number.</strong>",
