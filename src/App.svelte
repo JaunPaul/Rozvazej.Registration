@@ -46,6 +46,12 @@
 			localhost: 'Development'
 		};
 
+		static checkLanguage(): 'cs' | 'en' {
+			const path = typeof window !== 'undefined' ? window.location.pathname : '';
+			if (path.endsWith('-en')) return 'en';
+			return 'cs';
+		}
+
 		static getCompanyByDomain(hostname?: string): Company[] {
 			const raw = (
 				hostname ?? (typeof window !== 'undefined' ? window.location.hostname : '')
@@ -289,7 +295,7 @@
 			return Object.fromEntries(utmKeys.map((key) => [key, params.get(key) ?? '']));
 		}
 	}
-	let locale: Locale = 'cs';
+	let locale: Locale = $state(PageHelper.checkLanguage());
 	setLocale(locale);
 
 	const Steps = {
