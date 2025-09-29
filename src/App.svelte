@@ -278,8 +278,10 @@
 				console.log('Submit:', res.status, text);
 				if (!res.ok) {
 					console.error('Submit failed');
+					form.errors['submit'] = [t('result.fail')];
 				} else {
 					// success UI here if you want
+					delete form.errors['submit'];
 				}
 			} catch (err) {
 				console.error('Network error:', err);
@@ -312,9 +314,9 @@
 	let submitting = $state(false);
 
 	let currentStep = $state(Steps.step1);
-	if (formStep) {
-		currentStep = Steps[formStep];
-	}
+	//	if (formStep) {
+	//		currentStep = Steps[formStep];
+	//	}
 
 	let filesNationalId: FileList | undefined = $state();
 	let filesEuPassport: FileList | undefined = $state();
