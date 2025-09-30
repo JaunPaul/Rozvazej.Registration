@@ -24,6 +24,20 @@ export type FxValidity = {
   raw?: unknown;
 };
 
+export type FxError = {
+  status: 402;
+  errors: [
+    {
+      group: string;
+      type: string;
+      subtype: string;
+      severity: string;
+      relatedTo: string[];
+      description: string;
+    }
+  ];
+};
+
 export type FxLocation = {
   full?: string;
   street?: string;
@@ -133,13 +147,17 @@ export async function validateName(
     validationDepth: "minimal",
     smartMode: true,
   }
-): Promise<FxValidity> {
+): Promise<FxValidity | FxError> {
   const res = await fox
     .name()
     .setCustomId("name-check")
     .setOptions(opts)
     .includeRequestDetails(DEFAULTS.includeRequestDetails)
     .validate({ [type]: value });
+
+  if (res.getStatus() === 402) {
+    return { status: 402, ...res.getErrors() } as FxError;
+  }
 
   const result: any = unwrap(res);
   return {

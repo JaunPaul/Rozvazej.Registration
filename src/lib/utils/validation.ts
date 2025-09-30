@@ -157,7 +157,8 @@ const hasNoKeys = (o?: Record<string, unknown> | null) =>
  */
 export async function validateStepAsync(
   stepId: "step1" | "step2" | "step3",
-  data: any
+  data: any,
+  includeFoxentry: boolean
 ) {
   const visible = getVisibleIds(stepId, data);
   visible.forEach((id) => everVisible.add(id));
@@ -172,20 +173,23 @@ export async function validateStepAsync(
     ? {}
     : (zres.error.flatten().fieldErrors as FieldErrors);
 
-  // 2) Field-level Foxentry (only for visible keys that have a validator)
-  const toCheck = visible.filter((k) => k in fxValidators);
-  const fieldMsgs = await Promise.all(
-    toCheck.map(async (k) => ({ k, msg: await fxValidators[k](data) }))
-  );
-  for (const { k, msg } of fieldMsgs) {
-    if (msg) mergedErrors[k] = (mergedErrors[k] ?? []).concat(msg);
-  }
+  if (includeFoxentry) {
+    // 2) Field-level Foxentry (only for visible keys that have a validator)
+    const toCheck = visible.filter((k) => k in fxValidators);
+    const fieldMsgs = await Promise.all(
+      toCheck.map(async (k) => ({ k, msg: await fxValidators[k](data) }))
+    );
+    for (const { k, msg } of fieldMsgs) {
+      if (msg) mergedErrors[k] = (mergedErrors[k] ?? []).concat(msg);
+    }
 
-  // 3) Group-level Foxentry (address)
-  for (const run of fxGroupValidators) {
-    const g = await run(data, visible);
-    for (const [k, list] of Object.entries(g)) {
-      if (list?.length) mergedErrors[k] = (mergedErrors[k] ?? []).concat(list);
+    // 3) Group-level Foxentry (address)
+    for (const run of fxGroupValidators) {
+      const g = await run(data, visible);
+      for (const [k, list] of Object.entries(g)) {
+        if (list?.length)
+          mergedErrors[k] = (mergedErrors[k] ?? []).concat(list);
+      }
     }
   }
 
