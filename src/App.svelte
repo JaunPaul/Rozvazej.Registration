@@ -902,10 +902,10 @@
     companyActive = false;
   }
 
-  $inspect(errors, values);
+  
 
   $effect(() => {
-    console.log(errors);
+    console.log({errors, values});
   });
 </script>
 
