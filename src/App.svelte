@@ -28,6 +28,7 @@
   import { getEndpoint } from "./lib/utils/getEndpoints";
   import { onMount } from "svelte";
   import Loader from "./lib/components/Loader.svelte";
+  import { sendFoxentryFailedPaymentNotification } from "./lib/utils/notifications";
   type CustomErrors = Record<
     string,
     | undefined
@@ -535,7 +536,7 @@
       foxentryPaymentStatus?.status === 402
     ) {
       values.foxentryPaymentStatus = false;
-      // todo: send notification
+      await sendFoxentryFailedPaymentNotification();
     }
   });
 
