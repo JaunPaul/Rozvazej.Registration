@@ -903,10 +903,8 @@
     companyActive = false;
   }
 
-  
-
   $effect(() => {
-    console.log({errors, values});
+    console.log({ errors, values });
   });
 </script>
 
@@ -1100,6 +1098,7 @@
                       data-name="Checkbox"
                       style="opacity:0;position:absolute;z-index:-1"
                       value="Wolt"
+                      disabled={PageHelper.getCompanyByDomain()[0] === "Wolt"}
                       bind:group={values.deliveryCompany}
                     /><span class="w-form-label">Wolt</span>
                   </label><label
@@ -1119,6 +1118,7 @@
                       data-name="Checkbox"
                       style="opacity:0;position:absolute;z-index:-1"
                       value="Bolt"
+                      disabled={PageHelper.getCompanyByDomain()[0] === "Bolt"}
                       bind:group={values.deliveryCompany}
                     /><span class="w-form-label">Bolt</span>
                   </label><label
@@ -1140,6 +1140,8 @@
                       data-name="Checkbox"
                       style="opacity:0;position:absolute;z-index:-1"
                       value="Foodora"
+                      disabled={PageHelper.getCompanyByDomain()[0] ===
+                        "Foodora"}
                       bind:group={values.deliveryCompany}
                     /><span class="w-form-label">Foodora</span>
                   </label>
