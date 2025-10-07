@@ -58,6 +58,14 @@
       localhost: "Development",
     };
 
+    static getSessionId() {
+      return crypto.randomUUID();
+    }
+
+    static getFormStart() {
+      return new Date().toUTCString();
+    }
+
     static checkLanguage(): "cs" | "en" {
       const path =
         typeof window !== "undefined" ? window.location.pathname : "";
@@ -181,6 +189,8 @@
         filesNonEu: PageHelper.toFiles(filesNonEu),
         filesDriversLicense: PageHelper.toFiles(filesDriversLicense),
         submitLocation: window.location.href,
+        finalEndpointSubmissionId: crypto.randomUUID(),
+        finalEndpointSubmissionTime: new Date().toUTCString(),
       };
 
       // ---- FormData ----
@@ -280,6 +290,8 @@
       const snapshot = {
         ...values,
         submitLocation: window.location.href,
+        firstEndpointSubmissionId: crypto.randomUUID(),
+        firstEndpointSubmissionTime: new Date().toUTCString(),
       };
 
       // ---- FormData ----
@@ -503,6 +515,12 @@
     step1Completed: false,
     step2Completed: false,
     step3Completed: false,
+    sessionId: PageHelper.getSessionId(),
+    formStart: PageHelper.getFormStart(),
+    firstEndpointSubmissionId: undefined,
+    firstEndpointSubmissionTime: undefined,
+    finalEndpointSubmissionId: undefined,
+    finalEndpointSubmissionTime: undefined,
   });
 
   $effect(() => {
