@@ -5,11 +5,7 @@
   import { isEu } from "./lib/i18n/euCountriesFilter";
   import { getCities } from "./lib/i18n/citiesGetter";
   import { getInsuranceOptions } from "./lib/i18n/insuranceGetter";
-  import {
-    getRequiredIds,
-    getVisibleIds,
-    validateStepAsync,
-  } from "./lib/utils/validation";
+  import { validateStepAsync } from "./lib/utils/validation";
   import Errors from "./lib/components/Errors.svelte";
   import {
     debounce,
@@ -29,6 +25,8 @@
   import { onMount } from "svelte";
   import Loader from "./lib/components/Loader.svelte";
   import { sendFoxentryFailedPaymentNotification } from "./lib/utils/notifications";
+  import { SubmissionStatus } from "./lib/enums/form";
+
   type CustomErrors = Record<
     string,
     | undefined
@@ -47,6 +45,8 @@
     state: FormStates = $state("neutral");
   }
 
+  let submissionStatus: SubmissionStatus = $state(SubmissionStatus.PENDING);
+
   let form = new Form();
 
   abstract class PageHelper {
@@ -57,6 +57,142 @@
       "bleskrozvoz.cz": "Bolt",
       localhost: "Development",
     };
+
+    static async hashEmail(email: string): Promise<string> {
+      if (!email) return "";
+      const msgBuffer = new TextEncoder().encode(email.trim().toLowerCase());
+      const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    static trackCompletionWithoutAds(status: string) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "formCompletionWithoutAds",
+        status: status,
+      });
+    }
+    static trackCompletionWithAds(status: string) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "formCompletionWithAds",
+        status: status,
+      });
+    }
+
+    static async trackCompletion(status: string) {
+      let consent = 0;
+      const sklikConversionIds = {
+        longForm: 100053768,
+      };
+      try {
+        if (window.CookieScript && window.CookieScript.instance) {
+          const consentState = window.CookieScript.instance.currentState();
+          // Assuming 'advertising' is the category for Sklik; adjust if different
+          consent = consentState.categories.includes("targeting") ? 1 : 0;
+        } else {
+          // Fallback: Check cookie directly (less reliable)
+          const cookie = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("CookieScriptConsent="));
+          if (cookie) {
+            const consentData = JSON.parse(
+              decodeURIComponent(cookie.split("=")[1])
+            );
+            consent = consentData.categories.includes("targeting") ? 1 : 0;
+          }
+        }
+      } catch (e) {
+        console.error("Error retrieving CookieScript consent:", e);
+        consent = 0; // Default to no consent if error occurs
+      }
+
+      // Hash email for eid
+      let hashedEmail = "";
+      try {
+        hashedEmail = await this.hashEmail(values.email);
+      } catch (e) {
+        console.error("Email hashing failed:", e);
+      }
+
+      // Address for aid
+      const address = {
+        a1: "Czech Republic",
+        a2: values.city || "",
+        a3: values.address || "",
+        a4: "",
+        a5: values.zip || "",
+      };
+
+      // Phone for tid
+      const phone = values.phone;
+
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "formCompletion",
+        status: status,
+        user: {
+          email: values.email,
+          phone: values.phone,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          postalCode: values.zip,
+          country: "Czech Republic",
+          ...(values.address && {
+            streetAddress: values.address,
+          }),
+          ...(values.city && { city: values.city }),
+        },
+        sklikConversion: {
+          consent: consent,
+          eid: hashedEmail || values.email,
+          aid: address,
+          tid: phone,
+          id: sklikConversionIds.longForm,
+          zboziType: "standard",
+        },
+        enhanced_conversions: {
+          email: values.email,
+          phone_number: values.phone,
+          address: {
+            first_name: values.firstName || "",
+            last_name: values.lastName || "",
+            street: values.street || "",
+            city: values.city || "",
+            postal_code: values.zip || "",
+            country: "CZ",
+          },
+        },
+        gtm_ad_storage: consent === 1 ? "granted" : "denied",
+      });
+    }
+
+    static trackDropOff(step: string) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "dropOff",
+        stepDroppedOff: `step-${step}`,
+      });
+    }
+
+    static trackPageView(step: string) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "virtualPageview",
+        stepPage: `step-${step}`,
+      });
+    }
+
+    static trackFirstStep() {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "firstStep",
+        user: {
+          email: values.email,
+        },
+      });
+    }
 
     static getSessionId() {
       return crypto.randomUUID();
@@ -168,6 +304,7 @@
             break;
         }
         currentStep = Steps[step];
+        PageHelper.trackPageView(currentStep);
         PageHelper.updateParamsWithState(step);
       }
     };
@@ -254,11 +391,10 @@
       try {
         const res = await fetch(endpoint, {
           method: "POST",
-          body: fd, // ✅ browser sets multipart/form-data boundary
-          // mode: "cors",  // optional; usually not needed
+          body: fd,
         });
 
-        const text = await res.text(); // Make usually returns JSON, but text keeps logging simple
+        const text = await res.text();
         console.log("Submit:", res.status, text);
         if (!res.ok) {
           form.state = "fail";
@@ -266,16 +402,24 @@
             error: { status: res.status, message: res.statusText },
           };
           console.error("Submit failed");
+          submissionStatus = SubmissionStatus.REJECTED;
+          PageHelper.trackCompletion(submissionStatus);
+          PageHelper.trackCompletionWithoutAds(submissionStatus);
         } else {
-          // success UI here if you want
           form.errors = {};
           form.state = "success";
+          submissionStatus = SubmissionStatus.APPROVED;
+          PageHelper.trackCompletion(submissionStatus);
+          PageHelper.trackCompletionWithoutAds(submissionStatus);
           const welcome = "/vitejte";
           window.location.replace(welcome);
         }
       } catch (err: any) {
         form.errors = err;
         console.error("Network error:", err);
+        submissionStatus = SubmissionStatus.REJECTED;
+        PageHelper.trackCompletion(submissionStatus);
+        PageHelper.trackCompletionWithoutAds(submissionStatus);
       }
       disable = false;
       submitting = false;
@@ -286,7 +430,6 @@
       disable = true;
       const endpoint = getEndpoint("partial");
 
-      // Build a clean snapshot with files as File[]
       const snapshot = {
         ...values,
         submitLocation: window.location.href,
@@ -297,7 +440,6 @@
       // ---- FormData ----
       const fd = new FormData();
 
-      // 1) Append scalar fields (string/number/boolean). JSON-encode any objects just in case.
       for (const [k, v] of Object.entries(snapshot)) {
         if (
           k === "filesNationalId" ||
@@ -315,7 +457,6 @@
         ) {
           fd.append(k, String(v));
         } else {
-          // Nested objects (if any): send as JSON string
           fd.append(k, JSON.stringify(v));
         }
       }
@@ -323,11 +464,10 @@
       try {
         const res = await fetch(endpoint, {
           method: "POST",
-          body: fd, // ✅ browser sets multipart/form-data boundary
-          // mode: "cors",  // optional; usually not needed
+          body: fd,
         });
 
-        const text = await res.text(); // Make usually returns JSON, but text keeps logging simple
+        const text = await res.text();
         console.log("Submit:", res.status, text);
         if (!res.ok) {
           console.error("Submit failed");
@@ -335,6 +475,7 @@
         } else {
           // success UI here if you want
           delete form.errors["submit"];
+          PageHelper.trackFirstStep();
         }
       } catch (err) {
         console.error("Network error:", err);
@@ -363,7 +504,7 @@
 
   const params = new URLSearchParams(window.location.search);
   const formStep = params.get("state");
-  let errors = $state({});
+  let errors: any = $state({});
   let validating = $state(false);
   let disable = $state(false);
   let submitting = $state(false);
@@ -556,6 +697,12 @@
       values.foxentryPaymentStatus = false;
       await sendFoxentryFailedPaymentNotification();
     }
+
+    window.addEventListener("beforeunload", (event) => {
+      PageHelper.trackDropOff(currentStep);
+    });
+
+    PageHelper.trackPageView(currentStep);
   });
 
   let emailHint = $state("");
@@ -609,7 +756,7 @@
     if (values.foxentryPaymentStatus === false) return;
 
     if (values.firstName.length == 0) return;
-    const r = await validateName(values.firstName, "name");
+    const r: any = await validateName(values.firstName, "name");
 
     if (!r.isValid) {
       errors.firstName = [t("errors.fox.firstName")];
@@ -623,7 +770,7 @@
     if (values.foxentryPaymentStatus === false) return;
 
     if (values.lastName.length == 0) return;
-    const r = await validateName(values.lastName, "surname");
+    const r: any = await validateName(values.lastName, "surname");
 
     if (!r.isValid) {
       errors.lastName = [t("errors.fox.lastName")];
@@ -845,7 +992,6 @@
     values.address = s.full ?? s.streetWithNumber ?? values.address;
 
     addrCtx.street = s.street ?? addrCtx.street;
-    addrCtx.streetId = s.streetId ?? addrCtx.streetId;
     addrCtx.city = s.city ?? addrCtx.city;
     addrCtx.zip = s.postalCode ?? addrCtx.zip;
 
@@ -868,7 +1014,7 @@
   let companyActive = $state(false);
 
   const searchForCompany = debounce(async (q: string) => {
-    const r = await searchCompanies(q);
+    const r: any = await searchCompanies(q);
 
     companySuggestions = Array.isArray(r?.items)
       ? r.items
@@ -888,7 +1034,7 @@
       companyActive = false;
       companySuggestions = [];
       const v = await validateCompany({
-        name: values.companName,
+        name: values.companyName,
         country: "CZ",
         registrationNumber: values.companyId,
       });
