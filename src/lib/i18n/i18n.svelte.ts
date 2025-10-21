@@ -104,6 +104,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.gender": "Jaké je tvé pohlaví?",
     "labels.birthDate": "Datum narození",
     "labels.passportExpiryDate": "Datum vypršení platnosti pasu",
+    "labels.placeOfBirth": "Místo narození",
+    "labels.permanentResidence": "Trvalé bydliště",
 
     "answer.yes": "ANO",
     "answer.no": "NE",
@@ -233,6 +235,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.birthDate": "Birth date",
     "labels.gender": "What is your gender?",
     "labels.passportExpiry": "Passport expiry date",
+    "labels.placeOfBirth": "Place of birth",
+    "labels.permanentResidence": "Permanent residence",
 
     "answer.yes": "YES",
     "answer.no": "NO",
