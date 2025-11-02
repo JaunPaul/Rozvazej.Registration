@@ -33,7 +33,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.doc.euPassport": `Nahrajte svůj občanský průkaz nebo cestovní pas. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
     "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">1. Průkaz totožnosti nebo cestovní pas</span><br /><span class="bold-green">2. Vízum NEBO povolení k pobytu NEBO Potvrzení o</span><br /><span class="bold-green">2. studiu nebo pracovní povolení</span>`,
     "labels.doc.driversLicense": `Nahrajte platný řidičský průkaz. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br />`,
-    "labels.deliveryCompany": "Neomezujte se – u nás můžete jezdit pro všechny tři služby najednou: Bolt, Wolt i Foodora. Více platforem = více objednávek = vyšší výdělky. Stačí si zvolit, kde chcete začít!",
+    "labels.deliveryCompany":
+      "Neomezujte se – u nás můžete jezdit pro všechny tři služby najednou: Bolt, Wolt i Foodora. Více platforem = více objednávek = vyšší výdělky. Stačí si zvolit, kde chcete začít!",
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
@@ -84,7 +85,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.fox.company": "Toto IČO jsme nenašli.",
 
     "nav.prev": "Předchozí",
-    "nav.next": "Pokračovat",
+    "nav.next": "Pokračovat na krok",
     "nav.submit": "Odeslat",
     "nav.validate": "Ověřování....",
     "nav.wait": "Prosím čekejte..",
@@ -166,7 +167,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.doc.euPassport": `Upload your Identity card or passport. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
     "labels.doc.nonEu": `Upload the following valid documents. <br /><span class="bold-green">ID CARD OR PASSPORT</span><br /><span class="bold-green">VISA OR RESIDENCE PERMIT</span><br /><span class="bold-green">STUDY OR PERMIT</span>`,
     "labels.doc.driversLicense": `Upload valid driver's license. <br /><span class="bold-green">1. FRONT SIDE</span><br />`,
-    "labels.deliveryCompany": "Don’t limit yourself – with us you can ride for all three services at once: Bolt, Wolt, and Foodora. More platforms = more orders = higher earnings. Just choose where you want to start!",
+    "labels.deliveryCompany":
+      "Don’t limit yourself – with us you can ride for all three services at once: Bolt, Wolt, and Foodora. More platforms = more orders = higher earnings. Just choose where you want to start!",
 
     "hints.czPhone":
       "For deliveries in the Czech Republic you must provide a <strong>Czech phone number.</strong>",
@@ -215,7 +217,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "We could not find this company. Please search and select your company using the registration number.",
 
     "nav.prev": "Back",
-    "nav.next": "Continue",
+    "nav.next": "Continue to step",
     "nav.submit": "Submit",
     "nav.wait": "Please wait…",
     "nav.validate": "Validating...",
