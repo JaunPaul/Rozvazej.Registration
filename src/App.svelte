@@ -108,6 +108,64 @@
           currentStep = Steps.step3;
 
           break;
+        case "step2":
+          values = {
+            firstName: "",
+            lastName: "",
+            email: "",
+            phone: "",
+            companyId: "",
+            companyName: "",
+            nationalId: "",
+            passportOrId: "",
+            deliveryCompany: PageHelper.getCompanyByDomain(),
+            deliveryCompanyWolt: false,
+            deliveryCompanyFoodora: false,
+            deliveryCompanyBolt: false,
+            applyAsCompany: false,
+            __addressFromSuggestion: false,
+            address: "",
+            country: "FR",
+            street: "",
+            houseNumber: "",
+            city: "",
+            zip: "",
+            bankPrefix: "",
+            bankNumber: "",
+            bankCode: "",
+            deliveryCity: "",
+            transport: "",
+            insurance: "",
+            pinkStatement: undefined,
+            gender: "",
+            birthDate: "",
+            passportExpiryDate: "",
+            filesNationalId: [],
+            filesEuPassport: [],
+            filesNonEu: [],
+            filesDriversLicense: [],
+            utm_source: "",
+            utm_campaign: "",
+            utm_medium: "",
+            utm_id: "",
+            language: locale,
+            submitSource: PageHelper.getCompanyByDomain()[0],
+            foxentryPaymentStatus: true,
+            step1Completed: true,
+            step2Completed: false,
+            step3Completed: false,
+            sessionId: PageHelper.getSessionId(),
+            formStart: PageHelper.getFormStart(),
+            firstEndpointSubmissionId: undefined,
+            firstEndpointSubmissionTime: undefined,
+            finalEndpointSubmissionId: undefined,
+            finalEndpointSubmissionTime: undefined,
+            placeOfBirth: "",
+            permanentResidence: "",
+          };
+
+          currentStep = Steps.step2;
+          break;
         default:
           break;
       }
@@ -771,7 +829,8 @@
     const debug = searchParams.get("debug");
 
     if (debug && debug === "true") {
-      PageHelper.setDebugValues("step3");
+      const debugStep = searchParams.get("debugStep") ?? "step2";
+      PageHelper.setDebugValues(debugStep);
     }
 
     window.addEventListener("beforeunload", (event) => {

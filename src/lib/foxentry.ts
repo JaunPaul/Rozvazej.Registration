@@ -258,21 +258,25 @@ export async function validateLocation(q: ValidateLocationInput): Promise<{
 
   // Build the correct payload
   const payload: any = {
-    street: street || undefined,
+    street: street ?? undefined,
     streetWithNumber: street && house ? `${street} ${house}` : undefined,
-    "number.full": house ? house : undefined,
-    city: city || undefined,
-    zip: zip || undefined,
-    region: q.region || undefined,
+    "number.full": house ?? undefined,
+    city: city ?? undefined,
+    zip: zip ?? undefined,
+    region: q.region ?? undefined,
     country,
   };
+
+  const cleanPayload = Object.fromEntries(
+    Object.entries(payload).filter(([, v]) => v !== undefined)
+  );
 
   const res = await fox
     .location()
     .setCustomId("location-validate")
     .setClientCountry(country)
     .includeRequestDetails(false)
-    .validate(payload); // ✅ nested number / proper keys
+    .validate(cleanPayload); // ✅ nested number / proper keys
 
   const result: any = unwrap(res);
   return {

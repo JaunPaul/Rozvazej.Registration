@@ -71,6 +71,10 @@ const collectInvalidFoxKeys = (raw: any): string[] => {
   }
   return [...set];
 };
+type FoxErrorTypes = "INVALID" | "EMPTY";
+const collectFoxErrors = (raw: any) => {
+  const set = new Set();
+};
 
 const addressGroupValidator = async (d: any, visible: string[]) => {
   const out: Record<string, string[]> = {};
@@ -81,10 +85,10 @@ const addressGroupValidator = async (d: any, visible: string[]) => {
   if (!needs) return out;
 
   if (d.__addressFromSuggestion) return out;
-
+  // Change here where we remove all validators except zip and city
+  // street: d.street,
+  //  houseNumber: d.houseNumber,
   const r = await validateLocation({
-    street: d.street,
-    houseNumber: d.houseNumber,
     city: d.city,
     postalCode: d.zip,
     countryCode: d.country || "CZ",
@@ -92,6 +96,7 @@ const addressGroupValidator = async (d: any, visible: string[]) => {
 
   if (!r.isValid) {
     const foxKeys = collectInvalidFoxKeys(r.raw);
+
     const generic = t("errors.fox.address");
     if (foxKeys.length === 0) {
       out.houseNumber = [generic];
