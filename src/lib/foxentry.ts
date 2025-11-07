@@ -271,12 +271,17 @@ export async function validateLocation(q: ValidateLocationInput): Promise<{
     Object.entries(payload).filter(([, v]) => v !== undefined)
   );
 
+  const strictOnlyZipCountry = {
+    zip: zip ?? undefined,
+    country,
+  };
+
   const res = await fox
     .location()
     .setCustomId("location-validate")
     .setClientCountry(country)
     .includeRequestDetails(false)
-    .validate(cleanPayload); // ✅ nested number / proper keys
+    .validate(strictOnlyZipCountry);
 
   const result: any = unwrap(res);
   return {
