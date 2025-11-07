@@ -627,7 +627,7 @@
 
   let currentStep = $state(Steps.step1);
   let currentStepIndex = $derived(
-    StepIndexes.findIndex((s) => s === currentStep) + 1
+    StepIndexes.findIndex((s) => s === currentStep) + 2
   );
   //	if (formStep) {
   //		currentStep = Steps[formStep];
