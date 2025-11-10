@@ -2115,7 +2115,8 @@
                   <option value="" disabled
                     >{t("select.placeholder.city")}</option
                   >
-                  {#await getCities(locale) then cities}
+                  {#await getCities(locale, values.deliveryCompany) then cities}
+                  {@const sorted = cities.sort((a,b)=> a.localeCompare(b))}
                     {#each cities as city}
                       <option value={city}>{city}</option>
                     {/each}
