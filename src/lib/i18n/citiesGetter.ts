@@ -9,7 +9,7 @@ const extraCitiesByForm = {
   },
   Development: {
     en: ["Trutnov", "Uherské Hradiště"],
-    cs: ["Trutnov", "Uherské Hradiště"],
+    cs: ["Trutnov", "Uherské Hradiště", "Alphatop"],
   },
 };
 
