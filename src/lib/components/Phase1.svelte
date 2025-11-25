@@ -29,11 +29,19 @@
         // For now, I'll rely on the state's validation method but I might need to
         // pass a specific scope or just validate everything visible.
 
-        // Simplification: map sub-steps to original step IDs for validation
-        // SubStep 1 -> "step1" (mostly)
-        // SubStep 2, 3, 4 -> "step2" (mostly)
+        // SubStep 1 -> "step1"
+        // SubStep 2 -> "step2"
+        // SubStep 3 -> "step3"
+        // SubStep 4 -> "step4"
 
-        const validationScope = currentSubStep === 1 ? "step1" : "step2";
+        const validationScope =
+            currentSubStep === 1
+                ? "step1"
+                : currentSubStep === 2
+                  ? "step2"
+                  : currentSubStep === 3
+                    ? "step3"
+                    : "step4";
         const valid =
             await registrationState.validateCurrentStep(validationScope);
 

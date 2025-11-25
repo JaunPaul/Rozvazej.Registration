@@ -18,11 +18,13 @@ const fxValidators: Record<string, FxChecker> = {
   firstName: async (d) => {
     if (!d.firstName) return;
     const r = await validateName(d.firstName, "name");
+    if (!("isValid" in r)) return undefined; // It's an error object
     return r.isValid ? undefined : t("errors.fox.firstName");
   },
   lastName: async (d) => {
     if (!d.lastName) return;
     const r = await validateName(d.lastName, "surname");
+    if (!("isValid" in r)) return undefined;
     return r.isValid ? undefined : t("errors.fox.lastName");
   },
   email: async (d) => {
@@ -124,7 +126,7 @@ const fxGroupValidators: FxGroupChecker[] = [addressGroupValidator];
 const everVisible = new Set<string>();
 const root = formSchema;
 export function getVisibleIds(
-  stepId: "step1" | "step2" | "step3",
+  stepId: "step1" | "step2" | "step3" | "step4" | "phase2",
   data: any
 ): string[] {
   return steps[stepId].filter((id) => fields[id].visibleWhen(data));
@@ -161,7 +163,7 @@ const hasNoKeys = (o?: Record<string, unknown> | null) =>
  * Returns a merged FieldErrors map. `ok` is true only if the merged map is empty.
  */
 export async function validateStepAsync(
-  stepId: "step1" | "step2" | "step3",
+  stepId: "step1" | "step2" | "step3" | "step4" | "phase2",
   data: any,
   includeFoxentry: boolean
 ) {

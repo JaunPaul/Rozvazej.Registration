@@ -238,7 +238,7 @@ export class RegistrationState {
 
     // --- Validation & Navigation ---
 
-    async validateCurrentStep(stepId: "step1" | "step2" | "step3") {
+    async validateCurrentStep(stepId: "step1" | "step2" | "step3" | "step4" | "phase2") {
         this.validating = true;
         const { ok, fieldErrors } = await validateStepAsync(
             stepId,

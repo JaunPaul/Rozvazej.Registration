@@ -16,7 +16,8 @@
 
     async function next() {
         // Validate
-        const validationScope = currentSubStep === 1 ? "step2" : "step3"; // Mapping to original scopes roughly
+        // Phase 2 has only one step now
+        const validationScope = "phase2"; // Mapping to original scopes roughly
         const valid = await registrationState.validateCurrentStep(
             validationScope as any,
         );
