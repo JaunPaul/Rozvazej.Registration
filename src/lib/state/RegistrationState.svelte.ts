@@ -9,6 +9,7 @@ import {
     type FxLocation,
     type FxCompany,
     type LocationSearchType,
+    debounce,
 } from "../foxentry";
 import { getEndpoint } from "../utils/getEndpoints";
 import { validateStepAsync } from "../utils/validation";
@@ -97,6 +98,13 @@ export class RegistrationState {
         zip: undefined as string | undefined,
         streetId: undefined as string | undefined,
     });
+
+
+    toNextStepIndex = $state(2)
+
+    stepNavText = $derived(
+        `${t("nav.next")} ${this.toNextStepIndex}/4`,
+    );
 
     constructor() {
         this.init();
@@ -360,6 +368,227 @@ export class RegistrationState {
         else this.values.filesNonEu = newFiles;
     }
 
+    // --- Foxentry Search & Validation Wrappers ---
+
+    async onBlurEmail() {
+        if (this.values.foxentryPaymentStatus === false) return;
+        const r = await validateEmail(this.values.email, {
+            acceptDisposableEmails: false,
+        });
+
+        if (!r.isValid) {
+            this.errors.email = [t("errors.email")];
+        } else {
+            delete this.errors.email;
+        }
+        // Hint logic could go here if we had a UI for it
+        if (r.normalized) this.values.email = r.normalized;
+    }
+
+    async onBlurPhone() {
+        const raw = this.values.phone;
+        if (!raw || raw.trim().length === 0) return;
+
+        const normalized = this.normalizeCzPhone(raw);
+        if (!normalized) {
+            this.errors.phone = [t("errors.phone")];
+            return;
+        }
+
+        this.values.phone = normalized;
+
+        if (this.values.foxentryPaymentStatus === false) return;
+
+        const r = await validatePhone(this.values.phone, {
+            validationType: "basic",
+            preferredPrefixes: ["+420"],
+            formatNumber: false,
+            correctionMode: "full",
+            allowedPrefixes: ["+420"],
+        });
+        if (!r.isValid) {
+            this.errors.phone = [t("errors.phone")];
+        } else {
+            delete this.errors.phone;
+        }
+
+        if (r.normalized && r.normalized !== this.values.phone) {
+            this.values.phone = r.normalized;
+        }
+    }
+
+    async onBlurName(field: "firstName" | "lastName") {
+        if (this.values.foxentryPaymentStatus === false) return;
+        const val = this.values[field];
+        if (val.length === 0) return;
+
+        const r = await validateName(val, field === "firstName" ? "name" : "surname");
+
+        // Check if r is an error object or validity object
+        if (!("isValid" in r)) return; // Skip if error
+
+        if (!r.isValid) {
+            this.errors[field] = [t(`errors.fox.${field}`)];
+        } else {
+            delete this.errors[field];
+        }
+        if (r.normalized) this.values[field] = r.normalized;
+    }
+
+    // --- Address Search Logic ---
+
+    searchForAddress = debounce(
+        async (type: LocationSearchType, q: string) => {
+            const r = await searchLocations(
+                type,
+                q,
+                "CZ",
+                10,
+                0,
+                this.buildFilterFor(type),
+                { allowEmpty: this.hasContextFor(type) }
+            );
+            this.addressSuggestions = r.items;
+        },
+        50
+    );
+
+    buildFilterFor(type: LocationSearchType) {
+        const clean = <T extends Record<string, any>>(o: T): T =>
+            Object.fromEntries(
+                Object.entries(o).filter(([, v]) => v != null && v !== "")
+            ) as T;
+
+        const normZip = (z?: string) => (z ? z.replace(/\s/g, "") : undefined);
+
+        const street = (this.values.street || this.addrCtx.street || "").trim() || undefined;
+        const city = (this.values.city || this.addrCtx.city || "").trim() || undefined;
+        const zip = normZip(this.values.zip) ?? this.addrCtx.zip;
+        const base = { country: "CZ" };
+
+        switch (type) {
+            case "full":
+            case "street":
+                return clean({ ...base, city, zip });
+            case "number.full":
+                return clean({ ...base, street, city, zip });
+            case "city":
+                return clean({ ...base, zip, street });
+            case "zip":
+                return clean({ ...base, city, street });
+            default:
+                return base;
+        }
+    }
+
+    hasContextFor(type: LocationSearchType) {
+        const street = (this.values.street || this.addrCtx.street || "").trim();
+        const city = (this.values.city || this.addrCtx.city || "").trim();
+        const zip = (this.values.zip || this.addrCtx.zip || "").replace(/\s/g, "");
+
+        if (type === "number.full") {
+            return !!(this.addrCtx.streetId || (street && (city || zip)));
+        }
+        if (type === "city") return !!(street || zip);
+        if (type === "zip") return !!(street || city);
+        if (type === "street" || type === "full") return !!(city || zip);
+        return false;
+    }
+
+    apiTypeFor(field: LocationSearchType): LocationSearchType {
+        return field === "street" ? "full" : field;
+    }
+
+    currentQueryFor(type: LocationSearchType | null): string {
+        if (!type) return "";
+        if (type === "street") return this.values.street;
+        if (type === "number.full") return this.values.houseNumber;
+        if (type === "city") return this.values.city;
+        if (type === "zip") return this.values.zip;
+        return "";
+    }
+
+    queueSearchForActive() {
+        if (!this.activeAddressType) return;
+        if (this.values.foxentryPaymentStatus === false) return;
+
+        const q = (this.currentQueryFor(this.activeAddressType) || "").trim();
+
+        // FOCUS with empty value logic
+        if (q.length === 0) {
+            if (this.activeAddressType === "number.full") {
+                const street = (this.values.street || this.addrCtx.street || "").trim();
+                if (!street) {
+                    this.addressSuggestions = [];
+                    return;
+                }
+                this.searchForAddress("full", `${street} `);
+                return;
+            }
+            // ... (other empty logic from original if needed, simplified here)
+            if (this.activeAddressType === "city") {
+                const street = (this.values.street || this.addrCtx.street || "").trim();
+                const zip = (this.values.zip || this.addrCtx.zip || "").replace(/\s/g, "");
+                if (street) {
+                    this.searchForAddress("full", `${street} `);
+                    return;
+                }
+                if (zip) {
+                    this.searchForAddress("zip", zip);
+                    return;
+                }
+                this.addressSuggestions = [];
+                return;
+            }
+
+            if (this.activeAddressType === "zip") {
+                const street = (this.values.street || this.addrCtx.street || "").trim();
+                const city = (this.values.city || this.addrCtx.city || "").trim();
+                if (street) {
+                    this.searchForAddress("full", `${street} `);
+                    return;
+                }
+                if (city) {
+                    this.searchForAddress("city", city.slice(0, 3));
+                    return;
+                }
+                this.addressSuggestions = [];
+                return;
+            }
+        }
+
+        this.searchForAddress(this.apiTypeFor(this.activeAddressType), q);
+    }
+
+    onAddressFocus(type: LocationSearchType) {
+        if (this.values.foxentryPaymentStatus === false) return;
+        this.activeAddressType = type;
+        this.queueSearchForActive();
+    }
+
+    onAddressBlur() {
+        setTimeout(() => {
+            this.activeAddressType = null;
+            this.addressSuggestions = [];
+        }, 200);
+    }
+
+    applySuggestion(s: FxLocation) {
+        this.values.street = s.street ?? this.values.street;
+        this.values.houseNumber = s.streetNumber ?? this.values.houseNumber;
+        this.values.city = s.city ?? this.values.city;
+        this.values.zip = s.postalCode ?? this.values.zip;
+        // this.values.address = s.full ?? s.streetWithNumber ?? this.values.address; // If we use 'address' field
+
+        this.addrCtx.street = s.street ?? this.addrCtx.street;
+        this.addrCtx.city = s.city ?? this.addrCtx.city;
+        this.addrCtx.zip = s.postalCode ?? this.addrCtx.zip;
+
+        this.values.__addressFromSuggestion = true;
+        this.addressSuggestions = [];
+        this.activeAddressType = null;
+    }
+
     // --- Tracking ---
 
     trackPageView(step: string) {
@@ -371,7 +600,96 @@ export class RegistrationState {
         });
     }
 
-    trackCompletion(status: string) {
-        // ... tracking logic ...
+    async trackCompletion(status: string) {
+        let consent = 0;
+        const sklikConversionIds = {
+            longForm: 100053768,
+        };
+        try {
+            if (window.CookieScript && window.CookieScript.instance) {
+                const consentState =
+                    window.CookieScript.instance.currentState();
+                // Assuming 'advertising' is the category for Sklik; adjust if different
+                consent = consentState.categories.includes("targeting")
+                    ? 1
+                    : 0;
+            } else {
+                // Fallback: Check cookie directly (less reliable)
+                const cookie = document.cookie
+                    .split("; ")
+                    .find((row) => row.startsWith("CookieScriptConsent="));
+                if (cookie) {
+                    const consentData = JSON.parse(
+                        decodeURIComponent(cookie.split("=")[1]),
+                    );
+                    consent = consentData.categories.includes("targeting")
+                        ? 1
+                        : 0;
+                }
+            }
+        } catch (e) {
+            console.error("Error retrieving CookieScript consent:", e);
+            consent = 0; // Default to no consent if error occurs
+        }
+
+        // Hash email for eid
+        let hashedEmail = "";
+        try {
+            hashedEmail = await this.hashEmail(this.values.email);
+        } catch (e) {
+            console.error("Email hashing failed:", e);
+        }
+
+        // Address for aid
+        const address = {
+            a1: "Czech Republic",
+            a2: this.values.city || "",
+            a3: this.values.address || "",
+            a4: "",
+            a5: this.values.zip || "",
+        };
+
+        // Phone for tid
+        const phone = this.values.phone;
+
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            event: "formCompletion",
+            status: status,
+            user: {
+                email: this.values.email,
+                phone: this.values.phone,
+                firstName: this.values.firstName,
+                lastName: this.values.lastName,
+                postalCode: this.values.zip,
+                country: "Czech Republic",
+                ...(this.values.address && {
+                    streetAddress: this.values.address,
+                }),
+                ...(this.values.city && { city: this.values.city }),
+            },
+            sklikConversion: {
+                consent: consent,
+                eid: hashedEmail || this.values.email,
+                aid: address,
+                tid: phone,
+                id: sklikConversionIds.longForm,
+                zboziType: "standard",
+            },
+            enhanced_conversions: {
+                email: this.values.email,
+                phone_number: this.values.phone,
+                address: {
+                    first_name: this.values.firstName || "",
+                    last_name: this.values.lastName || "",
+                    street: this.values.street || "",
+                    city: this.values.city || "",
+                    postal_code: this.values.zip || "",
+                    country: "CZ",
+                },
+            },
+            gtm_ad_storage: consent === 1 ? "granted" : "denied",
+        });
     }
 }
+

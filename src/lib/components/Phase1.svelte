@@ -1,10 +1,7 @@
 <script lang="ts">
     import { t } from "../i18n/i18n.svelte";
-    import Errors from "./Errors.svelte";
+    import Loader from "./Loader.svelte";
     import { RegistrationState } from "../state/RegistrationState.svelte";
-    import { fade } from "svelte/transition";
-    import { getCountries } from "../i18n/countriesGetter";
-    import { isEu } from "../i18n/euCountriesFilter";
     import PersonalData from "./steps/PersonalData.svelte";
     import Citizenship from "./steps/Citizenship.svelte";
     import Address from "./steps/Address.svelte";
@@ -15,6 +12,9 @@
 
     // Local state for this phase
     let currentSubStep = $state(1);
+    $effect(() => {
+        registrationState.toNextStepIndex = currentSubStep + 1;
+    });
     const totalSubSteps = 4;
 
     // Step 1: Personal data
@@ -62,59 +62,59 @@
 </script>
 
 <div class="form-phase-1">
-    <!-- Progress Indicator -->
-    <div class="form-steps">
-        {#each Array(totalSubSteps) as _, i}
-            <div class="step" class:is-active={currentSubStep === i + 1}>
-                <div>{i + 1}</div>
-            </div>
-        {/each}
-    </div>
-
     <h2 class="heading is-regular">
         {currentSubStep === 1
             ? t("step1.title")
             : currentSubStep === 2
-              ? t("labels.companyId") // Placeholder title
+              ? t("step2.title")
               : currentSubStep === 3
-                ? t("labels.address")
-                : t("labels.bank.number")}
+                ? t("step3.title")
+                : t("step4.title")}
     </h2>
+    {#if registrationState.formState === "submitting"}
+        <Loader></Loader>
+    {:else}
+        <!-- Step 1: Personal data -->
+        {#if currentSubStep === 1}
+            <PersonalData {registrationState} />
+        {/if}
 
-    <!-- Step 1: Personal data -->
-    {#if currentSubStep === 1}
-        <PersonalData {registrationState} />
+        <!-- Step 2: Address -->
+        {#if currentSubStep === 2}
+            <Address {registrationState} />
+        {/if}
+
+        <!-- Step 3: Citizenship -->
+        {#if currentSubStep === 3}
+            <Citizenship {registrationState} />
+        {/if}
+
+        <!-- Step 4: Bank -->
+        {#if currentSubStep === 4}
+            <PaymentDetails {registrationState} />
+        {/if}
+
+        <div class="form-nav">
+            {#if currentSubStep > 1}
+                <button
+                    class="button is-ghost w-button"
+                    onclick={prev}
+                    disabled={currentSubStep === 1}
+                >
+                    {t("nav.prev")}
+                </button>
+            {:else}
+                <div></div>
+            {/if}
+            <button
+                class="button w-button"
+                onclick={next}
+                disabled={registrationState.submitting}
+            >
+                {currentSubStep === totalSubSteps
+                    ? t("nav.submit")
+                    : registrationState.stepNavText}
+            </button>
+        </div>
     {/if}
-
-    <!-- Step 2: Address -->
-    {#if currentSubStep === 2}
-        <Address {registrationState} />
-    {/if}
-
-    <!-- Step 3: Citizenship -->
-    {#if currentSubStep === 3}
-        <Citizenship {registrationState} />
-    {/if}
-
-    <!-- Step 4: Bank -->
-    {#if currentSubStep === 4}
-        <PaymentDetails {registrationState} />
-    {/if}
-
-    <div class="form-nav">
-        <button
-            class="button is-ghost w-button"
-            onclick={prev}
-            disabled={currentSubStep === 1}
-        >
-            {t("nav.prev")}
-        </button>
-        <button
-            class="button w-button"
-            onclick={next}
-            disabled={registrationState.submitting}
-        >
-            {currentSubStep === totalSubSteps ? t("nav.submit") : t("nav.next")}
-        </button>
-    </div>
 </div>

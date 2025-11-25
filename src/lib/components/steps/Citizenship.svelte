@@ -40,6 +40,7 @@
                 class="input-2 w-input"
                 type="text"
                 id="nationalId"
+                placeholder={t("ph.nationalId")}
                 bind:value={registrationState.values.nationalId}
             />
             <Errors errors={registrationState.errors} path="nationalId" />
@@ -53,6 +54,7 @@
                 class="input-2 w-input"
                 type="text"
                 id="passportOrId"
+                placeholder={t("ph.passportOrId")}
                 bind:value={registrationState.values.passportOrId}
             />
             <Errors errors={registrationState.errors} path="passportOrId" />
@@ -68,6 +70,7 @@
                 id="birthDate"
                 bind:value={registrationState.values.birthDate}
             />
+            <Errors errors={registrationState.errors} path="birthDate" />
         </div>
     {/if}
 </div>

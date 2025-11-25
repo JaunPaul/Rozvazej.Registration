@@ -100,13 +100,13 @@ export const formSchema = z.object({
   filesNonEu: fileArray(2),
 
   // step3
-  deliveryCity: z.string(),
+  deliveryCity: z.string().min(1, { error: t("errors.deliveryCity") }),
   transport: z.string(),
   gender: z.string(),
-  birthDate: z.string(),
+  birthDate: z.string().min(1, { error: t("errors.birthDate") }),
   passportExpiryDate: z.string(),
-  insurance: z.string(),
-  pinkStatement: z.boolean(),
+  insurance: z.string().min(1, { error: t("errors.insurance") }),
+  pinkStatement: z.coerce.boolean({ error: t("errors.pinkStatement") }),
 });
 
 export type FormSchema = z.infer<typeof formSchema>;

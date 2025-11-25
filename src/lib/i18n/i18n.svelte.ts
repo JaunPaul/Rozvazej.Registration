@@ -9,7 +9,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "steps.2": "Krok 2",
     "steps.3": "Krok 3",
 
-    "step1.title": "Začínáme – nic složitého",
+    "step1.title": "Osobní údaje",
     "step1.lead":
       "Na úvod nám stačí pár základních informací. Zvládnete to během chvilky.",
 
@@ -83,6 +83,12 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.fox.zip": "PSČ neodpovídá městu.",
     "errors.fox.houseNumber": "Číslo domu neodpovídá ulici.",
     "errors.fox.company": "Toto IČO jsme nenašli.",
+    "errors.deliveryCity": "Zadejte prosím město či obec",
+    "errors.birthDate": "Zadejte prosím datum narození",
+    "errors.country": "Vyberte možnost",
+    "errors.passportExpiryDate": "Zadejte prosím datum expirace pasu",
+    "errors.insurance": "Vyberte možnost",
+    "errors.pinkStatement": "Vyberte možnost",
 
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat na krok",
@@ -90,14 +96,14 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "nav.validate": "Ověřování....",
     "nav.wait": "Prosím čekejte..",
 
-    "step2.title": "Už jen pár údajů",
+    "step2.title": "Vaše adresa",
     "step2.lead":
       "Tato část obsahuje povinné údaje potřebné k dokončení registrace – na jejich základě Vám připravíme smlouvu, proto je prosím vyplňte pečlivě.",
 
-    "step3.title": "Chcete mít registraci hotovou co nejrychleji?",
+    "step3.title": "Občanství",
     "step3.lead":
       "Následující údaje nejsou povinné, ale pokud je vyplníte už teď, budeme moci vše zpracovat rychleji a bez zbytečného čekání.",
-
+    "step4.title": "Údaje pro výplatu",
     "labels.cityToDeliver": "Město kde budete rozvážet",
     "labels.transport": "Na čem budete rozvážet?",
     "labels.insurance": "Zdravotní pojištovna",
@@ -215,6 +221,13 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.fox.houseNumber": "House number does not match street.",
     "errors.fox.company":
       "We could not find this company. Please search and select your company using the registration number.",
+
+    "errors.deliveryCity": "You must select a city",
+    "errors.birthDate": "You must select a birth date",
+    "errors.country": "You must select a country",
+    "errors.passportExpiryDate": "You must select a passport expiry date",
+    "errors.insurance": "You must select an insurance",
+    "errors.pinkStatement": "You must select a pink statement",
 
     "nav.prev": "Back",
     "nav.next": "Continue to step",

@@ -19,6 +19,7 @@
                 class="input-2"
                 type="text"
                 id="bankPrefix"
+                placeholder={t("ph.bank.prefix")}
                 bind:value={registrationState.values.bankPrefix}
             />
         </div>
@@ -30,6 +31,7 @@
                 class="input-2 w-input"
                 type="text"
                 id="bankNumber"
+                placeholder={t("ph.bank.number")}
                 bind:value={registrationState.values.bankNumber}
             />
             <Errors errors={registrationState.errors} path="bankNumber" />
@@ -46,7 +48,53 @@
                 <option value="" disabled>{t("select.placeholder.bank")}</option
                 >
                 <option value="0100">0100 – Komerční banka</option>
-                <!-- ... other banks ... -->
+                <option value="0300">0300 – ČSOB</option>
+                <option value="0600">0600 – MONETA</option>
+                <option value="0800">0800 – Česká spořitelna</option>
+                <option value="2010">2010 – Fio banka</option>
+                <option value="3030">3030 – Air Bank</option>
+                <option value="5500">5500 – Raiffeisenbank</option>
+                <option value="6210">6210 – mBank</option>
+                <option value="2700">2700 – UniCredit Bank</option>
+                <option value="3050">3050 – Hello bank</option>
+                <option value="3500">3500 – ING Bank</option>
+                <option value="6800">6800 – Sberbank</option>
+                <option value="2250">2250 – Banka Creditas</option>
+                <option value="2070">2070 – Trinity Bank</option>
+                <option value="4000">4000 – Expobank</option>
+                <option value="8040">8040 – Oberbank</option>
+                <option value="2600">2600 – Citibank</option>
+                <option value="2020">2020 – MUFG Bank</option>
+                <option value="2100">2100 – Hypoteční banka</option>
+                <option value="2060">2060 – Citfin</option>
+                <option value="2200">2200 – Peněžní dům</option>
+                <option value="2220">2220 – Artesa</option>
+                <option value="2260">2260 – NEY</option>
+                <option value="3060">3060 – PKO BP</option>
+                <option value="4300">4300 – Národní rozvojová banka</option>
+                <option value="5800">5800 – J&T BANKA</option>
+                <option value="6000">6000 – PPF banka</option>
+                <option value="6200">6200 – COMMERZBANK</option>
+                <option value="6300">6300 – BNP Paribas</option>
+                <option value="6700">6700 – Všeobecná úvěrová banka</option>
+                <option value="7910">7910 – Deutsche Bank</option>
+                <option value="7950"
+                    >7950 – Raiffeisen stavební spořitelna</option
+                >
+                <option value="7960">7960 – ČSOB Stavební spořitelna</option>
+                <option value="7970">7970 – MONETA Stavební Spořitelna</option>
+                <option value="7990"
+                    >7990 – Modrá pyramida stavební spořitelna</option
+                >
+                <option value="8030"
+                    >8030 – Volksbank Raiffeisenbank Nordoberpfalz</option
+                >
+                <option value="8060"
+                    >8060 – Stavební spořitelna České spořitelny</option
+                >
+                <option value="8090">8090 – Česká exportní banka</option>
+                <option value="8150">8150 – HSBC Continental Europe</option>
+                <option value="6363">6363 – Partners banka</option>
             </select>
             <Errors errors={registrationState.errors} path="bankCode" />
         </div>
@@ -69,6 +117,7 @@
                 {/each}
             {/await}
         </select>
+        <Errors errors={registrationState.errors} path="insurance" />
     </div>
     <div class="input-wrap">
         <label class="field-label" for="pinkStatementYes"
@@ -104,5 +153,9 @@
                 <span class="w-form-label">{t("answer.no")}</span>
             </label>
         </div>
+        <div class="text-explain">
+            {@html t("hints.pinkstatement")}
+        </div>
+        <Errors errors={registrationState.errors} path="pinkStatement" />
     </div>
 </div>

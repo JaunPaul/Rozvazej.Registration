@@ -18,10 +18,9 @@
                 class="input-2 w-input"
                 type="text"
                 id="firstName"
+                placeholder={t("ph.firstName")}
                 bind:value={registrationState.values.firstName}
-                onblur={() => {
-                    /* trigger validation hint */
-                }}
+                onblur={() => registrationState.onBlurName("firstName")}
             />
             <Errors errors={registrationState.errors} path="firstName" />
         </div>
@@ -33,7 +32,9 @@
                 class="input-2 w-input"
                 type="text"
                 id="lastName"
+                placeholder={t("ph.lastName")}
                 bind:value={registrationState.values.lastName}
+                onblur={() => registrationState.onBlurName("lastName")}
             />
             <Errors errors={registrationState.errors} path="lastName" />
         </div>
@@ -46,8 +47,13 @@
                 class="input-2 w-input"
                 type="text"
                 id="phone"
+                placeholder={t("ph.phone")}
                 bind:value={registrationState.values.phone}
+                onblur={() => registrationState.onBlurPhone()}
             />
+            <div class="text-explain">
+                {@html t("hints.czPhone")}
+            </div>
             <Errors errors={registrationState.errors} path="phone" />
         </div>
         <div class="input-wrap">
@@ -56,8 +62,13 @@
                 class="input-2 w-input"
                 type="email"
                 id="email"
+                placeholder={t("ph.email")}
                 bind:value={registrationState.values.email}
+                onblur={() => registrationState.onBlurEmail()}
             />
+            <div class="text-explain">
+                {@html t("hints.useRealEmail")}
+            </div>
             <Errors errors={registrationState.errors} path="email" />
         </div>
     </div>

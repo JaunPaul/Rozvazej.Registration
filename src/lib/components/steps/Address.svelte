@@ -7,21 +7,74 @@
 
     let { registrationState }: { registrationState: RegistrationState } =
         $props();
+
+    // $effect that triggers search when active field changes
+    $effect(() => {
+        if (!registrationState.activeAddressType) return;
+        // track just the active field's value
+        const q = registrationState.currentQueryFor(
+            registrationState.activeAddressType,
+        );
+        void q; // establish reactive read
+        registrationState.queueSearchForActive();
+    });
+
+    // $effects that reset __addressFromSuggestion flag when user manually edits
+    $effect(() => {
+        void registrationState.values.street;
+        registrationState.values.__addressFromSuggestion = false;
+    });
+    $effect(() => {
+        void registrationState.values.houseNumber;
+        registrationState.values.__addressFromSuggestion = false;
+    });
+    $effect(() => {
+        void registrationState.values.city;
+        registrationState.values.__addressFromSuggestion = false;
+    });
+    $effect(() => {
+        void registrationState.values.zip;
+        registrationState.values.__addressFromSuggestion = false;
+    });
 </script>
 
 <div in:fade class="box has-8-gap">
     <div class="input-group-wrap">
-        <div class="input-wrap">
+        <div class="input-wrap relative">
             <label for="street" class="field-label">{t("labels.street")}</label>
             <input
                 class="input-2 w-input"
                 type="text"
                 id="street"
+                placeholder=""
                 bind:value={registrationState.values.street}
+                onfocus={() => registrationState.onAddressFocus("street")}
+                onblur={() => registrationState.onAddressBlur()}
             />
             <Errors errors={registrationState.errors} path="street" />
+            {#if registrationState.activeAddressType === "street" && registrationState.addressSuggestions.length}
+                <ul class="sugg" role="listbox">
+                    {#each registrationState.addressSuggestions as s}
+                        <li
+                            role="option"
+                            aria-selected="false"
+                            onmousedown={() =>
+                                registrationState.applySuggestion(s)}
+                        >
+                            {s.streetWithNumber || s.full}
+                            {#if s.city || s.postalCode}
+                                <small>
+                                    — {s.city}{s.postalCode
+                                        ? `, ${s.postalCode}`
+                                        : ""}</small
+                                >
+                            {/if}
+                        </li>
+                    {/each}
+                </ul>
+            {/if}
         </div>
-        <div class="input-wrap">
+        <div class="input-wrap relative">
             <label for="houseNumber" class="field-label"
                 >{t("labels.houseNumber")}</label
             >
@@ -29,31 +82,103 @@
                 class="input-2 w-input"
                 type="text"
                 id="houseNumber"
+                placeholder=""
                 bind:value={registrationState.values.houseNumber}
+                onfocus={() => registrationState.onAddressFocus("number.full")}
+                onblur={() => registrationState.onAddressBlur()}
             />
             <Errors errors={registrationState.errors} path="houseNumber" />
+            {#if registrationState.activeAddressType === "number.full" && registrationState.addressSuggestions.length}
+                <ul class="sugg" role="listbox">
+                    {#each registrationState.addressSuggestions as s}
+                        <li
+                            role="option"
+                            aria-selected="false"
+                            onmousedown={() =>
+                                registrationState.applySuggestion(s)}
+                        >
+                            {s.streetWithNumber || s.full}
+                            {#if s.city || s.postalCode}
+                                <small>
+                                    — {s.city}{s.postalCode
+                                        ? `, ${s.postalCode}`
+                                        : ""}</small
+                                >
+                            {/if}
+                        </li>
+                    {/each}
+                </ul>
+            {/if}
         </div>
     </div>
     <div class="input-group-wrap">
-        <div class="input-wrap">
+        <div class="input-wrap relative">
             <label for="city" class="field-label">{t("labels.city")}</label>
             <input
                 class="input-2 w-input"
                 type="text"
                 id="city"
+                placeholder=""
                 bind:value={registrationState.values.city}
+                onfocus={() => registrationState.onAddressFocus("city")}
+                onblur={() => registrationState.onAddressBlur()}
             />
             <Errors errors={registrationState.errors} path="city" />
+            {#if registrationState.activeAddressType === "city" && registrationState.addressSuggestions.length}
+                <ul class="sugg" role="listbox">
+                    {#each registrationState.addressSuggestions as s}
+                        <li
+                            role="option"
+                            aria-selected="false"
+                            onmousedown={() =>
+                                registrationState.applySuggestion(s)}
+                        >
+                            {s.streetWithNumber || s.full}
+                            {#if s.city || s.postalCode}
+                                <small>
+                                    — {s.city}{s.postalCode
+                                        ? `, ${s.postalCode}`
+                                        : ""}</small
+                                >
+                            {/if}
+                        </li>
+                    {/each}
+                </ul>
+            {/if}
         </div>
-        <div class="input-wrap">
+        <div class="input-wrap relative">
             <label for="zip" class="field-label">{t("labels.zip")}</label>
             <input
                 class="input-2 w-input"
                 type="text"
                 id="zip"
+                placeholder=""
                 bind:value={registrationState.values.zip}
+                onfocus={() => registrationState.onAddressFocus("zip")}
+                onblur={() => registrationState.onAddressBlur()}
             />
             <Errors errors={registrationState.errors} path="zip" />
+            {#if registrationState.activeAddressType === "zip" && registrationState.addressSuggestions.length}
+                <ul class="sugg" role="listbox">
+                    {#each registrationState.addressSuggestions as s}
+                        <li
+                            role="option"
+                            aria-selected="false"
+                            onmousedown={() =>
+                                registrationState.applySuggestion(s)}
+                        >
+                            {s.streetWithNumber || s.full}
+                            {#if s.city || s.postalCode}
+                                <small>
+                                    — {s.city}{s.postalCode
+                                        ? `, ${s.postalCode}`
+                                        : ""}</small
+                                >
+                            {/if}
+                        </li>
+                    {/each}
+                </ul>
+            {/if}
         </div>
     </div>
     <div class="input-wrap">
