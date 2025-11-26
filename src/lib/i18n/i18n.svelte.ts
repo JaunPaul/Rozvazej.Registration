@@ -9,6 +9,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "steps.2": "Krok 2",
     "steps.3": "Krok 3",
 
+    "form.title": "Hotovo za méně než 2 minuty",
+    "form.lead":
+      "Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci. Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci.",
+
     "step1.title": "Osobní údaje",
     "step1.lead":
       "Na úvod nám stačí pár základních informací. Zvládnete to během chvilky.",
@@ -34,7 +38,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">1. Průkaz totožnosti nebo cestovní pas</span><br /><span class="bold-green">2. Vízum NEBO povolení k pobytu NEBO Potvrzení o</span><br /><span class="bold-green">2. studiu nebo pracovní povolení</span>`,
     "labels.doc.driversLicense": `Nahrajte platný řidičský průkaz. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br />`,
     "labels.deliveryCompany":
-      "Neomezujte se – u nás můžete jezdit pro všechny tři služby najednou: Bolt, Wolt i Foodora. Více platforem = více objednávek = vyšší výdělky. Stačí si zvolit, kde chcete začít!",
+      "Neomezujte se - u nás můžete jezdit pro všechny tři služby najednou: Bolt, Wolt i Foodora. Více platforem = více objednávek = vyšší výdělky. Stačí si zvolit, kde chcete začít!",
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
@@ -56,12 +60,13 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.nationalId": "Zadejte prosím číslo cestovního dokladu",
     "ph.companyId": "Zadejte prosím IČO",
     "ph.bank.prefix": "Např. 123456",
+    "ph.bank.number": "123456789",
     "ph.passportOrId":
       "Zadejte číslo vašeho osobního dokladu nebo cestovního pasu",
 
     "errors.firstName": "Zadejte prosím své jméno",
     "errors.lastName": "Zadejte prosím své přijmení",
-    "errors.phone": "Zadejte české telefonní číslo ve formátu XXX XXX XXXX.",
+    "errors.phone": "Zadejte české telefonní číslo ve formátu XXX XXX XXX.",
     "errors.email": "Zadejte prosím svůj email",
     "errors.nationalId": "Zadejte platné rodné číslo.",
     "errors.passportOrId": "Zadejte prosím platné číslo průkazu totožnosti",
@@ -149,6 +154,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "steps.2": "Step 2",
     "steps.3": "Step 3",
 
+    "form.title": "Hotovo za méně než 2 minuty",
+    "form.lead":
+      "Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci. ",
+
     "step1.title": "Let's start — easy stuff",
     "step1.lead":
       "We only need a few basics to begin. This will take just a moment.",
@@ -194,6 +203,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.nationalId": "Your social security number",
     "ph.companyId": "Enter your company number",
     "ph.bank.prefix": "123456",
+    "ph.bank.number": "123456789",
     "ph.passportOrId": "Enter ID or passport number",
 
     "errors.firstName": "Please enter your first name",

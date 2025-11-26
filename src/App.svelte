@@ -9,53 +9,37 @@
   const registrationState = new RegistrationState();
 </script>
 
-<div class="section">
-  <div class="container">
-    <div class="w-form">
-      <form
-        id="email-form"
-        name="email-form"
-        data-name="Email Form"
-        class="form"
-        onsubmit={(e) => e.preventDefault()}
-      >
-        {#if registrationState.formState === "neutral" || registrationState.formState === "submitting"}
-          {#if registrationState.currentPhase === 1}
-            <Phase1 {registrationState} />
-          {:else}
-            <Phase2 {registrationState} />
-          {/if}
-        {/if}
-      </form>
+<div class="form">
+  {#if registrationState.formState === "neutral" || registrationState.formState === "submitting"}
+    {#if registrationState.currentPhase === 1}
+      <Phase1 {registrationState} />
+    {:else}
+      <Phase2 {registrationState} />
+    {/if}
+  {/if}
+</div>
 
-      {#if registrationState.formState === "success"}
-        <div class="w-form-done" style="display: block;">
-          <div>
-            {#if registrationState.submissionStatus === SubmissionStatus.APPROVED}
-              {t("messages.success")}
-            {:else}
-              {t("messages.rejected")}
-            {/if}
-          </div>
-        </div>
-      {/if}
-
-      {#if registrationState.formState === "fail"}
-        <div class="w-form-fail" style="display: block;">
-          <div>{t("messages.error")}</div>
-          {#if registrationState.errors?.error && typeof registrationState.errors.error === "object" && "message" in registrationState.errors.error}
-            <div>{(registrationState.errors.error as any).message}</div>
-          {/if}
-        </div>
+{#if registrationState.formState === "success"}
+  <div class="w-form-done" style="display: block;">
+    <div>
+      {#if registrationState.submissionStatus === SubmissionStatus.APPROVED}
+        {t("messages.success")}
+      {:else}
+        {t("messages.rejected")}
       {/if}
     </div>
   </div>
-</div>
+{/if}
+
+{#if registrationState.formState === "fail"}
+  <div class="w-form-fail" style="display: block;">
+    <div>{t("messages.error")}</div>
+    {#if registrationState.errors?.error && typeof registrationState.errors.error === "object" && "message" in registrationState.errors.error}
+      <div>{(registrationState.errors.error as any).message}</div>
+    {/if}
+  </div>
+{/if}
 
 {#if registrationState.submitting}
   <Loader />
 {/if}
-
-<style>
-  /* Add any necessary styles here, or rely on global styles */
-</style>
