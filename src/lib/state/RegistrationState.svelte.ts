@@ -104,6 +104,8 @@ export class RegistrationState {
   toNextStepIndex = $state(2);
 
   stepNavText = $derived(`${t("nav.next")} ${this.toNextStepIndex}/4`);
+  stepNavTextPaseTwo = $derived(`${t("nav.next")} ${this.toNextStepIndex}/2`);
+  askCountryAgain = $state(false);
 
   constructor() {
     this.init();
@@ -120,6 +122,14 @@ export class RegistrationState {
       if (params.get("phase") === "2") {
         this.currentPhase = 2;
         this.currentStep = "step1"; // Reset step for phase 2
+        const user = params.get("user");
+        const country = params.get("country");
+
+        if (!country) {
+          this.askCountryAgain = true;
+        } else {
+          this.values.country = country;
+        }
       }
 
       // Foxentry Payment Check

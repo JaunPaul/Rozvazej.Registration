@@ -4,14 +4,19 @@
   import { RegistrationState } from "../state/RegistrationState.svelte";
   import { fade } from "svelte/transition";
   import { isEu } from "../i18n/euCountriesFilter";
-  import Loader from "./Loader.svelte";
+  import { getCountries } from "../i18n/countriesGetter";
+  import CzechFileUpload from "./CzechFileUpload.svelte";
+  import EuFileUpload from "./EuFileUpload.svelte";
+  import NonEuFileUpload from "./NonEuFileUpload.svelte";
+  import DriversLicenseUpload from "./DriversLicenseUpload.svelte";
 
   let { registrationState }: { registrationState: RegistrationState } =
     $props();
 
   // Local state for this phase
   let currentSubStep = $state(1);
-  const totalSubSteps = 2;
+  const totalSubSteps = 1;
+
   // SubStep 1: Documents (moved from original Step 2)
   // SubStep 2: Additional Info (Delivery, Insurance, etc.)
 
@@ -23,6 +28,7 @@
       validationScope as any
     );
 
+    console.log("[next]", valid, currentSubStep, registrationState.errors);
     if (valid) {
       if (currentSubStep < totalSubSteps) {
         currentSubStep++;
@@ -37,127 +43,43 @@
       currentSubStep--;
     }
   }
-
-  // Helper for file items
-  function removeFile(bucket: any, file: File) {
-    registrationState.removeFile(bucket, file);
-  }
 </script>
 
-{#snippet fileItem(f: File, b: any)}
-  <div tabindex="-1" class="w-file-upload-success mt-4 mr-2">
-    <div class="w-file-upload-file">
-      <div class="w-file-upload-file-name">{f.name}</div>
-      <button
-        aria-label="Remove file"
-        tabindex="0"
-        class="w-file-remove-link"
-        onclick={() => removeFile(b, f)}
-      >
-        <div class="w-icon-file-upload-remove"></div>
-      </button>
+<div class="form-step is-active">
+  <div class="box has-24-gap">
+    <div class="box has-8-gap">
+      <h2 class="heading is-regular">{t("step3.title")}</h2>
+      <p class="body-text">{t("step3.lead")}</p>
     </div>
-  </div>
-{/snippet}
-
-<div class="form-phase-2">
-  {#if registrationState.formState === "submitting"}
-    <Loader></Loader>
-  {:else}
-    <h2 class="heading is-regular">{t("step3.title")}</h2>
-    <p class="body-text">{t("step3.lead")}</p>
-
     <!-- Step 1: Documents -->
     {#if currentSubStep === 1}
       <div in:fade class="box has-8-gap">
         <h3>{t("labels.documents")}</h3>
-
-        {#if registrationState.values.country === "CZ"}
-          <div class="upload">
-            <label class="field-label" for="filesNationalId"
-              >{@html t("labels.doc.nationalId")}</label
+        {#if registrationState.askCountryAgain}
+          <div class="input-wrap">
+            <label for="country" class="field-label"
+              >{t("labels.citizenship")}</label
             >
-            <div class="w-file-upload">
-              <input
-                id="filesNationalId"
-                type="file"
-                multiple
-                onchange={(e) => {
-                  if (e.currentTarget.files) {
-                    registrationState.appendFiles(
-                      "nationalId",
-                      e.currentTarget.files
-                    );
-                  }
-                }}
-              />
-              {#each registrationState.values.filesNationalId as file}
-                {@render fileItem(file, "nationalId")}
-              {/each}
-            </div>
-            <Errors errors={registrationState.errors} path="filesNationalId" />
+            <select
+              class="input-2"
+              id="country"
+              bind:value={registrationState.values.country}
+            >
+              <option value="" disabled
+                >{t("select.placeholder.country")}</option
+              >
+              {#await getCountries("cs") then countries}
+                {#each countries as country}
+                  {#each Object.entries(country) as [code, name]}
+                    <option value={code}>{name}</option>
+                  {/each}
+                {/each}
+              {/await}
+            </select>
+            <Errors errors={registrationState.errors} path="country" />
           </div>
         {/if}
 
-        {#if registrationState.values.country && isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
-          <div class="upload">
-            <label class="field-label" for="filesEuPassport"
-              >{@html t("labels.doc.euPassport")}</label
-            >
-            <div class="w-file-upload">
-              <input
-                id="filesEuPassport"
-                type="file"
-                multiple
-                onchange={(e) => {
-                  if (e.currentTarget.files) {
-                    registrationState.appendFiles(
-                      "euPassport",
-                      e.currentTarget.files
-                    );
-                  }
-                }}
-              />
-              {#each registrationState.values.filesEuPassport as file}
-                {@render fileItem(file, "euPassport")}
-              {/each}
-            </div>
-            <Errors errors={registrationState.errors} path="filesEuPassport" />
-          </div>
-        {/if}
-
-        {#if registrationState.values.country && !isEu(registrationState.values.country)}
-          <div class="upload">
-            <label class="field-label" for="filesNonEu"
-              >{@html t("labels.doc.nonEu")}</label
-            >
-            <div class="w-file-upload">
-              <input
-                id="filesNonEu"
-                type="file"
-                multiple
-                onchange={(e) => {
-                  if (e.currentTarget.files) {
-                    registrationState.appendFiles(
-                      "nonEu",
-                      e.currentTarget.files
-                    );
-                  }
-                }}
-              />
-              {#each registrationState.values.filesNonEu as file}
-                {@render fileItem(file, "nonEu")}
-              {/each}
-            </div>
-            <Errors errors={registrationState.errors} path="filesNonEu" />
-          </div>
-        {/if}
-      </div>
-    {/if}
-
-    <!-- Step 2: Additional Info -->
-    {#if currentSubStep === 2}
-      <div in:fade class="box has-8-gap">
         <div class="input-wrap">
           <label for="transport" class="field-label"
             >{t("labels.transport")}</label
@@ -182,33 +104,7 @@
 
         <!-- Drivers License if Auto -->
         {#if registrationState.values.transport === "auto"}
-          <div class="upload">
-            <label class="field-label" for="filesDriversLicense"
-              >{@html t("labels.doc.driversLicense")}</label
-            >
-            <div class="w-file-upload">
-              <input
-                id="filesDriversLicense"
-                type="file"
-                multiple
-                onchange={(e) => {
-                  if (e.currentTarget.files) {
-                    registrationState.appendFiles(
-                      "driversLicense",
-                      e.currentTarget.files
-                    );
-                  }
-                }}
-              />
-              {#each registrationState.values.filesDriversLicense as file}
-                {@render fileItem(file, "driversLicense")}
-              {/each}
-            </div>
-            <Errors
-              errors={registrationState.errors}
-              path="filesDriversLicense"
-            />
-          </div>
+          <DriversLicenseUpload {registrationState}></DriversLicenseUpload>
         {/if}
 
         <div class="input-group-wrap">
@@ -224,26 +120,41 @@
               <option value="muž">{t("options.gender.male")}</option>
               <option value="žena">{t("options.gender.female")}</option>
             </select>
+            <Errors errors={registrationState.errors} path="gender" />
           </div>
         </div>
+
+        {#if registrationState.values.country === "CZ"}
+          <CzechFileUpload {registrationState}></CzechFileUpload>
+        {/if}
+
+        {#if registrationState.values.country && isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
+          <EuFileUpload {registrationState}></EuFileUpload>
+        {/if}
+
+        {#if registrationState.values.country && !isEu(registrationState.values.country)}
+          <NonEuFileUpload {registrationState}></NonEuFileUpload>
+        {/if}
       </div>
     {/if}
 
     <div class="form-nav">
-      <button
-        class="button is-ghost w-button"
-        onclick={prev}
-        disabled={currentSubStep === 1}
-      >
-        {t("nav.prev")}
-      </button>
+      <div></div>
+
       <button
         class="button w-button"
         onclick={next}
-        disabled={registrationState.submitting}
+        disabled={registrationState.validating || registrationState.submitting}
+        type="button"
       >
-        {currentSubStep === totalSubSteps ? t("nav.submit") : t("nav.next")}
+        {registrationState.validating
+          ? t("nav.validate")
+          : registrationState.submitting
+            ? t("nav.wait")
+            : currentSubStep === totalSubSteps
+              ? t("nav.submit")
+              : registrationState.stepNavTextPaseTwo}
       </button>
     </div>
-  {/if}
+  </div>
 </div>

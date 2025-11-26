@@ -92,17 +92,21 @@ export const formSchema = z.object({
   city: z.string().min(1, { error: t("errors.city") }),
   zip: z.string().min(1, { error: t("errors.zip") }),
   bankPrefix: z.string().max(6, { error: t("errors.bank.prefix") }),
-  bankNumber: z.string().min(1, { error: t("errors.bank.number") }).max(10, { error: t("errors.bank.number") }),
+  bankNumber: z
+    .string()
+    .min(1, { error: t("errors.bank.number") })
+    .max(10, { error: t("errors.bank.number") }),
   bankCode: z.string().min(1, { error: t("errors.bank.code") }),
 
   filesNationalId: fileArray(2),
   filesEuPassport: fileArray(2),
   filesNonEu: fileArray(2),
+  filesDriversLicense: fileArray(1),
 
   // step3
   deliveryCity: z.string().min(1, { error: t("errors.deliveryCity") }),
-  transport: z.string(),
-  gender: z.string(),
+  transport: z.string().min(1, { error: t("errors.transport") }),
+  gender: z.string().min(1, { error: t("errors.gender") }),
   birthDate: z.string().min(1, { error: t("errors.birthDate") }),
   passportExpiryDate: z.string(),
   insurance: z.string().min(1, { error: t("errors.insurance") }),
