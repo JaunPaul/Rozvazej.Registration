@@ -11,11 +11,12 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "form.title": "Hotovo za méně než 2 minuty",
     "form.lead":
-      "Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci. Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci.",
+      "Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci.",
+    "phase2.title": "Phase 2 title",
 
     "step1.title": "Osobní údaje",
-    "step1.lead":
-      "Na úvod nám stačí pár základních informací. Zvládnete to během chvilky.",
+    "step3.title": "Občanství",
+    "step4.title": "Údaje pro výplatu",
 
     "labels.firstName": "Jméno",
     "labels.lastName": "Přijmení",
@@ -94,6 +95,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.passportExpiryDate": "Zadejte prosím datum expirace pasu",
     "errors.insurance": "Vyberte možnost",
     "errors.pinkStatement": "Vyberte možnost",
+    "errors.gender": "Vyberte možnost",
+    "errors.transport": "Vyberte možnost",
 
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat na krok",
@@ -101,14 +104,6 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "nav.validate": "Ověřování....",
     "nav.wait": "Prosím čekejte..",
 
-    "step2.title": "Vaše adresa",
-    "step2.lead":
-      "Tato část obsahuje povinné údaje potřebné k dokončení registrace – na jejich základě Vám připravíme smlouvu, proto je prosím vyplňte pečlivě.",
-
-    "step3.title": "Občanství",
-    "step3.lead":
-      "Následující údaje nejsou povinné, ale pokud je vyplníte už teď, budeme moci vše zpracovat rychleji a bez zbytečného čekání.",
-    "step4.title": "Údaje pro výplatu",
     "labels.cityToDeliver": "Město kde budete rozvážet",
     "labels.transport": "Na čem budete rozvážet?",
     "labels.insurance": "Zdravotní pojištovna",
@@ -157,7 +152,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "form.title": "Hotovo za méně než 2 minuty",
     "form.lead":
       "Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci. ",
-
+    "phase2.title": "Phase 2 title",
     "step1.title": "Let's start — easy stuff",
     "step1.lead":
       "We only need a few basics to begin. This will take just a moment.",
@@ -238,6 +233,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.passportExpiryDate": "You must select a passport expiry date",
     "errors.insurance": "You must select an insurance",
     "errors.pinkStatement": "You must select a pink statement",
+    "errors.gender": "Select a gender",
+    "errors.transport": "Select transport",
 
     "nav.prev": "Back",
     "nav.next": "Continue to step",

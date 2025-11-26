@@ -47,14 +47,19 @@
 
 <div class="form-step is-active">
   <div class="box has-24-gap">
+    <div class="form-heading-wrap">
+      <h2 class="heading-form-large">{t("form.title")}</h2>
+      <p class="body-text">{t("form.lead")}</p>
+    </div>
     <div class="box has-8-gap">
-      <h2 class="heading is-regular">{t("step3.title")}</h2>
-      <p class="body-text">{t("step3.lead")}</p>
+      <div class="form-heading">
+        {t("phase2.title")}
+      </div>
+      <div class="form-line"></div>
     </div>
     <!-- Step 1: Documents -->
     {#if currentSubStep === 1}
       <div in:fade class="box has-8-gap">
-        <h3>{t("labels.documents")}</h3>
         {#if registrationState.askCountryAgain}
           <div class="input-wrap">
             <label for="country" class="field-label"

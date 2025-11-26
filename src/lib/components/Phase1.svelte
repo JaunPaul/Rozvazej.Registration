@@ -62,12 +62,14 @@
 
 <div class="form-step is-active">
   <div class="box has-24-gap">
-    <div class="box has-8-gap">
-      <h2 class="heading is-regular">
+    <div class="form-heading-wrap">
+      <h2 class="heading-form-large">
         {t("form.title")}
       </h2>
       <p class="body-text">{t("form.lead")}</p>
-      <h2 class="heading is-regular">
+    </div>
+    <div>
+      <div class="form-heading">
         {currentSubStep === 1
           ? t("step1.title")
           : currentSubStep === 2
@@ -75,9 +77,9 @@
             : currentSubStep === 3
               ? t("step3.title")
               : t("step4.title")}
-      </h2>
+      </div>
+      <div class="form-line"></div>
     </div>
-
     <!-- Step 1: Personal data -->
     {#if currentSubStep === 1}
       <PersonalData {registrationState} />
