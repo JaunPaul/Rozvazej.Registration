@@ -9,15 +9,19 @@
   const registrationState = new RegistrationState();
 </script>
 
-<div class="form">
-  {#if registrationState.formState === "neutral" || registrationState.formState === "submitting"}
-    {#if registrationState.currentPhase === 1}
-      <Phase1 {registrationState} />
-    {:else}
-      <Phase2 {registrationState} />
+{#if registrationState.submitting}
+  <Loader />
+{:else}
+  <div class="form">
+    {#if registrationState.formState === "neutral" || registrationState.formState === "submitting"}
+      {#if registrationState.currentPhase === 1}
+        <Phase1 {registrationState} />
+      {:else}
+        <Phase2 {registrationState} />
+      {/if}
     {/if}
-  {/if}
-</div>
+  </div>
+{/if}
 
 {#if registrationState.formState === "success"}
   <div class="w-form-done" style="display: block;">
@@ -38,8 +42,4 @@
       <div>{(registrationState.errors.error as any).message}</div>
     {/if}
   </div>
-{/if}
-
-{#if registrationState.submitting}
-  <Loader />
 {/if}

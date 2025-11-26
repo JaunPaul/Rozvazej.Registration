@@ -2,7 +2,10 @@ import { isEu } from "../i18n/euCountriesFilter";
 
 // 1) Steps → field ids
 // 1) Steps → field ids
-export const steps: Record<"step1" | "step2" | "step3" | "step4" | "phase2", string[]> = {
+export const steps: Record<
+  "step1" | "step2" | "step3" | "step4" | "phase2" | "alwaysInclude",
+  string[]
+> = {
   step1: ["firstName", "lastName", "phone", "email"],
   step2: ["street", "houseNumber", "city", "zip", "deliveryCity"],
   step3: ["country", "nationalId", "passportOrId", "birthDate"],
@@ -15,6 +18,24 @@ export const steps: Record<"step1" | "step2" | "step3" | "step4" | "phase2", str
     "transport",
     "gender",
     "passportExpiryDate",
+  ],
+  alwaysInclude: [
+    "utm_source",
+    "utm_campaign",
+    "utm_medium",
+    "utm_id",
+    "submitSource",
+    "foxentryPaymentStatus",
+    "step1Completed",
+    "step2Completed",
+    "step3Completed",
+    "sessionId",
+    "formStart",
+    "firstEndpointSubmissionId",
+    "firstEndpointSubmissionTime",
+    "finalEndpointSubmissionId",
+    "finalEndpointSubmissionTime",
+    "deliveryCompany",
   ],
 };
 

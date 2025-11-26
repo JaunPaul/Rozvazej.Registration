@@ -104,22 +104,27 @@
         class="button is-ghost w-button"
         onclick={prev}
         disabled={currentSubStep === 1}
+        type="button"
       >
         {t("nav.prev")}
       </button>
     {:else}
       <div></div>
     {/if}
+
     <button
       class="button w-button"
       onclick={next}
-      disabled={registrationState.submitting}
+      disabled={registrationState.validating || registrationState.submitting}
+      type="button"
     >
       {registrationState.validating
         ? t("nav.validate")
-        : currentSubStep === totalSubSteps
-          ? t("nav.submit")
-          : registrationState.stepNavText}
+        : registrationState.submitting
+          ? t("nav.wait")
+          : currentSubStep === totalSubSteps
+            ? t("nav.submit")
+            : registrationState.stepNavText}
     </button>
   </div>
 </div>
