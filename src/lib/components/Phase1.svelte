@@ -6,16 +6,31 @@
   import Citizenship from "./steps/Citizenship.svelte";
   import Address from "./steps/Address.svelte";
   import PaymentDetails from "./steps/PaymentDetails.svelte";
+  import { onMount } from "svelte";
 
   let { registrationState }: { registrationState: RegistrationState } =
     $props();
 
   // Local state for this phase
   let currentSubStep = $state(1);
+  let externalSteps: HTMLElement[] | [] = $state([]);
   $effect(() => {
     registrationState.toNextStepIndex = currentSubStep + 1;
   });
   const totalSubSteps = 4;
+
+  onMount(() => {
+    externalSteps = Array.from(
+      document.querySelectorAll<HTMLElement>(".step-wrap")
+    );
+  });
+
+  $effect(() => {
+    if (!externalSteps.length || !currentSubStep) return;
+    externalSteps.forEach((el, i) => {
+      el.classList.toggle("is-active", i === currentSubStep - 1);
+    });
+  });
 
   // Step 1: Personal data
   // Step 2: Address
