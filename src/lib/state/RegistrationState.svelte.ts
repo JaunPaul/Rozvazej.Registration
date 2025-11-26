@@ -1,24 +1,19 @@
 import { t } from "../i18n/i18n.svelte";
 import {
-  validateCompany,
   validateEmail,
   validateName,
   validatePhone,
   searchLocations,
-  searchCompanies,
   type FxLocation,
   type FxCompany,
   type LocationSearchType,
   debounce,
 } from "../foxentry";
-import { getEndpoint } from "../utils/getEndpoints";
 import { validateStepAsync } from "../utils/validation";
 import { SubmissionStatus } from "../enums/form";
 import type { Company, FormStates, CustomErrors, Bucket } from "../types";
-import { isEu } from "../i18n/euCountriesFilter";
 import { PHASE1_ENDPOINT, PHASE2_ENDPOINT } from "../endpoints";
 import { steps } from "../utils/stateMachine";
-import { sleep } from "../utils/helpers";
 
 export class RegistrationState {
   // State
@@ -74,6 +69,7 @@ export class RegistrationState {
     finalEndpointSubmissionTime: undefined as string | undefined,
     placeOfBirth: "",
     permanentResidence: "",
+    userId: "",
   });
 
   errors: CustomErrors = $state({});
@@ -122,7 +118,7 @@ export class RegistrationState {
       if (params.get("phase") === "2") {
         this.currentPhase = 2;
         this.currentStep = "step1"; // Reset step for phase 2
-        const user = params.get("user");
+        this.values.userId = params.get("userId") ?? "";
         const country = params.get("country");
 
         if (!country) {
@@ -368,24 +364,71 @@ export class RegistrationState {
     this.submitting = true;
     this.formState = "submitting";
 
-    const endpoint = PHASE2_ENDPOINT; // Or new phase 2 endpoint
-
+    // Placeholder endpoint
+    const endpoint = PHASE2_ENDPOINT;
+    // artificial delay
+    // await sleep(3000);
     try {
-      // ... append fields and files ...
-      console.log("Submitting Phase 2", this.values);
+      const fieldsForSnapshot = [...steps.phase2, ...steps.alwaysInclude];
+      const snapshot = this.mapStepsToSnapshot(this.values, fieldsForSnapshot);
+      const fd = new FormData();
+      for (const [k, v] of Object.entries(snapshot)) {
+        if (
+          k === "filesNationalId" ||
+          k === "filesEuPassport" ||
+          k === "filesNonEu" ||
+          k === "filesDriversLicense"
+        )
+          continue;
+        if (v === undefined || v === null) continue;
 
-      // Simulate success
-      await new Promise((r) => setTimeout(r, 1000));
+        if (
+          typeof v === "string" ||
+          typeof v === "number" ||
+          typeof v === "boolean"
+        ) {
+          fd.append(k, String(v));
+        } else {
+          // Nested objects (if any): send as JSON string
+          fd.append(k, JSON.stringify(v));
+        }
+      }
+      snapshot.filesNationalId?.forEach((f) =>
+        fd.append("filesNationalId", f, f.name)
+      );
+      snapshot.filesEuPassport?.forEach((f) =>
+        fd.append("filesEuPassport", f, f.name)
+      );
+      snapshot.filesNonEu?.forEach((f) => fd.append("filesNonEu", f, f.name));
+      snapshot.filesDriversLicense?.forEach((f) =>
+        fd.append("filesDriversLicense", f, f.name)
+      );
 
+      snapshot.userId = this.values.userId;
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        body: fd,
+      });
+
+      const text = await res.text();
+      console.log("[formsubmission]", text);
       this.formState = "success";
       this.submissionStatus = SubmissionStatus.APPROVED;
-      this.trackCompletion("Phase2_Success");
+
+      this.errors = {};
+      // const welcome = "/vitejte";
+      // window.location.replace(welcome);
     } catch (err) {
       console.error(err);
       this.formState = "fail";
+      this.submissionStatus = SubmissionStatus.REJECTED;
     } finally {
       this.disable = false;
       this.submitting = false;
+
+      this.trackCompletion(this.submissionStatus);
+      this.trackCompletionWithoutAds(this.submissionStatus);
     }
   }
 
