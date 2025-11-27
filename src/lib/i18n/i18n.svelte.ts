@@ -9,9 +9,15 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "steps.2": "Krok 2",
     "steps.3": "Krok 3",
 
-    "step1.title": "Začínáme – nic složitého",
-    "step1.lead":
-      "Na úvod nám stačí pár základních informací. Zvládnete to během chvilky.",
+    "form.title": "Hotovo za méně než 2 minuty",
+    "form.lead":
+      "Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci.",
+    "phase2.title": "Poslední podrobnosti",
+
+    "step1.title": "Osobní údaje",
+    "step2.title": "Vaše adresa",
+    "step3.title": "Občanství",
+    "step4.title": "Údaje pro výplatu",
 
     "labels.firstName": "Jméno",
     "labels.lastName": "Přijmení",
@@ -34,7 +40,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">1. Průkaz totožnosti nebo cestovní pas</span><br /><span class="bold-green">2. Vízum NEBO povolení k pobytu NEBO Potvrzení o</span><br /><span class="bold-green">2. studiu nebo pracovní povolení</span>`,
     "labels.doc.driversLicense": `Nahrajte platný řidičský průkaz. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br />`,
     "labels.deliveryCompany":
-      "Neomezujte se – u nás můžete jezdit pro všechny tři služby najednou: Bolt, Wolt i Foodora. Více platforem = více objednávek = vyšší výdělky. Stačí si zvolit, kde chcete začít!",
+      "Neomezujte se - u nás můžete jezdit pro všechny tři služby najednou: Bolt, Wolt i Foodora. Více platforem = více objednávek = vyšší výdělky. Stačí si zvolit, kde chcete začít!",
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
@@ -56,12 +62,16 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.nationalId": "Zadejte prosím číslo cestovního dokladu",
     "ph.companyId": "Zadejte prosím IČO",
     "ph.bank.prefix": "Např. 123456",
+    "ph.bank.number": "123456789",
     "ph.passportOrId":
       "Zadejte číslo vašeho osobního dokladu nebo cestovního pasu",
+    "ph.permanentResidence":
+      "např. 5 Avenue Anatole Francie, Champ de Mars, 75007 Paříž, Francie",
+    "ph.placeOfBirth": "e.g. Francie",
 
     "errors.firstName": "Zadejte prosím své jméno",
     "errors.lastName": "Zadejte prosím své přijmení",
-    "errors.phone": "Zadejte české telefonní číslo ve formátu XXX XXX XXXX.",
+    "errors.phone": "Zadejte české telefonní číslo ve formátu XXX XXX XXX.",
     "errors.email": "Zadejte prosím svůj email",
     "errors.nationalId": "Zadejte platné rodné číslo.",
     "errors.passportOrId": "Zadejte prosím platné číslo průkazu totožnosti",
@@ -83,20 +93,23 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.fox.zip": "PSČ neodpovídá městu.",
     "errors.fox.houseNumber": "Číslo domu neodpovídá ulici.",
     "errors.fox.company": "Toto IČO jsme nenašli.",
+    "errors.deliveryCity": "Zadejte prosím město či obec",
+    "errors.birthDate": "Zadejte prosím datum narození",
+    "errors.country": "Vyberte možnost",
+    "errors.passportExpiryDate": "Zadejte prosím datum expirace pasu",
+    "errors.insurance": "Vyberte možnost",
+    "errors.pinkStatement": "Vyberte možnost",
+    "errors.gender": "Vyberte možnost",
+    "errors.transport": "Vyberte možnost",
+    "errors.birthDateTooYoung": "Musíte být starší 15 let",
+    "errors.permanentResidence": "Je vyžadován trvalý pobyt",
+    "errors.placeOfBirth": "Místo narození povinné",
 
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat na krok",
     "nav.submit": "Odeslat",
     "nav.validate": "Ověřování....",
     "nav.wait": "Prosím čekejte..",
-
-    "step2.title": "Už jen pár údajů",
-    "step2.lead":
-      "Tato část obsahuje povinné údaje potřebné k dokončení registrace – na jejich základě Vám připravíme smlouvu, proto je prosím vyplňte pečlivě.",
-
-    "step3.title": "Chcete mít registraci hotovou co nejrychleji?",
-    "step3.lead":
-      "Následující údaje nejsou povinné, ale pokud je vyplníte už teď, budeme moci vše zpracovat rychleji a bez zbytečného čekání.",
 
     "labels.cityToDeliver": "Město kde budete rozvážet",
     "labels.transport": "Na čem budete rozvážet?",
@@ -143,9 +156,15 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "steps.2": "Step 2",
     "steps.3": "Step 3",
 
-    "step1.title": "Let's start — easy stuff",
-    "step1.lead":
-      "We only need a few basics to begin. This will take just a moment.",
+    "form.title": "Hotovo za méně než 2 minuty",
+    "form.lead":
+      "Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci. ",
+    "phase2.title": "Phase 2 title",
+
+    "step1.title": "Osobní údaje",
+    "step2.title": "Vaše adresa",
+    "step3.title": "Občanství",
+    "step4.title": "Údaje pro výplatu",
 
     "labels.firstName": "First name",
     "labels.lastName": "Last name",
@@ -188,7 +207,11 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.nationalId": "Your social security number",
     "ph.companyId": "Enter your company number",
     "ph.bank.prefix": "123456",
+    "ph.bank.number": "123456789",
     "ph.passportOrId": "Enter ID or passport number",
+    "ph.permanentResidence":
+      "e.g. 5 Avenue Anatole France, Champ de Mars, 75007 Paris, France",
+    "ph.placeOfBirth": "e.g. France",
 
     "errors.firstName": "Please enter your first name",
     "errors.lastName": "Please enter your last name",
@@ -216,19 +239,23 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.fox.company":
       "We could not find this company. Please search and select your company using the registration number.",
 
+    "errors.deliveryCity": "You must select a city",
+    "errors.birthDate": "You must select a birth date",
+    "errors.country": "You must select a country",
+    "errors.passportExpiryDate": "You must select a passport expiry date",
+    "errors.insurance": "You must select an insurance",
+    "errors.pinkStatement": "You must select a pink statement",
+    "errors.gender": "Select a gender",
+    "errors.transport": "Select transport",
+    "errors.birthDateTooYoung": "You must be 15 or older",
+    "errors.permanentResidence": "Permanent residence is required",
+    "errors.placeOfBirth": "Place of birth required",
+
     "nav.prev": "Back",
     "nav.next": "Continue to step",
     "nav.submit": "Submit",
     "nav.wait": "Please wait…",
     "nav.validate": "Validating...",
-
-    "step2.title": "Just a few more details",
-    "step2.lead":
-      "These mandatory details are needed to finish your registration and prepare the contract. Please fill them in carefully.",
-
-    "step3.title": "Want to finish even faster?",
-    "step3.lead":
-      "The following fields are optional. If you add them now, we can process everything quicker without extra back‑and‑forth.",
 
     "labels.cityToDeliver": "City you will deliver in",
     "labels.transport": "What will you deliver on?",
