@@ -12,9 +12,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "form.title": "Hotovo za méně než 2 minuty",
     "form.lead":
       "Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci.",
-    "phase2.title": "Phase 2 title",
+    "phase2.title": "Poslední podrobnosti",
 
     "step1.title": "Osobní údaje",
+    "step2.title": "Vaše adresa",
     "step3.title": "Občanství",
     "step4.title": "Údaje pro výplatu",
 
@@ -159,9 +160,11 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "form.lead":
       "Vyplňte pár základních údajů, abychom mohli připravit Vaši registraci. ",
     "phase2.title": "Phase 2 title",
-    "step1.title": "Let's start — easy stuff",
-    "step1.lead":
-      "We only need a few basics to begin. This will take just a moment.",
+
+    "step1.title": "Osobní údaje",
+    "step2.title": "Vaše adresa",
+    "step3.title": "Občanství",
+    "step4.title": "Údaje pro výplatu",
 
     "labels.firstName": "First name",
     "labels.lastName": "Last name",
@@ -253,14 +256,6 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "nav.submit": "Submit",
     "nav.wait": "Please wait…",
     "nav.validate": "Validating...",
-
-    "step2.title": "Just a few more details",
-    "step2.lead":
-      "These mandatory details are needed to finish your registration and prepare the contract. Please fill them in carefully.",
-
-    "step3.title": "Want to finish even faster?",
-    "step3.lead":
-      "The following fields are optional. If you add them now, we can process everything quicker without extra back‑and‑forth.",
 
     "labels.cityToDeliver": "City you will deliver in",
     "labels.transport": "What will you deliver on?",
