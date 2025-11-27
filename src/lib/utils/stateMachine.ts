@@ -18,6 +18,8 @@ export const steps: Record<
     "transport",
     "gender",
     "passportExpiryDate",
+    "placeOfBirth",
+    "permanentResidence",
   ],
   alwaysInclude: [
     "utm_source",

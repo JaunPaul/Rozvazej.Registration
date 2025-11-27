@@ -43,6 +43,16 @@
       currentSubStep--;
     }
   }
+
+  const toDateInputValue = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const today = new Date();
+  const minPassportExpiry = toDateInputValue(today);
 </script>
 
 <div class="form-step is-active">
@@ -139,6 +149,59 @@
 
         {#if registrationState.values.country && !isEu(registrationState.values.country)}
           <NonEuFileUpload {registrationState}></NonEuFileUpload>
+        {/if}
+
+        {#if registrationState.values.country.length > 0 && registrationState.values.country !== "CZ"}
+          <div class="input-wrap">
+            <label for="passportExpiryDate" class="field-label"
+              >{t("labels.passportExpiryDate")}</label
+            ><input
+              class="input-2 w-input"
+              maxlength="256"
+              name="passportExpiryDate"
+              data-name="passportExpiryDate"
+              type="date"
+              id="passportExpiryDate"
+              min={minPassportExpiry}
+              bind:value={registrationState.values.passportExpiryDate}
+            />
+            <Errors
+              errors={registrationState.errors}
+              path="passportExpiryDate"
+            />
+          </div>
+
+          <div class="input-wrap">
+            <label for="placeOfBirth" class="field-label"
+              >{t("labels.placeOfBirth")}</label
+            ><input
+              class="input-2 w-input"
+              name="placeOfBirth"
+              data-name="placeOfBirth"
+              type="text"
+              id="placeOfBirth"
+              placeholder={t("ph.placeOfBirth")}
+              bind:value={registrationState.values.placeOfBirth}
+            />
+            <Errors errors={registrationState.errors} path="placeOfBirth" />
+          </div>
+          <div class="input-wrap">
+            <label for="permanentResidence" class="field-label"
+              >{t("labels.permanentResidence")}</label
+            ><input
+              class="input-2 w-input"
+              name="permanentResidence"
+              data-name="permanentResidence"
+              type="text"
+              id="permanentResidence"
+              placeholder={t("ph.permanentResidence")}
+              bind:value={registrationState.values.permanentResidence}
+            />
+            <Errors
+              errors={registrationState.errors}
+              path="permanentResidence"
+            />
+          </div>
         {/if}
       </div>
     {/if}

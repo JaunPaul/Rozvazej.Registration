@@ -107,8 +107,33 @@ export const formSchema = z.object({
   deliveryCity: z.string().min(1, { error: t("errors.deliveryCity") }),
   transport: z.string().min(1, { error: t("errors.transport") }),
   gender: z.string().min(1, { error: t("errors.gender") }),
-  birthDate: z.string().min(1, { error: t("errors.birthDate") }),
-  passportExpiryDate: z.string(),
+  birthDate: z
+    .string()
+    .min(1, { error: t("errors.birthDate") })
+    .refine(
+      (value) => {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return false;
+
+        const today = new Date();
+        const cutoff = new Date(
+          today.getFullYear() - 15,
+          today.getMonth(),
+          today.getDate()
+        );
+        return date <= cutoff;
+      },
+      {
+        message: t("errors.birthDateTooYoung"),
+      }
+    ),
+  passportExpiryDate: z
+    .string()
+    .min(1, { error: t("errors.passportExpiryDate") }),
+  permanentResidence: z
+    .string()
+    .min(1, { error: t("errors.permanentResidence") }),
+  placeOfBirth: z.string().min(1, { error: t("errors.placeOfBirth") }),
   insurance: z.string().min(1, { error: t("errors.insurance") }),
   pinkStatement: z.coerce.boolean({ error: t("errors.pinkStatement") }),
 });

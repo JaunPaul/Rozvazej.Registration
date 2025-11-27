@@ -64,6 +64,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.bank.number": "123456789",
     "ph.passportOrId":
       "Zadejte číslo vašeho osobního dokladu nebo cestovního pasu",
+    "ph.permanentResidence":
+      "např. 5 Avenue Anatole Francie, Champ de Mars, 75007 Paříž, Francie",
+    "ph.placeOfBirth": "e.g. Francie",
 
     "errors.firstName": "Zadejte prosím své jméno",
     "errors.lastName": "Zadejte prosím své přijmení",
@@ -97,6 +100,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.pinkStatement": "Vyberte možnost",
     "errors.gender": "Vyberte možnost",
     "errors.transport": "Vyberte možnost",
+    "errors.birthDateTooYoung": "Musíte být starší 15 let",
+    "errors.permanentResidence": "Je vyžadován trvalý pobyt",
+    "errors.placeOfBirth": "Místo narození povinné",
 
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat na krok",
@@ -200,6 +206,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.bank.prefix": "123456",
     "ph.bank.number": "123456789",
     "ph.passportOrId": "Enter ID or passport number",
+    "ph.permanentResidence":
+      "e.g. 5 Avenue Anatole France, Champ de Mars, 75007 Paris, France",
+    "ph.placeOfBirth": "e.g. France",
 
     "errors.firstName": "Please enter your first name",
     "errors.lastName": "Please enter your last name",
@@ -235,6 +244,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.pinkStatement": "You must select a pink statement",
     "errors.gender": "Select a gender",
     "errors.transport": "Select transport",
+    "errors.birthDateTooYoung": "You must be 15 or older",
+    "errors.permanentResidence": "Permanent residence is required",
+    "errors.placeOfBirth": "Place of birth required",
 
     "nav.prev": "Back",
     "nav.next": "Continue to step",
