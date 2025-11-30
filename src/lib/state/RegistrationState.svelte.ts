@@ -68,7 +68,10 @@ export class RegistrationState {
     finalEndpointSubmissionId: undefined as string | undefined,
     finalEndpointSubmissionTime: undefined as string | undefined,
     placeOfBirth: "",
-    permanentResidence: "",
+    permanentResidenceCountry: "",
+    permanentResidenceStreet: "",
+    permanentResidenceStreetNumber: "",
+    permanentResidenceCity: "",
     userId: "",
   });
 

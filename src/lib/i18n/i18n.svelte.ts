@@ -36,8 +36,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.bank.number": "Číslo bankovního účtu",
     "labels.bank.code": "Kód banky",
     "labels.doc.nationalId": `Nahrajte ID/ jiný platný doklad. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
-    "labels.doc.euPassport": `Nahrajte svůj občanský průkaz nebo cestovní pas. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
-    "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">1. Průkaz totožnosti nebo cestovní pas</span><br /><span class="bold-green">2. Vízum NEBO povolení k pobytu NEBO Potvrzení o</span><br /><span class="bold-green">2. studiu nebo pracovní povolení</span>`,
+    "labels.doc.euPassport": `Nahrajte svůj občanský průkaz. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
+    "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">1. Průkaz totožnosti</span><br /><span class="bold-green">2. Vízum NEBO povolení k pobytu NEBO pracovní povolení</span>`,
     "labels.doc.driversLicense": `Nahrajte platný řidičský průkaz. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br />`,
     "labels.deliveryCompany":
       "Neomezujte se - u nás můžete jezdit pro všechny tři služby najednou: Bolt, Wolt i Foodora. Více platforem = více objednávek = vyšší výdělky. Stačí si zvolit, kde chcete začít!",
@@ -54,20 +54,25 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "*Tyto dokumenty jsou vyžadovány. Občanský průkaz (přední i zadní strana) nebo cestovní pas, vízum nebo povolení k pobytu, studijní nebo pracovní povolení.",
     "hints.pinkstatement":
       'Pokud zvolíte ANO, uplatníme u Vás slevu na dani a budete dostávat více peněz.<br><br> <strong>POZOR</strong> - "růžové prohlášení o dani" (neboli Prohlášení poplatníka k dani z příjmů fyzických osob) můžete mít vyplněné a uplatněné pouze u jednoho zaměstnavatele. To znamená, že pokud máte více pracovních smluv, nebo kombinujete zaměstnání a brigády, můžete tento nárok využít jen u jedné firmy.',
+    "hints.doc.filesDriversLicense":
+      "Nahrajte jasnou fotografii nebo sken přední i zadní strany vašeho řidičského průkazu.",
 
-    "ph.firstName": "Zde napište své křestní jméno",
-    "ph.lastName": "Zde napište své přijmení",
-    "ph.phone": "777111222",
-    "ph.email": "Zadejte svou e-mailovou adresu",
-    "ph.nationalId": "Zadejte prosím číslo cestovního dokladu",
-    "ph.companyId": "Zadejte prosím IČO",
+    "ph.firstName": "Např. Jan",
+    "ph.lastName": "Např. Novák",
+    "ph.phone": "Např. 777111222",
+    "ph.email": "Např. jan.novak@email.cz",
+    "ph.nationalId": "Např. 123456789",
+    "ph.companyId": "Např. 12345678",
     "ph.bank.prefix": "Např. 123456",
-    "ph.bank.number": "123456789",
-    "ph.passportOrId":
-      "Zadejte číslo vašeho osobního dokladu nebo cestovního pasu",
+    "ph.bank.number": "Např. 123456789",
+    "ph.passportOrId": "Např. 123456789",
     "ph.permanentResidence":
-      "např. 5 Avenue Anatole Francie, Champ de Mars, 75007 Paříž, Francie",
-    "ph.placeOfBirth": "e.g. Francie",
+      "Např. 5 Avenue Anatole France, Champ de Mars, 75007 Paříž, Francie",
+    "ph.placeOfBirth": "Např. Paříž, Francie",
+    "ph.permanentResidenceCountry": "Např. Česká republika",
+    "ph.permanentResidenceStreet": "Např. Václavské náměstí",
+    "ph.permanentResidenceStreetNumber": "Např. 123/45",
+    "ph.permanentResidenceCity": "Např. Praha",
 
     "errors.firstName": "Zadejte prosím své jméno",
     "errors.lastName": "Zadejte prosím své přijmení",
@@ -96,7 +101,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.deliveryCity": "Zadejte prosím město či obec",
     "errors.birthDate": "Zadejte prosím datum narození",
     "errors.country": "Vyberte možnost",
-    "errors.passportExpiryDate": "Zadejte prosím datum expirace pasu",
+    "errors.passportExpiryDate": "Zadejte prosím datum expirace dokladu",
     "errors.insurance": "Vyberte možnost",
     "errors.pinkStatement": "Vyberte možnost",
     "errors.gender": "Vyberte možnost",
@@ -108,7 +113,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat na krok",
     "nav.submit": "Odeslat",
-    "nav.validate": "Ověřování....",
+    "nav.validate": "Ověřování...",
     "nav.wait": "Prosím čekejte..",
 
     "labels.cityToDeliver": "Město kde budete rozvážet",
@@ -117,7 +122,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.pinkStatement": "Chcete uplatnit růžové prohlášení?",
     "labels.gender": "Jaké je tvé pohlaví?",
     "labels.birthDate": "Datum narození",
-    "labels.passportExpiryDate": "Datum vypršení platnosti pasu",
+    "labels.passportExpiryDate": "Datum expirace dokladu",
     "labels.placeOfBirth": "Místo narození",
     "labels.permanentResidence": "Trvalé bydliště",
 
@@ -125,7 +130,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "answer.no": "NE",
 
     "select.placeholder.country": "Vyberte stát",
-    "select.placeholder.city": "Vyberte jednu z možností....",
+    "select.placeholder.city": "Vyberte jednu z možností...",
     "select.placeholder.transport": "Vyberte způsob dopravy",
     "select.placeholder.insurance": "Vyberte zdravotní pojišťovnu",
     "select.placeholder.bank": "Vyberte banku",
@@ -150,7 +155,6 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "result.loading.stage1": "Nahrávání souborů...",
     "result.loading.stage2": "Ověřování vašich údajů...",
     "result.loading.stage3": "Dokončování...",
-
     "result.verifying.stage1": "Ověřování dat...",
     "result.verifying.stage2": "Kontrola stavu smlouvy...",
     "result.verifying.stage3": "Téměř hotovo...",
@@ -181,17 +185,18 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.citizenship": "Citizenship",
     "labels.street": "Street",
     "labels.houseNumber": "House number",
+    "labels.passportExpiryDate": "Document expiration date",
     "labels.city": "City",
     "labels.zip": "ZIP / Postal code",
     "labels.bank.prefix": "Prefix",
     "labels.bank.number": "Bank account number",
     "labels.bank.code": "Bank code",
     "labels.doc.nationalId": `Upload ID / other valid document. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
-    "labels.doc.euPassport": `Upload your Identity card or passport. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
-    "labels.doc.nonEu": `Upload the following valid documents. <br /><span class="bold-green">ID CARD OR PASSPORT</span><br /><span class="bold-green">VISA OR RESIDENCE PERMIT</span><br /><span class="bold-green">STUDY OR PERMIT</span>`,
+    "labels.doc.euPassport": `Upload your Identity card. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
+    "labels.doc.nonEu": `Upload the following valid documents. <br /><span class="bold-green">ID CARD</span><br /><span class="bold-green">VISA OR RESIDENCE PERMIT</span><br /><span class="bold-green">STUDY OR PERMIT</span>`,
     "labels.doc.driversLicense": `Upload valid driver's license. <br /><span class="bold-green">1. FRONT SIDE</span><br />`,
     "labels.deliveryCompany":
-      "Don’t limit yourself – with us you can ride for all three services at once: Bolt, Wolt, and Foodora. More platforms = more orders = higher earnings. Just choose where you want to start!",
+      "Don’t limit yourself - with us you can ride for all three services at once: Bolt, Wolt, and Foodora. More platforms = more orders = higher earnings. Just choose where you want to start!",
 
     "hints.czPhone":
       "For deliveries in the Czech Republic you must provide a <strong>Czech phone number.</strong>",
@@ -200,9 +205,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "hints.doc.nationalId": "Upload both front and back of your ID card.",
     "hints.doc.euPassport": "Upload both front and back of your ID card.",
     "hints.doc.nonEu":
-      "*These files are required. ID card (front and back) or passport, Visa or residence permit, Study or work permit",
+      "*These files are required. ID card (front and back), Visa or residence permit, Study or work permit",
     "hints.pinkstatement":
       '<strong>POZOR</strong> - "růžové prohlášení o dani" (neboli Prohlášení poplatníka k dani z příjmů fyzických osob) můžete mít vyplněné a uplatněné pouze u jednoho zaměstnavatele. To znamená, že pokud máte více pracovních smluv, nebo kombinujete zaměstnání a brigády, můžete tento nárok využít jen u jedné firmy.',
+    "hints.doc.filesDriversLicense": "Upload your driver's license",
 
     "ph.firstName": "Type your first name",
     "ph.lastName": "Type your last name",
@@ -212,10 +218,14 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.companyId": "Enter your company number",
     "ph.bank.prefix": "123456",
     "ph.bank.number": "123456789",
-    "ph.passportOrId": "Enter ID or passport number",
+    "ph.passportOrId": "Enter ID number",
     "ph.permanentResidence":
       "e.g. 5 Avenue Anatole France, Champ de Mars, 75007 Paris, France",
     "ph.placeOfBirth": "e.g. France",
+    "ph.permanentResidenceCountry": "Např. Česká republika",
+    "ph.permanentResidenceStreet": "Např. Václavské náměstí",
+    "ph.permanentResidenceStreetNumber": "Např. 123/45",
+    "ph.permanentResidenceCity": "Např. Praha",
 
     "errors.firstName": "Please enter your first name",
     "errors.lastName": "Please enter your last name",
@@ -246,7 +256,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.deliveryCity": "You must select a city",
     "errors.birthDate": "You must select a birth date",
     "errors.country": "You must select a country",
-    "errors.passportExpiryDate": "You must select a passport expiry date",
+    "errors.passportExpiryDate": "You must select a document expiry date",
     "errors.insurance": "You must select an insurance",
     "errors.pinkStatement": "You must select a pink statement",
     "errors.gender": "Select a gender",
