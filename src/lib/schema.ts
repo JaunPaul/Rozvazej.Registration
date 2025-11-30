@@ -138,4 +138,10 @@ export const formSchema = z.object({
   pinkStatement: z.coerce.boolean({ error: t("errors.pinkStatement") }),
 });
 
+export const verifyResponseSchema = z.object({
+  courierId: z.string(),
+  contractSigned: z.boolean(),
+});
+
+export type VerifyResponse = z.infer<typeof verifyResponseSchema>;
 export type FormSchema = z.infer<typeof formSchema>;

@@ -150,6 +150,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "result.loading.stage1": "Nahrávání souborů...",
     "result.loading.stage2": "Ověřování vašich údajů...",
     "result.loading.stage3": "Dokončování...",
+
+    "result.verifying.stage1": "Ověřování dat...",
+    "result.verifying.stage2": "Kontrola stavu smlouvy...",
+    "result.verifying.stage3": "Téměř hotovo...",
   },
   en: {
     "steps.1": "Step 1",
@@ -297,6 +301,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "result.loading.stage1": "Uploading your files...",
     "results.loading.stage2": "Verifying your information...",
     "results.loading.stage3": "Finishing up...",
+
+    "result.verifying.stage1": "Verifying data...",
+    "result.verifying.stage2": "Checking contract status...",
+    "result.verifying.stage3": "Almost done...",
   },
 });
 

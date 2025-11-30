@@ -9,6 +9,9 @@
   import EuFileUpload from "./EuFileUpload.svelte";
   import NonEuFileUpload from "./NonEuFileUpload.svelte";
   import DriversLicenseUpload from "./DriversLicenseUpload.svelte";
+  import { onMount } from "svelte";
+  import { verifyUser } from "../utils/helpers";
+  import { testingUserId } from "../enums/testingData";
 
   let { registrationState }: { registrationState: RegistrationState } =
     $props();
