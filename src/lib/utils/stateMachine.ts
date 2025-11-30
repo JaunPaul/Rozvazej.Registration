@@ -11,6 +11,10 @@ export const steps: Record<
   step3: ["country", "nationalId", "passportOrId", "birthDate"],
   step4: ["bankPrefix", "bankNumber", "bankCode", "insurance", "pinkStatement"],
   phase2: [
+    "permanentResidenceCountry",
+    "permanentResidenceStreet",
+    "permanentResidenceStreetNumber",
+    "permanentResidenceCity",
     "filesNationalId",
     "filesEuPassport",
     "filesNonEu",
@@ -19,7 +23,6 @@ export const steps: Record<
     "gender",
     "passportExpiryDate",
     "placeOfBirth",
-    "permanentResidence",
   ],
   alwaysInclude: [
     "utm_source",
@@ -101,11 +104,28 @@ export const fields: Record<
     visibleWhen: (d) => d.transport === "auto",
     requiredWhen: (d) => d.transport === "auto",
   },
-  transport: { visibleWhen: (d) => true, requiredWhen: (d) => false },
-  gender: { visibleWhen: (d) => true, requiredWhen: (d) => false },
+  transport: { visibleWhen: (d) => true, requiredWhen: (d) => true },
+  gender: { visibleWhen: (d) => true, requiredWhen: (d) => true },
+  placeOfBirth: { visibleWhen: (d) => true, requiredWhen: (d) => true },
   passportExpiryDate: {
     visibleWhen: (d) => d.country && !isEu(d.country),
     requiredWhen: (d) => false,
+  },
+  permanentResidenceStreet: {
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
+  },
+  permanentResidenceStreetNumber: {
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
+  },
+  permanentResidenceCity: {
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
+  },
+  permanentResidenceCountry: {
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
   },
 
   // Archived / Unused

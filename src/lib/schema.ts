@@ -130,9 +130,12 @@ export const formSchema = z.object({
   passportExpiryDate: z
     .string()
     .min(1, { error: t("errors.passportExpiryDate") }),
-  permanentResidence: z
+  permanentResidenceStreet: z.string().min(1, { error: t("errors.street") }),
+  permanentResidenceStreetNumber: z
     .string()
-    .min(1, { error: t("errors.permanentResidence") }),
+    .min(1, { error: t("errors.houseNumber") }),
+  permanentResidenceCity: z.string().min(1, { error: t("errors.city") }),
+  permanentResidenceCountry: z.string().min(1, { error: t("errors.country") }),
   placeOfBirth: z.string().min(1, { error: t("errors.placeOfBirth") }),
   insurance: z.string().min(1, { error: t("errors.insurance") }),
   pinkStatement: z.coerce.boolean({ error: t("errors.pinkStatement") }),

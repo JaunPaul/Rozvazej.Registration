@@ -129,7 +129,11 @@ export function getVisibleIds(
   stepId: "step1" | "step2" | "step3" | "step4" | "phase2",
   data: any
 ): string[] {
-  return steps[stepId].filter((id) => fields[id].visibleWhen(data));
+  return steps[stepId].filter((id) => {
+    console.log("[getVisibleIds]", id);
+
+    return fields[id].visibleWhen(data);
+  });
 }
 export function getRequiredIds(visibleIds: string[], data: any): string[] {
   return visibleIds.filter((id) => fields[id].requiredWhen(data));
@@ -167,6 +171,7 @@ export async function validateStepAsync(
   data: any,
   includeFoxentry: boolean
 ) {
+  console.log("[data before getting visible ids]", data);
   const visible = getVisibleIds(stepId, data);
   visible.forEach((id) => everVisible.add(id));
   const required = getRequiredIds(visible, data);
