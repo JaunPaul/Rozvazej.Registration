@@ -188,83 +188,94 @@
             />
             <Errors errors={registrationState.errors} path="placeOfBirth" />
           </div>
-          <div class="input-group-wrap">
-            <div class="input-wrap relative">
-              <label for="permanentResidenceStreet" class="field-label"
-                >{t("labels.street")}</label
-              >
-              <input
-                class="input-2 w-input"
-                type="text"
-                id="permanentResidenceStreet"
-                placeholder={t("ph.permanentResidenceStreet")}
-                bind:value={registrationState.values.permanentResidenceStreet}
-              />
-              <Errors
-                errors={registrationState.errors}
-                path="permanentResidenceStreet"
-              />
+
+          <div class="box has-8-gap">
+            <div class="form-heading">
+              {t("labels.permanentResidence")}
             </div>
-            <div class="input-wrap relative">
-              <label for="permanentResidenceStreetNumber" class="field-label"
-                >{t("labels.houseNumber")}</label
-              >
-              <input
-                class="input-2 w-input"
-                type="text"
-                id="permanentResidenceStreetNumber"
-                placeholder={t("ph.permanentResidenceStreetNumber")}
-                bind:value={
-                  registrationState.values.permanentResidenceStreetNumber
-                }
-              />
-              <Errors
-                errors={registrationState.errors}
-                path="permanentResidenceStreetNumber"
-              />
-            </div>
+            <div class="form-line"></div>
           </div>
-          <div class="input-group-wrap">
-            <div class="input-wrap relative">
-              <label for="permanentResidenceCity" class="field-label"
-                >{t("labels.city")}</label
-              >
-              <input
-                class="input-2 w-input"
-                type="text"
-                id="permanentResidenceCity"
-                placeholder={t("ph.permanentResidenceCity")}
-                bind:value={registrationState.values.permanentResidenceCity}
-              />
-              <Errors
-                errors={registrationState.errors}
-                path="permanentResidenceCity"
-              />
-            </div>
-            <div class="input-wrap">
-              <label for="permanentResidenceCountry" class="field-label"
-                >{t("labels.citizenship")}</label
-              >
-              <select
-                class="input-2"
-                id="permanentResidenceCountry"
-                bind:value={registrationState.values.permanentResidenceCountry}
-              >
-                <option value="" disabled
-                  >{t("select.placeholder.country")}</option
+          <div>
+            <div class="input-group-wrap">
+              <div class="input-wrap relative">
+                <label for="permanentResidenceStreet" class="field-label"
+                  >{t("labels.street")}</label
                 >
-                {#await getCountries("cs") then countries}
-                  {#each countries as country}
-                    {#each Object.entries(country) as [code, name]}
-                      <option value={code}>{name}</option>
+                <input
+                  class="input-2 w-input"
+                  type="text"
+                  id="permanentResidenceStreet"
+                  placeholder={t("ph.permanentResidenceStreet")}
+                  bind:value={registrationState.values.permanentResidenceStreet}
+                />
+                <Errors
+                  errors={registrationState.errors}
+                  path="permanentResidenceStreet"
+                />
+              </div>
+              <div class="input-wrap relative">
+                <label for="permanentResidenceStreetNumber" class="field-label"
+                  >{t("labels.houseNumber")}</label
+                >
+                <input
+                  class="input-2 w-input"
+                  type="text"
+                  id="permanentResidenceStreetNumber"
+                  placeholder={t("ph.permanentResidenceStreetNumber")}
+                  bind:value={
+                    registrationState.values.permanentResidenceStreetNumber
+                  }
+                />
+                <Errors
+                  errors={registrationState.errors}
+                  path="permanentResidenceStreetNumber"
+                />
+              </div>
+            </div>
+            <div class="input-group-wrap">
+              <div class="input-wrap relative">
+                <label for="permanentResidenceCity" class="field-label"
+                  >{t("labels.city")}</label
+                >
+                <input
+                  class="input-2 w-input"
+                  type="text"
+                  id="permanentResidenceCity"
+                  placeholder={t("ph.permanentResidenceCity")}
+                  bind:value={registrationState.values.permanentResidenceCity}
+                />
+                <Errors
+                  errors={registrationState.errors}
+                  path="permanentResidenceCity"
+                />
+              </div>
+              <div class="input-wrap">
+                <label for="permanentResidenceCountry" class="field-label"
+                  >{t("labels.citizenship")}</label
+                >
+                <select
+                  class="input-2"
+                  id="permanentResidenceCountry"
+                  bind:value={
+                    registrationState.values.permanentResidenceCountry
+                  }
+                >
+                  <option value="" disabled
+                    >{t("select.placeholder.country")}</option
+                  >
+                  {#await getCountries("cs") then countries}
+                    {#each countries as country}
+                      {#each Object.entries(country) as [code, name]}
+                        <option value={code}>{name}</option>
+                      {/each}
                     {/each}
-                  {/each}
-                {/await}
-              </select>
-              <Errors
-                errors={registrationState.errors}
-                path="permanentResidenceCountry"
-              />
+                  {/await}
+                </select>
+                <Errors
+                  errors={registrationState.errors}
+                  path="permanentResidenceCountry"
+                />
+              </div>
             </div>
           </div>
         {/if}

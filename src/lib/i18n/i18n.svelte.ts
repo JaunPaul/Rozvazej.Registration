@@ -54,6 +54,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "*Tyto dokumenty jsou vyžadovány. Občanský průkaz (přední i zadní strana) nebo cestovní pas, vízum nebo povolení k pobytu, studijní nebo pracovní povolení.",
     "hints.pinkstatement":
       'Pokud zvolíte ANO, uplatníme u Vás slevu na dani a budete dostávat více peněz.<br><br> <strong>POZOR</strong> - "růžové prohlášení o dani" (neboli Prohlášení poplatníka k dani z příjmů fyzických osob) můžete mít vyplněné a uplatněné pouze u jednoho zaměstnavatele. To znamená, že pokud máte více pracovních smluv, nebo kombinujete zaměstnání a brigády, můžete tento nárok využít jen u jedné firmy.',
+    "hints.doc.filesDriversLicense":
+      "Nahrajte jasnou fotografii nebo sken přední i zadní strany vašeho řidičského průkazu.",
 
     "ph.firstName": "Např. Jan",
     "ph.lastName": "Např. Novák",
@@ -67,6 +69,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.permanentResidence":
       "Např. 5 Avenue Anatole France, Champ de Mars, 75007 Paříž, Francie",
     "ph.placeOfBirth": "Např. Paříž, Francie",
+    "ph.permanentResidenceCountry": "Např. Česká republika",
+    "ph.permanentResidenceStreet": "Např. Václavské náměstí",
+    "ph.permanentResidenceStreetNumber": "Např. 123/45",
+    "ph.permanentResidenceCity": "Např. Praha",
 
     "errors.firstName": "Zadejte prosím své jméno",
     "errors.lastName": "Zadejte prosím své přijmení",
@@ -202,6 +208,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "*These files are required. ID card (front and back), Visa or residence permit, Study or work permit",
     "hints.pinkstatement":
       '<strong>POZOR</strong> - "růžové prohlášení o dani" (neboli Prohlášení poplatníka k dani z příjmů fyzických osob) můžete mít vyplněné a uplatněné pouze u jednoho zaměstnavatele. To znamená, že pokud máte více pracovních smluv, nebo kombinujete zaměstnání a brigády, můžete tento nárok využít jen u jedné firmy.',
+    "hints.doc.filesDriversLicense": "Upload your driver's license",
 
     "ph.firstName": "Type your first name",
     "ph.lastName": "Type your last name",
@@ -215,6 +222,10 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.permanentResidence":
       "e.g. 5 Avenue Anatole France, Champ de Mars, 75007 Paris, France",
     "ph.placeOfBirth": "e.g. France",
+    "ph.permanentResidenceCountry": "Např. Česká republika",
+    "ph.permanentResidenceStreet": "Např. Václavské náměstí",
+    "ph.permanentResidenceStreetNumber": "Např. 123/45",
+    "ph.permanentResidenceCity": "Např. Praha",
 
     "errors.firstName": "Please enter your first name",
     "errors.lastName": "Please enter your last name",
