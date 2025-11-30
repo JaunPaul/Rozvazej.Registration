@@ -19,7 +19,6 @@
   // Local state for this phase
   let currentSubStep = $state(1);
   const totalSubSteps = 1;
-  let verified = $state(false);
 
   // SubStep 1: Documents (moved from original Step 2)
   // SubStep 2: Additional Info (Delivery, Insurance, etc.)
@@ -57,13 +56,6 @@
 
   const today = new Date();
   const minPassportExpiry = toDateInputValue(today);
-
-  onMount(async () => {
-    const userId = registrationState.values.userId;
-    const verification = await verifyUser(testingUserId);
-
-    console.log(verification);
-  });
 </script>
 
 <div class="form-step is-active">

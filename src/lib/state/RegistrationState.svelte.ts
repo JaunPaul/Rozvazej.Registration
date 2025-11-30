@@ -84,6 +84,7 @@ export class RegistrationState {
   validating = $state(false);
   submitting = $state(false);
   disable = $state(false);
+  verified = $state(false);
 
   // Foxentry State
   addressSuggestions: FxLocation[] = $state([]);

@@ -5,12 +5,35 @@
   import Phase2 from "./lib/components/Phase2.svelte";
   import { RegistrationState } from "./lib/state/RegistrationState.svelte";
   import { SubmissionStatus } from "./lib/enums/form";
+  import { onMount } from "svelte";
+  import { verifyUser } from "./lib/utils/helpers";
 
   const registrationState = new RegistrationState();
+
+  onMount(async () => {
+    if (registrationState.currentPhase === 2) {
+      const userId = registrationState.values.userId;
+      const verification = await verifyUser(userId);
+
+      if (verification.success && verification.data.contractSigned) {
+        registrationState.verified = true;
+      } else {
+        registrationState.formState = "fail";
+      }
+    }
+  });
 </script>
 
 {#if registrationState.submitting}
   <Loader />
+{:else if registrationState.currentPhase === 2 && !registrationState.verified}
+  <Loader
+    progressText={[
+      t("result.verifying.stage1"),
+      t("result.verifying.stage2"),
+      t("result.verifying.stage3"),
+    ]}
+  />
 {:else}
   <div class="form">
     {#if registrationState.formState === "neutral" || registrationState.formState === "submitting"}
