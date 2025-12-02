@@ -5682,6 +5682,31 @@ a {
 .a-button-primary.mobile-menu {
   display:none
 }
+.a-button-primary.white {
+  background-color:var(--alley-component-library--gray--900);
+  color:var(--white)
+}
+.a-button-primary.white:hover {
+  background-color:var(--alley-component-library--neutral--off-white);
+  color:var(--alley-component-library--gray--900)
+}
+.a-button-primary.white-2 {
+  background-color:var(--alley-component-library--gray--900);
+  color:var(--white)
+}
+.a-button-primary.white-2:hover {
+  background-color:var(--alley-component-library--neutral--off-white);
+  color:var(--alley-component-library--gray--900)
+}
+.a-button-primary.ghost {
+  border:1px solid var(--alley-component-library--gray--900);
+  color:var(--white);
+  background-color:#13131600
+}
+.a-button-primary.ghost:hover {
+  background-color:var(--alley-component-library--neutral--off-white);
+  color:var(--alley-component-library--gray--900)
+}
 .a-span-underline {
   border-bottom:6px none var(--alley-component-library--blue--900);
   color:var(--alley-component-library--blue--900);
@@ -7279,7 +7304,7 @@ a {
 }
 .input-wrap {
   width:100%;
-  margin-bottom:12px
+  margin-bottom:24px
 }
 .input-group-wrap {
   grid-column-gap:12px;
@@ -7349,6 +7374,7 @@ a {
   border:1px solid #000;
   border-radius:5px;
   width:100%;
+  margin-bottom:24px;
   padding:18px 18px 10px
 }
 .default-state-2 {
@@ -7473,6 +7499,7 @@ a {
   height:100%
 }
 .form-heading {
+  margin-top:40px;
   font-size:1.5rem;
   font-weight:500
 }
@@ -7485,7 +7512,7 @@ a {
 }
 .form-heading-wrap {
   max-width:390px;
-  margin-bottom:60px
+  margin-bottom:24px
 }
 .heading-form-large {
   color:var(--alley-component-library--gray--900);
@@ -7532,6 +7559,29 @@ a {
   background-color:var(--primary-gray);
   width:1px;
   height:60px
+}
+.message-container {
+  text-align:center;
+  flex-flow:column;
+  justify-content:center;
+  align-items:center;
+  padding:6rem;
+  font-family:Roboto,sans-serif;
+  font-weight:500;
+  display:flex
+}
+.text-16px {
+  font-weight:400;
+  line-height:1.4
+}
+.bold-message {
+  margin-bottom:20px;
+  display:inline-flex
+}
+.div-block-22 {
+  grid-column-gap:20px;
+  grid-row-gap:20px;
+  display:flex
 }
 @media screen and (min-width:1440px) {
   .form_field_lastname::placeholder {
@@ -9541,7 +9591,15 @@ a {
 #w-node-_4015522b-fb66-2026-582d-ba8c2df0eec1-5f691d6f,
 #ruzove-prohlaseni-ne.w-node-_4015522b-fb66-2026-582d-ba8c2df0eec9-5f691d6f,
 #w-node-_4015522b-fb66-2026-582d-ba8c2df0eecd-5f691d6f,
-#w-node-bbf84c42-1309-ca45-9ba6-1cbc04e6032e-c37f3cef {
+#w-node-bbf84c42-1309-ca45-9ba6-1cbc04e6032e-c37f3cef,
+#w-node-c0121263-42a6-ad55-fb6b-27106b3f6026-a949e2e6,
+#w-node-c0121263-42a6-ad55-fb6b-27106b3f602e-a949e2e6,
+#w-node-c0121263-42a6-ad55-fb6b-27106b3f6036-a949e2e6,
+#w-node-c0121263-42a6-ad55-fb6b-27106b3f603e-a949e2e6,
+#w-node-c0121263-42a6-ad55-fb6b-27106b3f604c-a949e2e6,
+#w-node-c0121263-42a6-ad55-fb6b-27106b3f5ff5-a949e2e6,
+#w-node-_35c63c6c-f1d1-5237-ce6b-842ba2afc3f0-a949e2e6,
+#w-node-e3ba0a7f-bb7a-e537-6a8e-b5ebca718a64-a949e2e6 {
   grid-area:span 1/span 1/span 1/span 1
 }
 @media screen and (max-width:991px) {

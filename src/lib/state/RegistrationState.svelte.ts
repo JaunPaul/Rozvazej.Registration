@@ -88,6 +88,7 @@ export class RegistrationState {
   submitting = $state(false);
   disable = $state(false);
   verified = $state(false);
+  verificationStatus: "pending" | "success" | "fail" = $state("pending");
 
   // Foxentry State
   addressSuggestions: FxLocation[] = $state([]);

@@ -16,17 +16,18 @@
       const verification = await verifyUser(userId);
 
       if (verification.success && verification.data.contractSigned) {
-        registrationState.verified = true;
+        registrationState.verificationStatus = "success";
       } else {
-        registrationState.formState = "fail";
+        registrationState.verificationStatus = "fail";
       }
+      registrationState.verified = true;
     }
   });
 </script>
 
 {#if registrationState.submitting}
   <Loader />
-{:else if registrationState.currentPhase === 2 && !registrationState.verified}
+{:else if registrationState.currentPhase === 2 && !registrationState.verified && registrationState.verificationStatus === "pending"}
   <Loader
     progressText={[
       t("result.verifying.stage1"),
@@ -34,6 +35,17 @@
       t("result.verifying.stage3"),
     ]}
   />
+{:else if registrationState.currentPhase === 2 && registrationState.verified && registrationState.verificationStatus === "fail"}
+  <div class="message-container">
+    <div class="text-16px">
+      <strong class="bold-message"
+        >Omlouváme se, vypadá to, že v našem systému nemáme záznam o uzavřené
+        smlouvě.
+      </strong><br />Prosíme, obraťte se na nás na e-mailu:
+      <a href="mailto:info@pcsoffice.cz" target="_blank">info@pcsoffice.cz</a>,
+      abychom vše společně vyřešili.<br />Děkujeme za pochopení.
+    </div>
+  </div>
 {:else}
   <div class="form">
     {#if registrationState.formState === "neutral" || registrationState.formState === "submitting"}
