@@ -349,8 +349,8 @@ export class RegistrationState {
       this.submissionStatus = SubmissionStatus.APPROVED;
 
       this.errors = {};
-      // const welcome = "/vitejte";
-      // window.location.replace(welcome);
+      const welcome = "/vitejte";
+      window.location.replace(welcome);
     } catch (err) {
       console.error(err);
       this.formState = "fail";
@@ -422,8 +422,8 @@ export class RegistrationState {
       this.submissionStatus = SubmissionStatus.APPROVED;
 
       this.errors = {};
-      // const welcome = "/vitejte";
-      // window.location.replace(welcome);
+      const welcome = "/dekujeme";
+      window.location.replace(welcome);
     } catch (err) {
       console.error(err);
       this.formState = "fail";
