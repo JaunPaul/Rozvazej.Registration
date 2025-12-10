@@ -23,6 +23,8 @@ export const steps: Record<
     "gender",
     "passportExpiryDate",
     "placeOfBirth",
+    "documentNumber",
+    "documentIssuingCountry",
   ],
   alwaysInclude: [
     "utm_source",
@@ -106,28 +108,38 @@ export const fields: Record<
   },
   transport: { visibleWhen: (d) => true, requiredWhen: (d) => true },
   gender: { visibleWhen: (d) => true, requiredWhen: (d) => true },
-  placeOfBirth: { visibleWhen: (d) => true, requiredWhen: (d) => true },
+  placeOfBirth: {
+    visibleWhen: (d) => d.country !== "CZ",
+    requiredWhen: (d) => d.country !== "CZ",
+  },
   passportExpiryDate: {
-    visibleWhen: (d) => d.country && !isEu(d.country),
+    visibleWhen: (d) => d.country && !isEu(d.country) && d.country !== "CZ",
     requiredWhen: (d) => false,
   },
   permanentResidenceStreet: {
-    visibleWhen: (d) => true,
-    requiredWhen: (d) => true,
+    visibleWhen: (d) => d.country !== "CZ",
+    requiredWhen: (d) => d.country !== "CZ",
   },
   permanentResidenceStreetNumber: {
-    visibleWhen: (d) => true,
-    requiredWhen: (d) => true,
+    visibleWhen: (d) => d.country !== "CZ",
+    requiredWhen: (d) => d.country !== "CZ",
   },
   permanentResidenceCity: {
-    visibleWhen: (d) => true,
-    requiredWhen: (d) => true,
+    visibleWhen: (d) => d.country !== "CZ",
+    requiredWhen: (d) => d.country !== "CZ",
   },
   permanentResidenceCountry: {
-    visibleWhen: (d) => true,
-    requiredWhen: (d) => true,
+    visibleWhen: (d) => d.country !== "CZ",
+    requiredWhen: (d) => d.country !== "CZ",
   },
-
+  documentNumber: {
+    visibleWhen: (d) => d.country !== "CZ",
+    requiredWhen: (d) => d.country !== "CZ",
+  },
+  documentIssuingCountry: {
+    visibleWhen: (d) => d.country !== "CZ",
+    requiredWhen: (d) => d.country !== "CZ",
+  },
   // Archived / Unused
   applyAsCompany: { visibleWhen: (d) => false, requiredWhen: (d) => false },
   companyId: { visibleWhen: (d) => false, requiredWhen: (d) => false },

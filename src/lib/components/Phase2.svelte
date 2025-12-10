@@ -146,15 +146,41 @@
           <CzechFileUpload {registrationState}></CzechFileUpload>
         {/if}
 
-        {#if registrationState.values.country && isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
-          <EuFileUpload {registrationState}></EuFileUpload>
-        {/if}
-
-        {#if registrationState.values.country && !isEu(registrationState.values.country)}
-          <NonEuFileUpload {registrationState}></NonEuFileUpload>
-        {/if}
-
         {#if registrationState.values.country.length > 0 && registrationState.values.country !== "CZ"}
+          {#if registrationState.values.country && isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
+            <EuFileUpload {registrationState}></EuFileUpload>
+            <div class="input-wrap">
+              <label for="documentNumber" class="field-label"
+                >{t("labels.documentNumberEu")}</label
+              >
+              <input
+                class="input-2 w-input"
+                type="text"
+                id="documentNumber"
+                placeholder={t("ph.documentNumber")}
+                bind:value={registrationState.values.documentNumber}
+              />
+              <Errors errors={registrationState.errors} path="documentNumber" />
+            </div>
+          {/if}
+
+          {#if registrationState.values.country && !isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
+            <NonEuFileUpload {registrationState}></NonEuFileUpload>
+            <div class="input-wrap">
+              <label for="documentNumber" class="field-label"
+                >{t("labels.documentNumberNonEu")}</label
+              >
+              <input
+                class="input-2 w-input"
+                type="text"
+                id="documentNumber"
+                placeholder={t("ph.documentNumber")}
+                bind:value={registrationState.values.documentNumber}
+              />
+              <Errors errors={registrationState.errors} path="documentNumber" />
+            </div>
+          {/if}
+
           <div class="input-wrap">
             <label for="passportExpiryDate" class="field-label"
               >{t("labels.passportExpiryDate")}</label
@@ -171,6 +197,32 @@
             <Errors
               errors={registrationState.errors}
               path="passportExpiryDate"
+            />
+          </div>
+
+          <div class="input-wrap">
+            <label for="documentIssuingCountry" class="field-label"
+              >{t("labels.citizenship")}</label
+            >
+            <select
+              class="input-2"
+              id="documentIssuingCountry"
+              bind:value={registrationState.values.documentIssuingCountry}
+            >
+              <option value="" disabled
+                >{t("select.placeholder.country")}</option
+              >
+              {#await getCountries("cs") then countries}
+                {#each countries as country}
+                  {#each Object.entries(country) as [code, name]}
+                    <option value={code}>{name}</option>
+                  {/each}
+                {/each}
+              {/await}
+            </select>
+            <Errors
+              errors={registrationState.errors}
+              path="documentIssuingCountry"
             />
           </div>
 

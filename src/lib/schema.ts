@@ -139,6 +139,8 @@ export const formSchema = z.object({
   placeOfBirth: z.string().min(1, { error: t("errors.placeOfBirth") }),
   insurance: z.string().min(1, { error: t("errors.insurance") }),
   pinkStatement: z.coerce.boolean({ error: t("errors.pinkStatement") }),
+  documentNumber: z.string().min(1, { error: t("errors.documentNumber") }),
+  documentIssuingCountry: z.string().min(1, { error: t("errors.country") }),
 });
 
 export const verifyResponseSchema = z.object({

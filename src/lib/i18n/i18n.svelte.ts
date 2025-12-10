@@ -41,6 +41,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.doc.driversLicense": `Nahrajte platný řidičský průkaz. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br />`,
     "labels.deliveryCompany":
       "Neomezujte se - u nás můžete jezdit pro všechny tři služby najednou: Bolt, Wolt i Foodora. Více platforem = více objednávek = vyšší výdělky. Stačí si zvolit, kde chcete začít!",
+    "labels.documentNumberEu": "Číslo občanského průkazu ",
+    "labels.documentNumberNonEu":
+      "Číslo víza NEBO povolení k pobytu NEBO pracovní povolení  ",
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
@@ -73,6 +76,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.permanentResidenceStreet": "Např. Václavské náměstí",
     "ph.permanentResidenceStreetNumber": "Např. 123/45",
     "ph.permanentResidenceCity": "Např. Praha",
+    "ph.documentNumber": "Např. M0032786",
 
     "errors.firstName": "Zadejte prosím své jméno",
     "errors.lastName": "Zadejte prosím své přijmení",
@@ -109,6 +113,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.birthDateTooYoung": "Musíte být starší 15 let",
     "errors.permanentResidence": "Je vyžadován trvalý pobyt",
     "errors.placeOfBirth": "Místo narození povinné",
+    "errors.documentIssuingCountry": "Tento vstup je povinný",
 
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat na krok",
@@ -226,6 +231,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.permanentResidenceStreet": "Např. Václavské náměstí",
     "ph.permanentResidenceStreetNumber": "Např. 123/45",
     "ph.permanentResidenceCity": "Např. Praha",
+    "ph.documentNumber": "Např. M0032786",
 
     "errors.firstName": "Please enter your first name",
     "errors.lastName": "Please enter your last name",
@@ -280,6 +286,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.passportExpiry": "Passport expiry date",
     "labels.placeOfBirth": "Place of birth",
     "labels.permanentResidence": "Permanent residence",
+    "labels.documentNumberEu": "Číslo občanského průkazu ",
+    "labels.documentNumberNonEu":
+      "Číslo víza NEBO povolení k pobytu NEBO pracovní povolení  ",
 
     "answer.yes": "YES",
     "answer.no": "NO",

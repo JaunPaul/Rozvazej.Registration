@@ -72,7 +72,9 @@ export class RegistrationState {
     permanentResidenceStreet: "",
     permanentResidenceStreetNumber: "",
     permanentResidenceCity: "",
-    userId: "",
+    courierId: "",
+    documentNumber: "",
+    documentIssuingCountry: "",
   });
 
   errors: CustomErrors = $state({});
@@ -123,7 +125,7 @@ export class RegistrationState {
       if (params.get("phase") === "2") {
         this.currentPhase = 2;
         this.currentStep = "step1"; // Reset step for phase 2
-        this.values.userId = params.get("userId") ?? "";
+        this.values.courierId = params.get("userId") ?? "";
         const country = params.get("country");
 
         if (!country) {
@@ -409,8 +411,13 @@ export class RegistrationState {
         fd.append("filesDriversLicense", f, f.name)
       );
 
-      snapshot.userId = this.values.userId;
-
+      snapshot.courierId = this.values.courierId;
+      console.log({
+        values: $state.snapshot(this.values),
+        errors: $state.snapshot(this.errors),
+        snapshot: $state.snapshot(snapshot),
+      });
+      debugger;
       const res = await fetch(endpoint, {
         method: "POST",
         body: fd,

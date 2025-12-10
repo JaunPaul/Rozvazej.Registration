@@ -12,7 +12,7 @@
 
   onMount(async () => {
     if (registrationState.currentPhase === 2) {
-      const userId = registrationState.values.userId;
+      const userId = registrationState.values.courierId;
       const verification = await verifyUser(userId);
 
       if (verification.success && verification.data.contractSigned) {
