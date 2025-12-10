@@ -13,14 +13,19 @@
   onMount(async () => {
     if (registrationState.currentPhase === 2) {
       const userId = registrationState.values.courierId;
-      const verification = await verifyUser(userId);
 
-      if (verification.success && verification.data.contractSigned) {
-        registrationState.verificationStatus = "success";
-      } else {
-        registrationState.verificationStatus = "fail";
+      try {
+        const verification = await verifyUser(userId);
+
+        if (verification.success && verification.data.contractSigned) {
+          registrationState.verificationStatus = "success";
+        } else {
+          registrationState.verificationStatus = "fail";
+        }
+        registrationState.verified = true;
+      } catch (error) {
+        registrationState.verificationStatus = "error";
       }
-      registrationState.verified = true;
     }
   });
 </script>
@@ -41,6 +46,17 @@
       <strong class="bold-message"
         >Omlouváme se, vypadá to, že v našem systému nemáme záznam o uzavřené
         smlouvě.
+      </strong><br />Prosíme, obraťte se na nás na e-mailu:
+      <a href="mailto:info@pcsoffice.cz" target="_blank">info@pcsoffice.cz</a>,
+      abychom vše společně vyřešili.<br />Děkujeme za pochopení.
+    </div>
+  </div>
+{:else if registrationState.currentPhase === 2 && registrationState.verificationStatus === "error"}
+  <div class="message-container">
+    <div class="text-16px">
+      <strong class="bold-message"
+        >Při načítání formuláře se něco pokazilo. Nahlaste chybu
+        administrátorovi.
       </strong><br />Prosíme, obraťte se na nás na e-mailu:
       <a href="mailto:info@pcsoffice.cz" target="_blank">info@pcsoffice.cz</a>,
       abychom vše společně vyřešili.<br />Děkujeme za pochopení.

@@ -90,7 +90,8 @@ export class RegistrationState {
   submitting = $state(false);
   disable = $state(false);
   verified = $state(false);
-  verificationStatus: "pending" | "success" | "fail" = $state("pending");
+  verificationStatus: "pending" | "success" | "fail" | "error" =
+    $state("pending");
 
   // Foxentry State
   addressSuggestions: FxLocation[] = $state([]);
@@ -412,11 +413,7 @@ export class RegistrationState {
       );
 
       snapshot.courierId = this.values.courierId;
-      console.log({
-        values: $state.snapshot(this.values),
-        errors: $state.snapshot(this.errors),
-        snapshot: $state.snapshot(snapshot),
-      });
+
       debugger;
       const res = await fetch(endpoint, {
         method: "POST",

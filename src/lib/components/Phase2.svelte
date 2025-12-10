@@ -9,9 +9,6 @@
   import EuFileUpload from "./EuFileUpload.svelte";
   import NonEuFileUpload from "./NonEuFileUpload.svelte";
   import DriversLicenseUpload from "./DriversLicenseUpload.svelte";
-  import { onMount } from "svelte";
-  import { verifyUser } from "../utils/helpers";
-  import { testingUserId } from "../enums/testingData";
 
   let { registrationState }: { registrationState: RegistrationState } =
     $props();
@@ -30,8 +27,6 @@
     const valid = await registrationState.validateCurrentStep(
       validationScope as any
     );
-
-    console.log("[next]", valid, currentSubStep, registrationState.errors);
     if (valid) {
       if (currentSubStep < totalSubSteps) {
         currentSubStep++;
@@ -56,6 +51,7 @@
 
   const today = new Date();
   const minPassportExpiry = toDateInputValue(today);
+  console.log("mount phase 2");
 </script>
 
 <div class="form-step is-active">
