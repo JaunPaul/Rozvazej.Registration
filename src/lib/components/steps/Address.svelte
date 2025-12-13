@@ -13,7 +13,7 @@
     if (!registrationState.activeAddressType) return;
     // track just the active field's value
     const q = registrationState.currentQueryFor(
-      registrationState.activeAddressType
+      registrationState.activeAddressType,
     );
     void q; // establish reactive read
     registrationState.queueSearchForActive();
@@ -46,6 +46,7 @@
         class="input-2 w-input"
         type="text"
         id="street"
+        name="street"
         placeholder=""
         bind:value={registrationState.values.street}
         onfocus={() => registrationState.onAddressFocus("street")}
@@ -79,6 +80,7 @@
         class="input-2 w-input"
         type="text"
         id="houseNumber"
+        name="houseNumber"
         placeholder=""
         bind:value={registrationState.values.houseNumber}
         onfocus={() => registrationState.onAddressFocus("number.full")}
@@ -112,6 +114,7 @@
         class="input-2 w-input"
         type="text"
         id="city"
+        name="city"
         placeholder=""
         bind:value={registrationState.values.city}
         onfocus={() => registrationState.onAddressFocus("city")}
@@ -143,6 +146,7 @@
         class="input-2 w-input"
         type="text"
         id="zip"
+        name="zip"
         placeholder=""
         bind:value={registrationState.values.zip}
         onfocus={() => registrationState.onAddressFocus("zip")}
@@ -176,6 +180,7 @@
     <select
       class="input-2 w-select"
       id="deliveryCity"
+      name="deliveryCity"
       bind:value={registrationState.values.deliveryCity}
     >
       <option value="" disabled>{t("select.placeholder.city")}</option>

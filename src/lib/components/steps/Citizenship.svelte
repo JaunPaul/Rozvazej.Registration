@@ -19,7 +19,7 @@
   const fifteenYearsAgo = new Date(
     today.getFullYear() - 15,
     today.getMonth(),
-    today.getDate()
+    today.getDate(),
   );
 
   const maxBirthDate = toDateInputValue(fifteenYearsAgo);
@@ -31,6 +31,7 @@
     <select
       class="input-2"
       id="country"
+      name="country"
       bind:value={registrationState.values.country}
     >
       <option value="" disabled>{t("select.placeholder.country")}</option>
@@ -54,6 +55,7 @@
         class="input-2 w-input"
         type="text"
         id="nationalId"
+        name="nationalId"
         placeholder={t("ph.nationalId")}
         bind:value={registrationState.values.nationalId}
       />
@@ -68,6 +70,7 @@
         class="input-2 w-input"
         type="text"
         id="passportOrId"
+        name="passportOrId"
         placeholder={t("ph.passportOrId")}
         bind:value={registrationState.values.passportOrId}
       />
@@ -80,6 +83,7 @@
         class="input-2 w-input"
         type="date"
         id="birthDate"
+        name="birthDate"
         max={maxBirthDate}
         bind:value={registrationState.values.birthDate}
       />

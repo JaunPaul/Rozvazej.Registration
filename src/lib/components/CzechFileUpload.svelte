@@ -16,6 +16,7 @@
   <div class="w-file-upload">
     <input
       id="filesNationalId"
+      name="filesNationalId"
       type="file"
       class="w-file-upload-input"
       multiple

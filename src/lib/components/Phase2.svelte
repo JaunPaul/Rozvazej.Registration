@@ -25,7 +25,7 @@
     // Phase 2 has only one step now
     const validationScope = "phase2"; // Mapping to original scopes roughly
     const valid = await registrationState.validateCurrentStep(
-      validationScope as any
+      validationScope as any,
     );
     if (valid) {
       if (currentSubStep < totalSubSteps) {
@@ -101,6 +101,7 @@
           <select
             class="input-2"
             id="transport"
+            name="transport"
             bind:value={registrationState.values.transport}
           >
             <option value="" disabled
@@ -127,6 +128,7 @@
             <select
               class="input-2"
               id="gender"
+              name="gender"
               bind:value={registrationState.values.gender}
             >
               <option value="" disabled>{t("select.placeholder.gender")}</option
@@ -147,6 +149,7 @@
               class="input-2 w-input"
               type="text"
               id="documentNumber"
+              name="documentNumber"
               placeholder={t("ph.documentNumber")}
               bind:value={registrationState.values.documentNumber}
             />
@@ -178,6 +181,7 @@
             <select
               class="input-2"
               id="documentIssuingCountry"
+              name="documentIssuingCountry"
               bind:value={registrationState.values.documentIssuingCountry}
             >
               <option value="" disabled
@@ -230,6 +234,7 @@
                   class="input-2 w-input"
                   type="text"
                   id="permanentResidenceStreet"
+                  name="permanentResidenceStreet"
                   placeholder={t("ph.permanentResidenceStreet")}
                   bind:value={registrationState.values.permanentResidenceStreet}
                 />
@@ -246,6 +251,7 @@
                   class="input-2 w-input"
                   type="text"
                   id="permanentResidenceStreetNumber"
+                  name="permanentResidenceStreetNumber"
                   placeholder={t("ph.permanentResidenceStreetNumber")}
                   bind:value={
                     registrationState.values.permanentResidenceStreetNumber
@@ -266,6 +272,7 @@
                   class="input-2 w-input"
                   type="text"
                   id="permanentResidenceCity"
+                  name="permanentResidenceCity"
                   placeholder={t("ph.permanentResidenceCity")}
                   bind:value={registrationState.values.permanentResidenceCity}
                 />
@@ -281,6 +288,7 @@
                 <select
                   class="input-2"
                   id="permanentResidenceCountry"
+                  name="permanentResidenceCountry"
                   bind:value={
                     registrationState.values.permanentResidenceCountry
                   }

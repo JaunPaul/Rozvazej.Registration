@@ -16,6 +16,7 @@
         class="input-2 w-input"
         type="text"
         id="firstName"
+        name="firstName"
         placeholder={t("ph.firstName")}
         bind:value={registrationState.values.firstName}
         onblur={() => registrationState.onBlurName("firstName")}
@@ -28,6 +29,7 @@
         class="input-2 w-input"
         type="text"
         id="lastName"
+        name="lastName"
         placeholder={t("ph.lastName")}
         bind:value={registrationState.values.lastName}
         onblur={() => registrationState.onBlurName("lastName")}
@@ -43,6 +45,7 @@
         class="input-2 w-input"
         type="text"
         id="phone"
+        name="phone"
         placeholder={t("ph.phone")}
         bind:value={registrationState.values.phone}
         onblur={() => registrationState.onBlurPhone()}
@@ -58,6 +61,7 @@
         class="input-2 w-input"
         type="email"
         id="email"
+        name="email"
         placeholder={t("ph.email")}
         bind:value={registrationState.values.email}
         onblur={() => registrationState.onBlurEmail()}
