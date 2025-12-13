@@ -414,7 +414,6 @@ export class RegistrationState {
 
       snapshot.courierId = this.values.courierId;
 
-      debugger;
       const res = await fetch(endpoint, {
         method: "POST",
         body: fd,

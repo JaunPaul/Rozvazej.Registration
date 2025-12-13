@@ -21,11 +21,10 @@ export const steps: Record<
     "filesDriversLicense",
     "transport",
     "gender",
-    "passportExpiryDate",
     "placeOfBirth",
+    "passportExpiryDate",
     "documentNumber",
     "documentIssuingCountry",
-    "courierId",
   ],
   alwaysInclude: [
     "utm_source",
@@ -114,8 +113,8 @@ export const fields: Record<
     requiredWhen: (d) => d.country !== "CZ",
   },
   passportExpiryDate: {
-    visibleWhen: (d) => d.country && !isEu(d.country) && d.country !== "CZ",
-    requiredWhen: (d) => false,
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
   },
   permanentResidenceStreet: {
     visibleWhen: (d) => d.country !== "CZ",
@@ -134,12 +133,12 @@ export const fields: Record<
     requiredWhen: (d) => d.country !== "CZ",
   },
   documentNumber: {
-    visibleWhen: (d) => d.country !== "CZ",
-    requiredWhen: (d) => d.country !== "CZ",
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
   },
   documentIssuingCountry: {
-    visibleWhen: (d) => d.country !== "CZ",
-    requiredWhen: (d) => d.country !== "CZ",
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
   },
   // Archived / Unused
   applyAsCompany: { visibleWhen: (d) => false, requiredWhen: (d) => false },
