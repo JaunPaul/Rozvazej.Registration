@@ -138,45 +138,20 @@
           </div>
         </div>
 
-        {#if registrationState.values.country === "CZ"}
-          <CzechFileUpload {registrationState}></CzechFileUpload>
-        {/if}
-
-        {#if registrationState.values.country.length > 0 && registrationState.values.country !== "CZ"}
-          {#if registrationState.values.country && isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
-            <EuFileUpload {registrationState}></EuFileUpload>
-            <div class="input-wrap">
-              <label for="documentNumber" class="field-label"
-                >{t("labels.documentNumberEu")}</label
-              >
-              <input
-                class="input-2 w-input"
-                type="text"
-                id="documentNumber"
-                placeholder={t("ph.documentNumber")}
-                bind:value={registrationState.values.documentNumber}
-              />
-              <Errors errors={registrationState.errors} path="documentNumber" />
-            </div>
-          {/if}
-
-          {#if registrationState.values.country && !isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
-            <NonEuFileUpload {registrationState}></NonEuFileUpload>
-            <div class="input-wrap">
-              <label for="documentNumber" class="field-label"
-                >{t("labels.documentNumberNonEu")}</label
-              >
-              <input
-                class="input-2 w-input"
-                type="text"
-                id="documentNumber"
-                placeholder={t("ph.documentNumber")}
-                bind:value={registrationState.values.documentNumber}
-              />
-              <Errors errors={registrationState.errors} path="documentNumber" />
-            </div>
-          {/if}
-
+        {#snippet documentFields(documentNumberLabel: string)}
+          <div class="input-wrap">
+            <label for="documentNumber" class="field-label"
+              >{documentNumberLabel}</label
+            >
+            <input
+              class="input-2 w-input"
+              type="text"
+              id="documentNumber"
+              placeholder={t("ph.documentNumber")}
+              bind:value={registrationState.values.documentNumber}
+            />
+            <Errors errors={registrationState.errors} path="documentNumber" />
+          </div>
           <div class="input-wrap">
             <label for="passportExpiryDate" class="field-label"
               >{t("labels.passportExpiryDate")}</label
@@ -221,7 +196,9 @@
               path="documentIssuingCountry"
             />
           </div>
+        {/snippet}
 
+        {#snippet residenceFields()}
           <div class="input-wrap">
             <label for="placeOfBirth" class="field-label"
               >{t("labels.placeOfBirth")}</label
@@ -326,6 +303,25 @@
               </div>
             </div>
           </div>
+        {/snippet}
+
+        {#if registrationState.values.country === "CZ"}
+          <CzechFileUpload {registrationState}></CzechFileUpload>
+
+          {@render documentFields(t("labels.documentNumberEu"))}
+        {/if}
+
+        {#if registrationState.values.country.length > 0 && registrationState.values.country !== "CZ"}
+          {#if registrationState.values.country && isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
+            <EuFileUpload {registrationState}></EuFileUpload>
+            {@render documentFields(t("labels.documentNumberEu"))}
+          {/if}
+
+          {#if registrationState.values.country && !isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
+            <NonEuFileUpload {registrationState}></NonEuFileUpload>
+            {@render documentFields(t("labels.documentNumberNonEu"))}
+          {/if}
+          {@render residenceFields()}
         {/if}
       </div>
     {/if}

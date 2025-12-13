@@ -25,6 +25,7 @@ export const steps: Record<
     "placeOfBirth",
     "documentNumber",
     "documentIssuingCountry",
+    "courierId",
   ],
   alwaysInclude: [
     "utm_source",
