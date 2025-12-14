@@ -127,9 +127,9 @@ export const formSchema = z.object({
         message: t("errors.birthDateTooYoung"),
       }
     ),
-  passportExpiryDate: z
+  documentExpiryDate: z
     .string()
-    .min(1, { error: t("errors.passportExpiryDate") }),
+    .min(1, { error: t("errors.documentExpiryDate") }),
   permanentResidenceStreet: z.string().min(1, { error: t("errors.street") }),
   permanentResidenceStreetNumber: z
     .string()

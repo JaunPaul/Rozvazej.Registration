@@ -22,7 +22,7 @@ export const steps: Record<
     "transport",
     "gender",
     "placeOfBirth",
-    "passportExpiryDate",
+    "documentExpiryDate",
     "documentNumber",
     "documentIssuingCountry",
   ],
@@ -112,7 +112,7 @@ export const fields: Record<
     visibleWhen: (d) => d.country !== "CZ",
     requiredWhen: (d) => d.country !== "CZ",
   },
-  passportExpiryDate: {
+  documentExpiryDate: {
     visibleWhen: (d) => true,
     requiredWhen: (d) => true,
   },

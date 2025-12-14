@@ -47,7 +47,7 @@ export class RegistrationState {
     pinkStatement: undefined as boolean | undefined,
     gender: "",
     birthDate: "",
-    passportExpiryDate: "",
+    documentExpiryDate: "",
     filesNationalId: [] as File[],
     filesEuPassport: [] as File[],
     filesNonEu: [] as File[],

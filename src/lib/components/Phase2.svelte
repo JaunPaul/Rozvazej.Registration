@@ -25,7 +25,7 @@
     // Phase 2 has only one step now
     const validationScope = "phase2"; // Mapping to original scopes roughly
     const valid = await registrationState.validateCurrentStep(
-      validationScope as any,
+      validationScope as any
     );
     if (valid) {
       if (currentSubStep < totalSubSteps) {
@@ -156,21 +156,21 @@
             <Errors errors={registrationState.errors} path="documentNumber" />
           </div>
           <div class="input-wrap">
-            <label for="passportExpiryDate" class="field-label"
-              >{t("labels.passportExpiryDate")}</label
+            <label for="documentExpiryDate" class="field-label"
+              >{t("labels.documentExpiryDate")}</label
             ><input
               class="input-2 w-input"
               maxlength="256"
-              name="passportExpiryDate"
-              data-name="passportExpiryDate"
+              name="documentExpiryDate"
+              data-name="documentExpiryDate"
               type="date"
-              id="passportExpiryDate"
+              id="documentExpiryDate"
               min={minPassportExpiry}
-              bind:value={registrationState.values.passportExpiryDate}
+              bind:value={registrationState.values.documentExpiryDate}
             />
             <Errors
               errors={registrationState.errors}
-              path="passportExpiryDate"
+              path="documentExpiryDate"
             />
           </div>
 

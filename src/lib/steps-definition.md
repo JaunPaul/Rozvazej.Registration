@@ -40,7 +40,7 @@ all fields required
 - filesNonEu > files > required and visible if values.country !== t("select.placeholder.country") && !isEu(values.country)
 - transport > select
 - gender > select
-- passportExpiryDate > date > visible if values.country !== t("select.placeholder.country") && !isEu(values.country)
+- documentExpiryDate > date > visible if values.country !== t("select.placeholder.country") && !isEu(values.country)
 
 # Archived
 - applyAsCompany > radio
