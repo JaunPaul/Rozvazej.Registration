@@ -373,9 +373,7 @@ export class RegistrationState {
     this.formState = "submitting";
 
     // Placeholder endpoint
-    //const endpoint =  PHASE2_ENDPOINT;
-    const endpoint =
-      "https://n8n-service-5f4r.onrender.com/webhook/6f7d2386-2b46-4d73-b2cc-bbe303878e37";
+    const endpoint = PHASE2_ENDPOINT;
     // artificial delay
     // await sleep(3000);
     try {
