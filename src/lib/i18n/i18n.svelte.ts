@@ -44,6 +44,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.documentNumberEu": "Číslo občanského průkazu ",
     "labels.documentNumberNonEu":
       "Číslo víza NEBO povolení k pobytu NEBO pracovní povolení  ",
+    "labels.documentIssuingCountry": "Země vydání dokladu",
+    "labels.permanentResidenceCountry": "Země",
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
@@ -202,6 +204,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.doc.driversLicense": `Upload valid driver's license. <br /><span class="bold-green">1. FRONT SIDE</span><br />`,
     "labels.deliveryCompany":
       "Don’t limit yourself - with us you can ride for all three services at once: Bolt, Wolt, and Foodora. More platforms = more orders = higher earnings. Just choose where you want to start!",
+    "labels.documentIssuingCountry": "Země vydání dokladu",
+    "labels.permanentResidenceCountry": "Země",
 
     "hints.czPhone":
       "For deliveries in the Czech Republic you must provide a <strong>Czech phone number.</strong>",

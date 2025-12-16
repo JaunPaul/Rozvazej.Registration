@@ -176,7 +176,7 @@
 
           <div class="input-wrap">
             <label for="documentIssuingCountry" class="field-label"
-              >{t("labels.citizenship")}</label
+              >{t("labels.documentIssuingCountry")}</label
             >
             <select
               class="input-2"
@@ -283,7 +283,7 @@
               </div>
               <div class="input-wrap">
                 <label for="permanentResidenceCountry" class="field-label"
-                  >{t("labels.citizenship")}</label
+                  >{t("labels.permanentResidenceCountry")}</label
                 >
                 <select
                   class="input-2"
