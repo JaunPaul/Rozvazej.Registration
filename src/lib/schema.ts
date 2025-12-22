@@ -92,21 +92,61 @@ export const formSchema = z.object({
   city: z.string().min(1, { error: t("errors.city") }),
   zip: z.string().min(1, { error: t("errors.zip") }),
   bankPrefix: z.string().max(6, { error: t("errors.bank.prefix") }),
-  bankNumber: z.string().min(1, { error: t("errors.bank.number") }).max(10, { error: t("errors.bank.number") }),
+  bankNumber: z
+    .string()
+    .min(1, { error: t("errors.bank.number") })
+    .max(10, { error: t("errors.bank.number") }),
   bankCode: z.string().min(1, { error: t("errors.bank.code") }),
 
   filesNationalId: fileArray(2),
   filesEuPassport: fileArray(2),
   filesNonEu: fileArray(2),
+  filesDriversLicense: fileArray(1),
 
   // step3
-  deliveryCity: z.string(),
-  transport: z.string(),
-  gender: z.string(),
-  birthDate: z.string(),
-  passportExpiryDate: z.string(),
-  insurance: z.string(),
-  pinkStatement: z.boolean(),
+  deliveryCity: z.string().min(1, { error: t("errors.deliveryCity") }),
+  transport: z.string().min(1, { error: t("errors.transport") }),
+  gender: z.string().min(1, { error: t("errors.gender") }),
+  birthDate: z
+    .string()
+    .min(1, { error: t("errors.birthDate") })
+    .refine(
+      (value) => {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return false;
+
+        const today = new Date();
+        const cutoff = new Date(
+          today.getFullYear() - 15,
+          today.getMonth(),
+          today.getDate()
+        );
+        return date <= cutoff;
+      },
+      {
+        message: t("errors.birthDateTooYoung"),
+      }
+    ),
+  documentExpiryDate: z
+    .string()
+    .min(1, { error: t("errors.documentExpiryDate") }),
+  permanentResidenceStreet: z.string().min(1, { error: t("errors.street") }),
+  permanentResidenceStreetNumber: z
+    .string()
+    .min(1, { error: t("errors.houseNumber") }),
+  permanentResidenceCity: z.string().min(1, { error: t("errors.city") }),
+  permanentResidenceCountry: z.string().min(1, { error: t("errors.country") }),
+  placeOfBirth: z.string().min(1, { error: t("errors.placeOfBirth") }),
+  insurance: z.string().min(1, { error: t("errors.insurance") }),
+  pinkStatement: z.coerce.boolean({ error: t("errors.pinkStatement") }),
+  documentNumber: z.string().min(1, { error: t("errors.documentNumber") }),
+  documentIssuingCountry: z.string().min(1, { error: t("errors.country") }),
 });
 
+export const verifyResponseSchema = z.object({
+  courierId: z.string(),
+  contractSigned: z.boolean(),
+});
+
+export type VerifyResponse = z.infer<typeof verifyResponseSchema>;
 export type FormSchema = z.infer<typeof formSchema>;
