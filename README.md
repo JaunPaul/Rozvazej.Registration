@@ -1,69 +1,47 @@
-# Unified Registration Form (Wolt, Bolt, Foodora)
+# Svelte + TS + Vite
 
-This project is a unified registration form built with **Svelte 5** and **Vite**. It is designed to be embedded into Webflow websites for multiple platforms: **Wolt**, **Bolt**, and **Foodora**.
+This template should help get you started developing with Svelte and TypeScript in Vite.
 
-## Architecture & Integration
+## Recommended IDE Setup
 
-This is a **client-side application** that compiles into a single JavaScript file.
+[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
 
-1.  **Build**: Vite compiles the Svelte application into a single JS bundle.
-2.  **Hosting**: The build artifacts are hosted on **GitHub Pages**.
-3.  **Integration**: The hosted JavaScript file is imported into various Webflow websites via a `<script>` tag.
-4.  **Mounting**: The script automatically mounts the application to a `div` with the ID `app` (`<div id="app"></div>`).
+## Need an official Svelte framework?
 
-### GitHub Actions
-A workflow (`.github/workflows/static.yml`) handles the deployment:
--   Installs dependencies (`pnpm`).
--   Builds the project (`pnpm build`).
--   Deploys the `dist` folder to GitHub Pages.
+Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
 
-## Design Pattern
+## Technical considerations
 
-The application logic is centralized in the **State** using Svelte 5's runes.
+**Why use this over SvelteKit?**
 
--   **State Management**: `RegistrationState.svelte.ts` holds the entire form state, validation logic, and submission handlers.
--   **Components**: Purely presentational, they consume the state and render the UI.
--   **No Backend**: There is no dedicated backend service in this repository; it communicates directly with external endpoints defined in `endpoints.ts`.
+- It brings its own routing solution which might not be preferable for some users.
+- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
 
-## Form Structure
+This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
 
-The registration process is divided into two distinct phases:
+Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
 
-### Phase 1: Initial Registration
-This phase collects the primary user information across 4 steps:
--   **Step 1**: Personal Information (Name, Contact, etc.)
--   **Step 2**: Address (Integrated with Foxentry for validation)
--   **Step 3**: Citizenship & Documents
--   **Step 4**: Payment Details
+**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
 
-Upon completion, the data is submitted to the `PHASE1_ENDPOINT`.
+Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
 
-### Phase 2: Final Details
-This phase is for collecting additional details after the initial registration is processed. It is a single-step form that submits to `PHASE2_ENDPOINT`.
+**Why include `.vscode/extensions.json`?**
 
-## Internationalization (i18n)
+Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
 
-The project uses a lightweight, custom i18n solution located in `src/lib/i18n/i18n.svelte.ts`.
+**Why enable `allowJs` in the TS template?**
 
--   **Dictionary**: Translations are stored in a `dict` object (currently `cs` and `en`).
--   **Usage**: `t('key')` retrieves translations, falling back to Czech (`cs`).
+While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
 
-## Usage & Configuration
+**Why is HMR not preserving my local component state?**
 
-The application adapts its behavior and branding based on the context in which it runs.
+HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
 
-### Platform Detection
-The form detects which platform (Wolt, Bolt, Foodora) it is running for based on the **domain** or **URL parameters**.
+If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
 
-### Phase 2 Activation
-Phase 2 is activated via URL parameters, allowing pre-filling of user data.
-
-**Required URL Pattern:**
-`/?phase=2&country=[countryCode]&userId=[userId]`
-
--   **`phase=2`**: Activates Phase 2 mode.
--   **`country=[countryCode]`**: Pre-selects the country (e.g., `CZ`). If missing, the user is prompted to select it.
--   **`userId=[userId]`**: Unique identifier linking the submission to the user's record. **Required** for traceability.
-
-**Example:**
-`https://your-webflow-site.com/?phase=2&country=CZ&userId=12345-abcde`
+```ts
+// store.ts
+// An extremely simple external store
+import { writable } from 'svelte/store'
+export default writable(0)
+```

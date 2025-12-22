@@ -1,8 +1,6 @@
 <script lang="ts">
-  import type { CustomErrors } from "../types";
-
   interface Props {
-    errors?: CustomErrors;
+    errors?: { [key: string]: string[] };
     path?: string;
   }
   let { errors = {}, path = undefined }: Props = $props();
@@ -10,13 +8,9 @@
 
 {#if path && errors[path]}
   <ul class="errors text-explain">
-    {#if Array.isArray(errors[path])}
-      {#each errors[path] as message}
-        <li>{message}</li>
-      {/each}
-    {:else if typeof errors[path] === "string"}
-      <li>{errors[path]}</li>
-    {/if}
+    {#each errors[path] as message}
+      <li>{message}</li>
+    {/each}
   </ul>
 {/if}
 

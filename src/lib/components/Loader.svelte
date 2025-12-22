@@ -4,21 +4,17 @@
   import { t } from "../i18n/i18n.svelte";
   import { fade } from "svelte/transition";
 
-  type Props = {
-    progressText?: string[];
-  };
-  let {
-    progressText = [
-      t("result.loading.stage1"),
-      t("result.loading.stage2"),
-      t("result.loading.stage3"),
-    ],
-  }: Props = $props();
   let bar = new Tween(0, {
     easing: cubicOut,
   });
 
   let currentStage = $state(0);
+
+  const progressText = [
+    t("result.loading.stage1"),
+    t("result.loading.stage2"),
+    t("result.loading.stage3"),
+  ];
 
   function progress() {
     if (currentStage === 0) bar.set(40, { duration: 1500 });

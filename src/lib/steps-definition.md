@@ -1,6 +1,3 @@
-# Phase 1
-All fields and steps in Phase 1 are now required
-
 # step1
 ## fields
 all fields required
@@ -8,40 +5,33 @@ all fields required
 - lastName > text
 - phone > text
 - email > text
+- applyAsCompany > radio
 
 # step2
 ## fields
+- companyId > text > required and visible if applyAsCompany = "ANO"
+- country > select > required and visible if applyAsCompany = "NE"
+- nationalId > text > required and visible if values.applyAsCompany === "NE" && values.country === "CZ"
+- passportOrId > text required and visible if values.applyAsCompany === "NE" && values.country !== t("select.placeholder.country") && values.country !== "CZ"
 - street > text required
 - houseNumber > text required
 - city > text required
 - zip > text > required
-- deliveryCity > select required
-
-# step 3
-## fields
-- country > select > required
-- nationalId > text > required and values.country === "CZ"
-- passportOrId > text required and values.country !== t("select.placeholder.country") && values.country !== "CZ"
-- birthDate > date required and values.country !== t("select.placeholder.country") && values.country !== "CZ"
-
-# step4
-## fields
 - bankPrefix > number > required
 - bankNumber > number > required
 - bankCode > select > required
-- insurance > select
-- pinkStatement > radio
-
-# Phase 2
-# step 1
-
 - filesNationalId > files > required and visible if values.country === "CZ"
 - filesEuPassport > files > required and visible if values.country !== t("select.placeholder.country") && isEu(values.country) && values.country !== "CZ"
 - filesNonEu > files > required and visible if values.country !== t("select.placeholder.country") && !isEu(values.country)
+
+# step3
+step3 not available if applyAsCompany = "ANO" they go straight to submit so the next button becomes the submit button
+all fields are optional
+## fields
+- deliveryCity > select
 - transport > select
 - gender > select
-- documentExpiryDate > date > visible if values.country !== t("select.placeholder.country") && !isEu(values.country)
-
-# Archived
-- applyAsCompany > radio
-- companyId > text > required and visible if applyAsCompany = "ANO"
+- birthDate > date
+- passportExpiryDate > date > visible if values.country !== t("select.placeholder.country") && !isEu(values.country)
+- insurance > select
+- pinkStatement > radio
