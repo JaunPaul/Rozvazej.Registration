@@ -42,7 +42,7 @@ export async function getCities(locale: string, domain: string) {
 
 export async function getSplitCities(domain: string): Promise<string[]> {
   try {
-    const res = await fetch("/i18n/cities/cs-split.json");
+    const res = await fetch(`${BASE_URL}/cs-split.json?v=1`);
     if (!res.ok) return getCities("cs", domain);
     const data = await res.json();
     const key = domain.toLowerCase();
