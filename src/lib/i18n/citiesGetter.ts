@@ -32,10 +32,29 @@ export async function getCities(locale: string, domain: string) {
 
   if (!domain || domain.length === 0) return base;
 
-  const extraCities = extraCitiesByForm[domain];
+  const extraCities = (extraCitiesByForm as any)[domain];
   if (!extraCities) return base;
 
   const extras = extraCities[locale] ?? extraCities[FALLBACK_LOCALE] ?? [];
 
   return [...base, ...extras];
+}
+
+export async function getSplitCities(domain: string): Promise<string[]> {
+  try {
+    const res = await fetch("/i18n/cities/cs-split.json");
+    if (!res.ok) return getCities("cs", domain);
+    const data = await res.json();
+    const key = domain.toLowerCase();
+
+    // Exact match
+    if (data[key]) return data[key];
+
+    // Fallback? If Development, maybe return all? Or default to valid ones?
+    // If not found in split, fallback to original getCities
+    return getCities("cs", domain);
+  } catch (e) {
+    console.error("Failed to load split cities", e);
+    return getCities("cs", domain);
+  }
 }
