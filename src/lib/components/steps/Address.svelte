@@ -3,7 +3,7 @@
   import type { RegistrationState } from "../../state/RegistrationState.svelte";
   import Errors from "../Errors.svelte";
   import { t } from "../../i18n/i18n.svelte";
-  import { getCities } from "../../i18n/citiesGetter";
+  import { getSplitCities } from "../../i18n/citiesGetter";
 
   let { registrationState }: { registrationState: RegistrationState } =
     $props();
@@ -184,7 +184,7 @@
       bind:value={registrationState.values.deliveryCity}
     >
       <option value="" disabled>{t("select.placeholder.city")}</option>
-      {#await getCities("cs", registrationState.values.deliveryCompany[0] || "") then cities}
+      {#await getSplitCities(registrationState.values.submitSource || "") then cities}
         {#each [...cities].sort() as city}
           <option value={city}>{city}</option>
         {/each}
