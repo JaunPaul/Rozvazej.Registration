@@ -13,7 +13,7 @@
     if (!registrationState.activeAddressType) return;
     // track just the active field's value
     const q = registrationState.currentQueryFor(
-      registrationState.activeAddressType,
+      registrationState.activeAddressType
     );
     void q; // establish reactive read
     registrationState.queueSearchForActive();
@@ -185,7 +185,7 @@
     >
       <option value="" disabled>{t("select.placeholder.city")}</option>
       {#await getSplitCities(registrationState.values.submitSource || "") then cities}
-        {#each [...cities].sort() as city}
+        {#each [...cities] as city}
           <option value={city}>{city}</option>
         {/each}
       {/await}
