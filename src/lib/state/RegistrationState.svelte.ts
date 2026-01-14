@@ -324,7 +324,7 @@ export class RegistrationState {
         ...steps.step4,
         ...steps.alwaysInclude,
       ];
-      const snapshot = this.mapStepsToSnapshot(this.values, fieldsForSnapshot);
+      const snapshot = this.mapStepsToSnapshot(this.values, fieldsForSnapshot as any);
       const fd = new FormData();
       for (const [k, v] of Object.entries(snapshot)) {
         if (
@@ -352,6 +352,10 @@ export class RegistrationState {
         body: fd,
       });
 
+      if (!res.ok) {
+        throw new Error(`Submission failed with status: ${res.status}`);
+      }
+
       const text = await res.text();
       console.log("[formsubmission]", text);
       this.formState = "success";
@@ -364,6 +368,9 @@ export class RegistrationState {
       console.error(err);
       this.formState = "fail";
       this.submissionStatus = SubmissionStatus.REJECTED;
+
+      // Capture error
+      await this.captureError(err);
     } finally {
       this.disable = false;
       this.submitting = false;
@@ -384,7 +391,7 @@ export class RegistrationState {
     // await sleep(3000);
     try {
       const fieldsForSnapshot = [...steps.phase2, ...steps.alwaysInclude];
-      const snapshot = this.mapStepsToSnapshot(this.values, fieldsForSnapshot);
+      const snapshot = this.mapStepsToSnapshot(this.values, fieldsForSnapshot as any);
       const fd = new FormData();
       for (const [k, v] of Object.entries(snapshot)) {
         if (
@@ -426,6 +433,10 @@ export class RegistrationState {
         body: fd,
       });
 
+      if (!res.ok) {
+        throw new Error(`Submission failed with status: ${res.status}`);
+      }
+
       const text = await res.text();
       console.log("[formsubmission]", text);
       this.formState = "success";
@@ -438,12 +449,43 @@ export class RegistrationState {
       console.error(err);
       this.formState = "fail";
       this.submissionStatus = SubmissionStatus.REJECTED;
+
+      // Capture error
+      await this.captureError(err);
     } finally {
       this.disable = false;
       this.submitting = false;
 
       this.trackCompletion(this.submissionStatus);
       this.trackCompletionWithoutAds(this.submissionStatus);
+    }
+  }
+
+  async captureError(error: any) {
+    try {
+      const errorPayload = {
+        url: window.location.href,
+        response: {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          values: this.values,
+        },
+        created_at: new Date().toISOString(),
+        session_id: this.values.sessionId,
+      };
+
+      await fetch(
+        "https://n8n-kn-digital-b6b8cc160b77.herokuapp.com/webhook/67c46be5-d570-47b3-8855-296d9edb7f03",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(errorPayload),
+        }
+      );
+    } catch (e) {
+      console.error("Failed to capture error", e);
     }
   }
 
@@ -456,10 +498,10 @@ export class RegistrationState {
       bucket === "nationalId"
         ? this.values.filesNationalId
         : bucket === "euPassport"
-        ? this.values.filesEuPassport
-        : bucket === "driversLicense"
-        ? this.values.filesDriversLicense
-        : this.values.filesNonEu;
+          ? this.values.filesEuPassport
+          : bucket === "driversLicense"
+            ? this.values.filesDriversLicense
+            : this.values.filesNonEu;
 
     // Dedupe
     const current = targetArray;
@@ -482,10 +524,10 @@ export class RegistrationState {
       bucket === "nationalId"
         ? this.values.filesNationalId
         : bucket === "euPassport"
-        ? this.values.filesEuPassport
-        : bucket === "driversLicense"
-        ? this.values.filesDriversLicense
-        : this.values.filesNonEu;
+          ? this.values.filesEuPassport
+          : bucket === "driversLicense"
+            ? this.values.filesDriversLicense
+            : this.values.filesNonEu;
 
     const newFiles = targetArray.filter((f) => f !== file);
 
