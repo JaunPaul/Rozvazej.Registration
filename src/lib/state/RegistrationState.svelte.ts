@@ -324,7 +324,10 @@ export class RegistrationState {
         ...steps.step4,
         ...steps.alwaysInclude,
       ];
-      const snapshot = this.mapStepsToSnapshot(this.values, fieldsForSnapshot as any);
+      const snapshot = this.mapStepsToSnapshot(
+        this.values,
+        fieldsForSnapshot as any
+      );
       const fd = new FormData();
       for (const [k, v] of Object.entries(snapshot)) {
         if (
@@ -391,7 +394,10 @@ export class RegistrationState {
     // await sleep(3000);
     try {
       const fieldsForSnapshot = [...steps.phase2, ...steps.alwaysInclude];
-      const snapshot = this.mapStepsToSnapshot(this.values, fieldsForSnapshot as any);
+      const snapshot = this.mapStepsToSnapshot(
+        this.values,
+        fieldsForSnapshot as any
+      );
       const fd = new FormData();
       for (const [k, v] of Object.entries(snapshot)) {
         if (
@@ -463,12 +469,15 @@ export class RegistrationState {
 
   async captureError(error: any) {
     try {
+      const userAgent =
+        navigator.userAgent.toLowerCase() ?? "Cannot detect browser";
       const errorPayload = {
         url: window.location.href,
         response: {
           error: error instanceof Error ? error.message : String(error),
           stack: error instanceof Error ? error.stack : undefined,
           values: this.values,
+          browser: userAgent,
         },
         created_at: new Date().toISOString(),
         session_id: this.values.sessionId,
@@ -498,10 +507,10 @@ export class RegistrationState {
       bucket === "nationalId"
         ? this.values.filesNationalId
         : bucket === "euPassport"
-          ? this.values.filesEuPassport
-          : bucket === "driversLicense"
-            ? this.values.filesDriversLicense
-            : this.values.filesNonEu;
+        ? this.values.filesEuPassport
+        : bucket === "driversLicense"
+        ? this.values.filesDriversLicense
+        : this.values.filesNonEu;
 
     // Dedupe
     const current = targetArray;
@@ -524,10 +533,10 @@ export class RegistrationState {
       bucket === "nationalId"
         ? this.values.filesNationalId
         : bucket === "euPassport"
-          ? this.values.filesEuPassport
-          : bucket === "driversLicense"
-            ? this.values.filesDriversLicense
-            : this.values.filesNonEu;
+        ? this.values.filesEuPassport
+        : bucket === "driversLicense"
+        ? this.values.filesDriversLicense
+        : this.values.filesNonEu;
 
     const newFiles = targetArray.filter((f) => f !== file);
 
