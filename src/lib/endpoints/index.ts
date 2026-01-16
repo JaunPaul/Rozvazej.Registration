@@ -11,3 +11,4 @@ export const _PHASE2_ENDPOINT =
   "https://hook.eu1.make.com/uwswnnoplatzsvsda6kfytd5hquhqqw4";
 export const _VERIFY_ENDPOINT =
   "https://hook.eu1.make.com/mw8efuwuj53hq8i1nxqo7ukac9vl5iaf";
+export const CLOUDINARY_URL= "cloudinary://489118994815518:qc0gqIghf9qaJyEPGaYMVbX5Omw@dlxnu5ekr"
