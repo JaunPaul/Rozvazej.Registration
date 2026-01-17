@@ -12,7 +12,12 @@ import {
 import { validateStepAsync } from "../utils/validation";
 import { SubmissionStatus } from "../enums/form";
 import type { Company, FormStates, CustomErrors, Bucket } from "../types";
-import { PHASE1_ENDPOINT, PHASE2_ENDPOINT, CLOUDINARY_URL } from "../endpoints";
+import {
+  PHASE1_ENDPOINT,
+  PHASE2_ENDPOINT,
+  CLOUDINARY_UPLOAD_URL,
+  CLOUDINARY_UPLOAD_PRESET,
+} from "../endpoints";
 import { steps } from "../utils/stateMachine";
 
 const FALLBACK_HTTP_STATUSES = new Set([408, 413, 429, 500, 502, 503, 504]);
@@ -63,11 +68,13 @@ type CloudinaryUploadResult = {
 
 async function uploadOneToCloudinary(
   cloudinaryUrl: string,
+  preset: string,
   file: File,
   timeoutMs: number
 ): Promise<string> {
   const fd = new FormData();
   fd.append("file", file, file.name);
+  fd.append("upload_preset", preset);
 
   // If you use unsigned presets/folders, add them here:
   // fd.append("upload_preset", "YOUR_PRESET");
@@ -105,8 +112,9 @@ async function uploadOneToCloudinary(
   return String(url);
 }
 
-async function uploadAllToCloudinary(
+export async function uploadAllToCloudinary(
   cloudinaryUrl: string,
+  preset: string,
   filesWithBucket: { file: File; bucket: string }[],
   perFileTimeoutMs = 60_000
 ): Promise<CloudinaryUploadResult> {
@@ -114,7 +122,7 @@ async function uploadAllToCloudinary(
 
   const settled = await Promise.allSettled(
     filesWithBucket.map(({ file }) =>
-      uploadOneToCloudinary(cloudinaryUrl, file, perFileTimeoutMs)
+      uploadOneToCloudinary(cloudinaryUrl, preset, file, perFileTimeoutMs)
     )
   );
 
@@ -631,8 +639,7 @@ export class RegistrationState {
           }
 
           throw new Error(
-            `Submission failed (${
-              firstAttemptRes.status
+            `Submission failed (${firstAttemptRes.status
             }): ${firstAttemptText.slice(0, 300)}`
           );
         }
@@ -666,7 +673,8 @@ export class RegistrationState {
       const filesWithBucket = extractFilesWithBuckets(snapshot);
 
       const { urls, failures } = await uploadAllToCloudinary(
-        CLOUDINARY_URL,
+        CLOUDINARY_UPLOAD_URL,
+        CLOUDINARY_UPLOAD_PRESET,
         filesWithBucket,
         CLOUDINARY_PER_FILE_TIMEOUT_MS
       );
@@ -674,8 +682,7 @@ export class RegistrationState {
       // Decision: if *all* uploads failed and we have files, stop (nothing useful to send).
       if (filesWithBucket.length > 0 && urls.length === 0) {
         throw new Error(
-          `Cloudinary fallback failed: no files uploaded. Example error: ${
-            failures[0]?.error ?? "unknown"
+          `Cloudinary fallback failed: no files uploaded. Example error: ${failures[0]?.error ?? "unknown"
           }`
         );
       }
@@ -739,8 +746,7 @@ export class RegistrationState {
 
       if (!fallbackRes.ok) {
         throw new Error(
-          `Fallback submission failed (${
-            fallbackRes.status
+          `Fallback submission failed (${fallbackRes.status
           }): ${fallbackText.slice(0, 300)}`
         );
       }
@@ -803,10 +809,10 @@ export class RegistrationState {
       bucket === "nationalId"
         ? this.values.filesNationalId
         : bucket === "euPassport"
-        ? this.values.filesEuPassport
-        : bucket === "driversLicense"
-        ? this.values.filesDriversLicense
-        : this.values.filesNonEu;
+          ? this.values.filesEuPassport
+          : bucket === "driversLicense"
+            ? this.values.filesDriversLicense
+            : this.values.filesNonEu;
 
     // Dedupe
     const current = targetArray;
@@ -829,10 +835,10 @@ export class RegistrationState {
       bucket === "nationalId"
         ? this.values.filesNationalId
         : bucket === "euPassport"
-        ? this.values.filesEuPassport
-        : bucket === "driversLicense"
-        ? this.values.filesDriversLicense
-        : this.values.filesNonEu;
+          ? this.values.filesEuPassport
+          : bucket === "driversLicense"
+            ? this.values.filesDriversLicense
+            : this.values.filesNonEu;
 
     const newFiles = targetArray.filter((f) => f !== file);
 
