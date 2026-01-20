@@ -152,8 +152,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "options.gender.other": "Ostatní",
 
     "upload.button": "Nahrát soubor",
-    "upload.max": "Maximální velikost souboru 10 MB.",
-    "upload.error.size": "Nahrávání selhalo. Max. velikost souboru je 10 MB.",
+    "upload.max": "Maximální velikost souboru 2 MB.",
+    "upload.error.size": "Nahrávání selhalo. Max. velikost souboru je 2 MB.",
     "upload.error.type": "Nahrávání selhalo. Neplatný typ souboru.",
     "upload.error.generic": "Nahrávání selhalo. Zkuste to prosím znovu.",
 
@@ -332,8 +332,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "options.gender.other": "Other",
 
     "upload.button": "Upload file",
-    "upload.max": "Maximum file size is 10 MB.",
-    "upload.error.size": "Upload failed. Maximum file size is 10 MB.",
+    "upload.max": "Maximum file size is 2 MB.",
+    "upload.error.size": "Upload failed. Maximum file size is 2 MB.",
     "upload.error.type": "Upload failed. Invalid file type.",
     "upload.error.generic": "Upload failed. Please try again.",
 

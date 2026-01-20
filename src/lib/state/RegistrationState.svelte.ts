@@ -805,6 +805,36 @@ export class RegistrationState {
   appendFiles(bucket: Bucket, files: FileList | File[]) {
     const fileList = Array.isArray(files) ? files : Array.from(files);
 
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+    const validFiles: File[] = [];
+    let hasLargeFile = false;
+
+    fileList.forEach(f => {
+      if (f.size > MAX_FILE_SIZE) {
+        hasLargeFile = true;
+      } else {
+        validFiles.push(f);
+      }
+    });
+
+    const errorKey =
+      bucket === "nationalId"
+        ? "filesNationalId"
+        : bucket === "euPassport"
+          ? "filesEuPassport"
+          : bucket === "driversLicense"
+            ? "filesDriversLicense"
+            : "filesNonEu";
+
+    if (hasLargeFile) {
+      this.errors[errorKey] = [t("upload.error.size")];
+    } else {
+      // Clear error if it exists and we're adding valid files w/o issues
+      if (this.errors[errorKey]) {
+        delete this.errors[errorKey];
+      }
+    }
+
     const targetArray =
       bucket === "nationalId"
         ? this.values.filesNationalId
@@ -817,7 +847,7 @@ export class RegistrationState {
     // Dedupe
     const current = targetArray;
     const byKey = new Map<string, File>();
-    [...current, ...fileList].forEach((f) => {
+    [...current, ...validFiles].forEach((f) => {
       byKey.set(`${f.name}|${f.size}|${f.lastModified}`, f);
     });
 
