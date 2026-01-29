@@ -26,7 +26,7 @@
     // Phase 2 has only one step now
     const validationScope = "phase2"; // Mapping to original scopes roughly
     const valid = await registrationState.validateCurrentStep(
-      validationScope as any
+      validationScope as any,
     );
     if (valid) {
       if (currentSubStep < totalSubSteps) {
@@ -54,7 +54,7 @@
   const minPassportExpiry = toDateInputValue(today);
   onMount(() => {
     const panel = Array.from(
-      document.querySelectorAll<HTMLElement>(".panel-items")
+      document.querySelectorAll<HTMLElement>(".panel-items"),
     );
     if (panel.length) {
       panel.forEach((el, i) => {
@@ -327,6 +327,20 @@
           <CzechFileUpload {registrationState}></CzechFileUpload>
 
           {@render documentFields(t("labels.documentNumberEu"))}
+          <div class="input-wrap">
+            <label for="placeOfBirth" class="field-label"
+              >{t("labels.placeOfBirth")}</label
+            ><input
+              class="input-2 w-input"
+              name="placeOfBirth"
+              data-name="placeOfBirth"
+              type="text"
+              id="placeOfBirth"
+              placeholder={t("ph.placeOfBirth")}
+              bind:value={registrationState.values.placeOfBirth}
+            />
+            <Errors errors={registrationState.errors} path="placeOfBirth" />
+          </div>
         {/if}
 
         {#if registrationState.values.country.length > 0 && registrationState.values.country !== "CZ"}
