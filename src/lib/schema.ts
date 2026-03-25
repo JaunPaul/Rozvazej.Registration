@@ -82,12 +82,16 @@ export const formSchema = z.object({
   // step2
   companyId: z.string().min(1, { error: t("errors.companyId") }),
   country: z.string().min(1, { error: t("errors.country") }),
-  nationalId: z
+  /* nationalId: z
     .string()
     .trim()
     .refine(isValidCzechBirthNumber, { message: t("errors.nationalId") })
-    .transform((s) => normalizeCzechBirthNumber(s)!),
-  passportOrId: z.string().min(1, { error: t("errors.passportOrId") }),
+    .transform((s) => normalizeCzechBirthNumber(s)!), */
+  // passportOrId: z.string().min(1, { error: t("errors.passportOrId") }),
+  communicationPassword: z
+    .string()
+    .min(1, { error: t("errors.communicationPassword") })
+    .regex(/^[a-zA-Z0-9]+$/, { message: t("errors.communicationPasswordSpecialChars") }),
   street: z.string().min(1, { error: t("errors.street") }),
   houseNumber: z.string().min(1, { error: t("errors.houseNumber") }),
   city: z.string().min(1, { error: t("errors.city") }),

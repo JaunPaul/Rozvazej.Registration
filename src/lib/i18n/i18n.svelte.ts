@@ -28,6 +28,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.nationalId": "Rodné číslo",
     "labels.applyAsCompany": "Budete jezdit na IČO?",
     "labels.passportOrId": "Číslo občanského průkazu nebo cestovního pasu",
+    "labels.communicationPassword": "Heslo pro elektronickou komunikaci",
     "labels.citizenship": "Státní občanství",
     "labels.street": "Ulice",
     "labels.houseNumber": "Číslo popisné",
@@ -57,6 +58,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "Nahrajte přední i zadní stranu svého občanského průkazu.",
     "hints.doc.euPassport":
       "Nahrajte přední i zadní stranu svého občanského průkazu.",
+    "hints.communicationPassword": "Vytvořte si heslo bez speciálních znaků",
     "hints.doc.nonEu":
       "*Tyto dokumenty jsou vyžadovány: vízum NEBO povolení k pobytu NEBO studijní/pracovní povolení.",
     "hints.pinkstatement":
@@ -74,6 +76,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.bank.prefix": "Např. 123456",
     "ph.bank.number": "Např. 123456789",
     "ph.passportOrId": "Např. 123456789",
+    "ph.communicationPassword": "Zadejte Vaše heslo",
     "ph.permanentResidence":
       "Např. 5 Avenue Anatole France, Champ de Mars, 75007 Paříž, Francie",
     "ph.placeOfBirth": "Např. Paříž, Francie",
@@ -89,6 +92,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.email": "Zadejte prosím svůj email",
     "errors.nationalId": "Zadejte platné rodné číslo.",
     "errors.passportOrId": "Zadejte prosím platné číslo průkazu totožnosti",
+    "errors.communicationPassword": "Zadejte heslo pro komunikaci",
+    "errors.communicationPasswordSpecialChars": "Heslo nesmí obsahovat speciální znaky",
     "errors.street": "Zadejte prosím název ulice",
     "errors.houseNumber": "Zadejte prosím číslo popisné",
     "errors.city": "Zadejte prosím město či obec",
@@ -194,6 +199,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.email": "Email",
     "labels.companyId": "Company ID Number",
     "labels.passportOrId": "ID card or passport",
+    "labels.communicationPassword": "Communication Password",
     "labels.nationalId": "Social Security number",
     "labels.applyAsCompany": "Are you applying as a company?",
     "labels.citizenship": "Citizenship",
@@ -230,6 +236,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "Upload both the front and back side of your ID card.",
     "hints.doc.euPassport":
       "Upload both the front and back side of your ID card.",
+    "hints.communicationPassword": "Create a password without special characters",
 
     // ✅ Non-EU change: remove “upload ID card” mention
     "hints.doc.nonEu":
@@ -252,6 +259,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "ph.bank.prefix": "123456",
     "ph.bank.number": "123456789",
     "ph.passportOrId": "Enter ID number",
+    "ph.communicationPassword": "Your password",
     "ph.permanentResidence":
       "e.g. 5 Avenue Anatole France, Champ de Mars, 75007 Paris, France",
     "ph.placeOfBirth": "e.g. Paris, France",
@@ -266,6 +274,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.phone": "Enter a Czech phone number in the format XXX XXX XXX.",
     "errors.email": "Please enter your email",
     "errors.passportOrId": "Please enter a valid ID number",
+    "errors.communicationPassword": "Enter a communication password",
+    "errors.communicationPasswordSpecialChars": "Password cannot contain special characters",
     "errors.nationalId": "Enter a valid national social security number.",
     "errors.street": "Please enter the street name",
     "errors.houseNumber": "Please enter the house number",

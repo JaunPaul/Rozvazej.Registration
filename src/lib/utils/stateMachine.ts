@@ -8,7 +8,7 @@ export const steps: Record<
 > = {
   step1: ["firstName", "lastName", "birthLastName", "phone", "email"],
   step2: ["street", "houseNumber", "city", "zip", "deliveryCity"],
-  step3: ["country", "nationalId", "passportOrId", "birthDate"],
+  step3: ["country", "communicationPassword", "birthDate"],
   step4: ["bankPrefix", "bankNumber", "bankCode", "insurance", "pinkStatement"],
   phase2: [
     "permanentResidenceCountry",
@@ -70,17 +70,18 @@ export const fields: Record<
 
   // Phase 1 - Step 3 (Citizenship)
   country: { visibleWhen: (d) => true, requiredWhen: (d) => true },
-  nationalId: {
+  /* nationalId: {
     visibleWhen: (d) => d.country === "CZ",
     requiredWhen: (d) => d.country === "CZ",
-  },
-  passportOrId: {
+  }, */
+  communicationPassword: { visibleWhen: (d) => true, requiredWhen: (d) => true },
+  /* passportOrId: {
     visibleWhen: (d) => d.country && d.country !== "CZ",
     requiredWhen: (d) => d.country && d.country !== "CZ",
-  },
+  }, */
   birthDate: {
-    visibleWhen: (d) => d.country && d.country !== "CZ",
-    requiredWhen: (d) => d.country && d.country !== "CZ",
+    visibleWhen: (d) => !!d.country,
+    requiredWhen: (d) => !!d.country,
   },
 
   // Phase 1 - Step 4 (Bank & Insurance)

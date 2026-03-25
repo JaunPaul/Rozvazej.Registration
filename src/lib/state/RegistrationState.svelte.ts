@@ -232,6 +232,7 @@ export class RegistrationState {
     companyName: "",
     nationalId: "",
     passportOrId: "",
+    communicationPassword: "",
     deliveryCompany: [] as string[],
     deliveryCompanyWolt: false,
     deliveryCompanyFoodora: false,
@@ -929,9 +930,9 @@ export class RegistrationState {
     }
   }
 
-  async onBlurName(field: "firstName" | "lastName" | "birthLastName") {
+  async onBlurName(field: "firstName" | "lastName") {
     if (this.values.foxentryPaymentStatus === false) return;
-    const val = this.values[field] || "";
+    const val = this.values[field];
     if (val.length === 0) return;
 
     const r = await validateName(
