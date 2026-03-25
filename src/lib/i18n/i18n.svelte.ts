@@ -21,6 +21,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "labels.firstName": "Jméno",
     "labels.lastName": "Přijmení",
+    "labels.birthLastName": "Rodné příjmení",
     "labels.phone": "Telefonní číslo",
     "labels.email": "Email",
     "labels.companyId": "IČO",
@@ -49,6 +50,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
+    "hints.birthLastName": "Nevyplňujte, pokud je stejné",
     "hints.useRealEmail":
       "Zvolte prosím email, který reálně používáte. <strong>Budou Vám na něj chodit důležité emaily.</strong>",
     "hints.doc.nationalId":
@@ -64,6 +66,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "ph.firstName": "Např. Jan",
     "ph.lastName": "Např. Novák",
+    "ph.birthLastName": "Např. Novák",
     "ph.phone": "Např. 777111222",
     "ph.email": "Např. jan.novak@email.cz",
     "ph.nationalId": "Např. 123456789",
@@ -96,6 +99,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.files": "Požadované soubory: ",
     "errors.fox.firstName": "Jméno je neplatné.",
     "errors.fox.lastName": "Příjmení je neplatné.",
+    "errors.fox.birthLastName": "Rodné příjmení je neplatné.",
     "errors.fox.email": "E-mail je neplatný.",
     "errors.fox.phone": "Telefon je neplatný.",
     "errors.fox.address": "Neplatné umístění.",
@@ -185,6 +189,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "labels.firstName": "First name",
     "labels.lastName": "Last name",
+    "labels.birthLastName": "Birth last name",
     "labels.phone": "Phone number",
     "labels.email": "Email",
     "labels.companyId": "Company ID Number",
@@ -218,6 +223,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "hints.czPhone":
       "For deliveries in the Czech Republic you must provide a <strong>Czech phone number.</strong>",
+    "hints.birthLastName": "Do not fill if same",
     "hints.useRealEmail":
       "Use an email you actually check. <strong>Important messages will go there.</strong>",
     "hints.doc.nationalId":
@@ -238,6 +244,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "ph.firstName": "Type your first name",
     "ph.lastName": "Type your last name",
+    "ph.birthLastName": "Type your birth last name",
     "ph.phone": "775111222",
     "ph.email": "Enter your email address",
     "ph.nationalId": "Your social security number",
@@ -270,6 +277,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.files": "Files required: ",
     "errors.fox.firstName": "Please enter a valid name",
     "errors.fox.lastName": "Please enter a valid last name",
+    "errors.fox.birthLastName": "Please enter a valid birth last name",
     "errors.fox.email": "Email is invalid",
     "errors.fox.phone": "Phone is invalid",
 

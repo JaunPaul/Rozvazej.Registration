@@ -6,7 +6,7 @@ export const steps: Record<
   "step1" | "step2" | "step3" | "step4" | "phase2" | "alwaysInclude",
   string[]
 > = {
-  step1: ["firstName", "lastName", "phone", "email"],
+  step1: ["firstName", "lastName", "birthLastName", "phone", "email"],
   step2: ["street", "houseNumber", "city", "zip", "deliveryCity"],
   step3: ["country", "nationalId", "passportOrId", "birthDate"],
   step4: ["bankPrefix", "bankNumber", "bankCode", "insurance", "pinkStatement"],
@@ -57,6 +57,7 @@ export const fields: Record<
   // Phase 1 - Step 1 (Personal Data)
   firstName: { visibleWhen: (d) => true, requiredWhen: (d) => true },
   lastName: { visibleWhen: (d) => true, requiredWhen: (d) => true },
+  birthLastName: { visibleWhen: (d) => true, requiredWhen: (d) => false },
   phone: { visibleWhen: (d) => true, requiredWhen: (d) => true },
   email: { visibleWhen: (d) => true, requiredWhen: (d) => true },
 

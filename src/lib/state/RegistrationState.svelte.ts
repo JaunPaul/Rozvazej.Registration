@@ -225,6 +225,7 @@ export class RegistrationState {
   values = $state({
     firstName: "",
     lastName: "",
+    birthLastName: "",
     email: "",
     phone: "",
     companyId: "",
@@ -928,9 +929,9 @@ export class RegistrationState {
     }
   }
 
-  async onBlurName(field: "firstName" | "lastName") {
+  async onBlurName(field: "firstName" | "lastName" | "birthLastName") {
     if (this.values.foxentryPaymentStatus === false) return;
-    const val = this.values[field];
+    const val = this.values[field] || "";
     if (val.length === 0) return;
 
     const r = await validateName(
