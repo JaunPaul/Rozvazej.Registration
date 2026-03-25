@@ -252,6 +252,7 @@ export class RegistrationState {
     transport: "",
     insurance: "",
     pinkStatement: undefined as boolean | undefined,
+    execution: undefined as boolean | undefined,
     gender: "",
     birthDate: "",
     documentExpiryDate: "",

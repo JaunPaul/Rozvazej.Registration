@@ -9,7 +9,7 @@ export const steps: Record<
   step1: ["firstName", "lastName", "birthLastName", "phone", "email"],
   step2: ["street", "houseNumber", "city", "zip", "deliveryCity"],
   step3: ["country", "communicationPassword", "birthDate"],
-  step4: ["bankPrefix", "bankNumber", "bankCode", "insurance", "pinkStatement"],
+  step4: ["bankPrefix", "bankNumber", "bankCode", "insurance", "pinkStatement", "execution"],
   phase2: [
     "permanentResidenceCountry",
     "permanentResidenceStreet",
@@ -89,7 +89,8 @@ export const fields: Record<
   bankNumber: { visibleWhen: (d) => true, requiredWhen: (d) => true },
   bankCode: { visibleWhen: (d) => true, requiredWhen: (d) => true },
   insurance: { visibleWhen: (d) => true, requiredWhen: (d) => false },
-  pinkStatement: { visibleWhen: (d) => true, requiredWhen: (d) => false },
+  pinkStatement: { visibleWhen: (d) => true, requiredWhen: (d) => true },
+  execution: { visibleWhen: (d) => true, requiredWhen: (d) => true },
 
   // Phase 2
   filesNationalId: {
