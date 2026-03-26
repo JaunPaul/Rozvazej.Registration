@@ -18,6 +18,8 @@ export const steps: Record<
     "filesNationalId",
     "filesEuPassport",
     "filesNonEu",
+    "filesEuResidence",
+    "filesNonEuResidence",
     "filesDriversLicense",
     "transport",
     "gender",
@@ -26,6 +28,10 @@ export const steps: Record<
     "documentType",
     "documentNumber",
     "documentIssuingCountry",
+    "residenceDocumentType",
+    "residenceDocumentNumber",
+    "residenceDocumentExpiryDate",
+    "residenceDocumentIssuingCountry",
   ],
   alwaysInclude: [
     "utm_source",
@@ -103,8 +109,16 @@ export const fields: Record<
     requiredWhen: (d) => d.country && isEu(d.country) && d.country !== "CZ",
   },
   filesNonEu: {
-    visibleWhen: (d) => d.country && !isEu(d.country),
-    requiredWhen: (d) => d.country && !isEu(d.country),
+    visibleWhen: (d) => !!(d.country && !isEu(d.country) && d.country !== "CZ"),
+    requiredWhen: (d) => !!(d.country && !isEu(d.country) && d.country !== "CZ"),
+  },
+  filesEuResidence: {
+    visibleWhen: (d) => !!(d.country && isEu(d.country) && d.country !== "CZ"),
+    requiredWhen: (d) => !!(d.country && isEu(d.country) && d.country !== "CZ"),
+  },
+  filesNonEuResidence: {
+    visibleWhen: (d) => !!(d.country && !isEu(d.country) && d.country !== "CZ"),
+    requiredWhen: (d) => !!(d.country && !isEu(d.country) && d.country !== "CZ"),
   },
   filesDriversLicense: {
     visibleWhen: (d) => d.transport === "auto",
@@ -145,6 +159,22 @@ export const fields: Record<
     requiredWhen: (d) => true,
   },
   documentIssuingCountry: {
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
+  },
+  residenceDocumentType: {
+    visibleWhen: (d) => d.country && d.country !== "CZ",
+    requiredWhen: (d) => d.country && d.country !== "CZ",
+  },
+  residenceDocumentNumber: {
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
+  },
+  residenceDocumentExpiryDate: {
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
+  },
+  residenceDocumentIssuingCountry: {
     visibleWhen: (d) => true,
     requiredWhen: (d) => true,
   },

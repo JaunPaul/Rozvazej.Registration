@@ -39,7 +39,9 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.bank.code": "Kód banky",
     "labels.doc.nationalId": `Nahrajte ID/ jiný platný doklad. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
     "labels.doc.euPassport": `Nahrajte svůj občanský průkaz. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
+    "labels.doc.euResidence": `Nahrajte svůj doklad o pobytu. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
     "labels.doc.nonEu": `Nahrajte následující platné dokumenty. <br /><span class="bold-green">1. Vízum NEBO povolení k pobytu NEBO pracovní povolení</span>`,
+    "labels.doc.nonEuResidence": `Nahrajte svůj doklad o pobytu. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
     "labels.doc.driversLicense": `Nahrajte platný řidičský průkaz. <br /><span class="bold-green">1. PŘEDNÍ STRANA</span><br /><span class="bold-green">2. ZADNÍ STRANA</span>`,
     "labels.deliveryCompany":
       "Neomezujte se - u nás můžete jezdit pro všechny tři služby najednou: Bolt, Wolt i Foodora. Více platforem = více objednávek = vyšší výdělky. Stačí si zvolit, kde chcete začít!",
@@ -48,6 +50,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "Číslo víza NEBO povolení k pobytu NEBO pracovní povolení  ",
     "labels.documentType": "Typ dokladu",
     "labels.documentIssuingCountry": "Země vydání dokladu",
+    "labels.residenceDocumentType": "Typ dokladu o pobytu",
     "labels.permanentResidenceCountry": "Země",
 
     "hints.czPhone":
@@ -59,9 +62,13 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "Nahrajte přední i zadní stranu svého občanského průkazu.",
     "hints.doc.euPassport":
       "Nahrajte přední i zadní stranu svého občanského průkazu.",
+    "hints.doc.euResidence":
+      "Nahrajte přední i zadní stranu svého dokladu.",
     "hints.communicationPassword": "Vytvořte si heslo bez speciálních znaků",
     "hints.doc.nonEu":
       "*Tyto dokumenty jsou vyžadovány: vízum NEBO povolení k pobytu NEBO studijní/pracovní povolení.",
+    "hints.doc.nonEuResidence":
+      "Nahrajte přední i zadní stranu svého dokladu.",
     "hints.pinkstatement":
       'Pokud zvolíte ANO, uplatníme u Vás slevu na dani a budete dostávat více peněz.<br><br> <strong>POZOR</strong> - "růžové prohlášení o dani" (neboli Prohlášení poplatníka k dani z příjmů fyzických osob) můžete mít vyplněné a uplatněné pouze u jednoho zaměstnavatele. To znamená, že pokud máte více pracovních smluv, nebo kombinujete zaměstnání a brigády, můžete tento nárok využít jen u jedné firmy.',
     "hints.doc.filesDriversLicense":
@@ -128,6 +135,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.placeOfBirth": "Místo narození povinné",
     "errors.documentIssuingCountry": "Tento vstup je povinný",
     "errors.documentType": "Vyberte typ dokladu",
+    "errors.residenceDocumentType": "Vyberte typ dokladu o pobytu",
 
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat na krok",
@@ -156,6 +164,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "select.placeholder.bank": "Vyberte banku",
     "select.placeholder.gender": "Vyberte pohlaví",
     "select.placeholder.documentType": "Vyberte typ dokladu",
+    "select.placeholder.residenceDocumentType": "Vyberte typ dokladu o pobytu",
 
     "options.transport.car": "Auto",
     "options.transport.bike": "Kolo",
@@ -166,6 +175,16 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "options.gender.other": "Ostatní",
     "options.documentType.id": "Občanský průkaz",
     "options.documentType.passport": "Pas",
+    "options.residenceDocumentType.temp": "Přechodný pobyt",
+    "options.residenceDocumentType.perma": "Trvalý pobyt",
+    "options.residenceDocumentType.shortVisa": "Krátkodobé vízum",
+    "options.residenceDocumentType.longVisa": "Dlouhodobé vízum",
+    "options.residenceDocumentType.study": "Studium",
+    "options.residenceDocumentType.tempProtection": "Dočasná ochrana",
+    "options.residenceDocumentType.intlProtection": "Mezinárodní ochrana",
+    "options.residenceDocumentType.code95": "Dlouhodobý pobyt (kód 95)",
+    "options.residenceDocumentType.code99": "Dlouhodobý pobyt (kód 99)",
+    "options.residenceDocumentType.code670": "Dlouhodobý pobyt (kód 670)",
 
     "upload.button": "Nahrát soubor",
     "upload.max": "Maximální velikost souboru 2 MB.",
@@ -221,9 +240,11 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "labels.doc.nationalId": `Upload ID / other valid document. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
     "labels.doc.euPassport": `Upload your identity card. <br /><span class="bold-green">FRONT SIDE</span><br /><span class="bold-green">BACK SIDE</span>`,
+    "labels.doc.euResidence": `Upload your residence document. <br /><span class="bold-green">1. FRONT SIDE</span><br /><span class="bold-green">2. BACK SIDE</span>`,
 
     // ✅ Non-EU change: remove ID card requirement
     "labels.doc.nonEu": `Upload the following valid documents. <br /><span class="bold-green">1. VISA OR RESIDENCE PERMIT OR WORK PERMIT</span>`,
+    "labels.doc.nonEuResidence": `Upload your residence document. <br /><span class="bold-green">1. FRONT SIDE</span><br /><span class="bold-green">2. BACK SIDE</span>`,
 
     // ✅ Driver’s license change: move both instructions into main green text
     "labels.doc.driversLicense": `Upload a valid driver's license. <br /><span class="bold-green">1. FRONT SIDE</span><br /><span class="bold-green">2. BACK SIDE</span>`,
@@ -232,6 +253,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "Don’t limit yourself - with us you can ride for all three services at once: Bolt, Wolt, and Foodora. More platforms = more orders = higher earnings. Just choose where you want to start!",
     "labels.documentType": "Document Type",
     "labels.documentIssuingCountry": "Issuing country",
+    "labels.residenceDocumentType": "Residence Document Type",
     "labels.permanentResidenceCountry": "Country",
 
     "hints.czPhone":
@@ -243,11 +265,15 @@ const dict = $state<Record<Locale, Record<string, string>>>({
       "Upload both the front and back side of your ID card.",
     "hints.doc.euPassport":
       "Upload both the front and back side of your ID card.",
+    "hints.doc.euResidence":
+      "Upload both the front and back side of your document.",
     "hints.communicationPassword": "Create a password without special characters",
 
     // ✅ Non-EU change: remove “upload ID card” mention
     "hints.doc.nonEu":
       "*These files are required: visa OR residence permit OR work permit.",
+    "hints.doc.nonEuResidence":
+      "Upload both the front and back side of your document.",
 
     "hints.pinkstatement":
       "<strong>WARNING</strong> - You can only have the “pink tax declaration” (Taxpayer’s Declaration for Personal Income Tax) applied with one employer. This means that if you have multiple employment contracts or combine jobs and part-time work, you can only claim this benefit with one company.",
@@ -319,6 +345,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.permanentResidence": "Permanent residence is required",
     "errors.placeOfBirth": "Place of birth required",
     "errors.documentType": "Select document type",
+    "errors.residenceDocumentType": "Select residence document type",
 
     "nav.prev": "Back",
     "nav.next": "Continue to step",
@@ -351,6 +378,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "select.placeholder.gender": "Select gender",
     "select.placeholder.bank": "Select a bank",
     "select.placeholder.documentType": "Select document type",
+    "select.placeholder.residenceDocumentType": "Select residence document type",
 
     "options.transport.car": "Car",
     "options.transport.bike": "Bicycle",
@@ -361,6 +389,16 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "options.gender.other": "Other",
     "options.documentType.id": "ID Card",
     "options.documentType.passport": "Passport",
+    "options.residenceDocumentType.temp": "Temporary Residence",
+    "options.residenceDocumentType.perma": "Permanent Residence",
+    "options.residenceDocumentType.shortVisa": "Short-term visa",
+    "options.residenceDocumentType.longVisa": "Long-term visa",
+    "options.residenceDocumentType.study": "Study purposes",
+    "options.residenceDocumentType.tempProtection": "Temporary protection",
+    "options.residenceDocumentType.intlProtection": "International protection",
+    "options.residenceDocumentType.code95": "Long-term Residence (code 95)",
+    "options.residenceDocumentType.code99": "Long-term Residence (code 99)",
+    "options.residenceDocumentType.code670": "Long-term Residence (code 670)",
 
     "upload.button": "Upload file",
     "upload.max": "Maximum file size is 2 MB.",

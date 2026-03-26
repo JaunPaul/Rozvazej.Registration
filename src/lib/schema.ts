@@ -106,6 +106,8 @@ export const formSchema = z.object({
   filesNationalId: fileArray(2),
   filesEuPassport: fileArray(2),
   filesNonEu: fileArray(2),
+  filesEuResidence: fileArray(1),
+  filesNonEuResidence: fileArray(1),
   filesDriversLicense: fileArray(1),
 
   // step3
@@ -148,6 +150,10 @@ export const formSchema = z.object({
   documentNumber: z.string().min(1, { error: t("errors.documentNumber") }),
   documentType: z.string().min(1, { error: t("errors.documentType") }),
   documentIssuingCountry: z.string().min(1, { error: t("errors.country") }),
+  residenceDocumentType: z.string().min(1, { error: t("errors.residenceDocumentType") }),
+  residenceDocumentNumber: z.string().min(1, { error: t("errors.documentNumber") }),
+  residenceDocumentExpiryDate: z.string().min(1, { error: t("errors.documentExpiryDate") }),
+  residenceDocumentIssuingCountry: z.string().min(1, { error: t("errors.country") }),
 });
 
 export const verifyResponseSchema = z.object({

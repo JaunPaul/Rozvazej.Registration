@@ -259,6 +259,8 @@ export class RegistrationState {
     filesNationalId: [] as File[],
     filesEuPassport: [] as File[],
     filesNonEu: [] as File[],
+    filesEuResidence: [] as File[],
+    filesNonEuResidence: [] as File[],
     filesDriversLicense: [] as File[],
     utm_source: "",
     utm_campaign: "",
@@ -284,6 +286,10 @@ export class RegistrationState {
     documentType: "",
     documentNumber: "",
     documentIssuingCountry: "",
+    residenceDocumentType: "",
+    residenceDocumentNumber: "",
+    residenceDocumentExpiryDate: "",
+    residenceDocumentIssuingCountry: "",
   });
 
   errors: CustomErrors = $state({});
@@ -861,6 +867,10 @@ export class RegistrationState {
     else if (bucket === "euPassport") this.values.filesEuPassport = newFiles;
     else if (bucket === "driversLicense")
       this.values.filesDriversLicense = newFiles;
+    else if (bucket === "euResidence")
+      this.values.filesEuResidence = newFiles;
+    else if (bucket === "nonEuResidence")
+      this.values.filesNonEuResidence = newFiles;
     else this.values.filesNonEu = newFiles;
   }
 
@@ -872,7 +882,11 @@ export class RegistrationState {
           ? this.values.filesEuPassport
           : bucket === "driversLicense"
             ? this.values.filesDriversLicense
-            : this.values.filesNonEu;
+            : bucket === "euResidence"
+              ? this.values.filesEuResidence
+              : bucket === "nonEuResidence"
+                ? this.values.filesNonEuResidence
+                : this.values.filesNonEu;
 
     const newFiles = targetArray.filter((f) => f !== file);
 
