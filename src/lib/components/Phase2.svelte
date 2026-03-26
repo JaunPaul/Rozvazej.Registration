@@ -1,14 +1,6 @@
 <script lang="ts">
   import { t } from "../i18n/i18n.svelte";
-  import Errors from "./Errors.svelte";
   import { RegistrationState } from "../state/RegistrationState.svelte";
-  import { fade } from "svelte/transition";
-  import { isEu } from "../i18n/euCountriesFilter";
-  import { getCountries } from "../i18n/countriesGetter";
-  import CzechFileUpload from "./CzechFileUpload.svelte";
-  import EuFileUpload from "./EuFileUpload.svelte";
-  import NonEuFileUpload from "./NonEuFileUpload.svelte";
-  import DriversLicenseUpload from "./DriversLicenseUpload.svelte";
   import { onMount } from "svelte";
   import BasicInformation from "./steps/phase2/BasicInformation.svelte";
   import IdentityDocument from "./steps/phase2/IdentityDocument.svelte";
@@ -19,18 +11,42 @@
 
   // Local state for this phase
   let currentSubStep = $state(1);
-  const totalSubSteps = 1;
+  let totalSubSteps = $derived(
+    registrationState.values.country === "CZ" ? 2 : 3,
+  );
+  let externalSteps: HTMLElement[] | [] = $state([]);
 
-  // SubStep 1: Documents (moved from original Step 2)
-  // SubStep 2: Additional Info (Delivery, Insurance, etc.)
+  onMount(() => {
+    externalSteps = Array.from(
+      document.querySelectorAll<HTMLElement>(".step-wrap"),
+    );
+    // Also toggle panel items if they exist
+    const panel = Array.from(
+      document.querySelectorAll<HTMLElement>(".panel-items"),
+    );
+    if (panel.length) {
+      panel.forEach((el) => {
+        el.classList.toggle("hide");
+      });
+    }
+  });
+
+  $effect(() => {
+    if (!externalSteps.length || !currentSubStep) return;
+    externalSteps.forEach((el, i) => {
+      el.classList.toggle("is-active", i === currentSubStep - 1);
+    });
+  });
 
   async function next() {
-    // Validate
-    // Phase 2 has only one step now
-    const validationScope = "phase2"; // Mapping to original scopes roughly
-    const valid = await registrationState.validateCurrentStep(
-      validationScope as any,
-    );
+    const validationScope =
+      currentSubStep === 1
+        ? "phase2Step1"
+        : currentSubStep === 2
+          ? "phase2Step2"
+          : "phase2Step3";
+    const valid = await registrationState.validateCurrentStep(validationScope);
+
     if (valid) {
       if (currentSubStep < totalSubSteps) {
         currentSubStep++;
@@ -45,17 +61,6 @@
       currentSubStep--;
     }
   }
-
-  onMount(() => {
-    const panel = Array.from(
-      document.querySelectorAll<HTMLElement>(".panel-items"),
-    );
-    if (panel.length) {
-      panel.forEach((el, i) => {
-        el.classList.toggle("hide");
-      });
-    }
-  });
 </script>
 
 <div class="form-step is-active">
@@ -87,7 +92,18 @@
     {/if}
 
     <div class="form-nav">
-      <div></div>
+      {#if currentSubStep > 1}
+        <button
+          class="button is-ghost w-button"
+          onclick={prev}
+          disabled={currentSubStep === 1}
+          type="button"
+        >
+          {t("nav.prev")}
+        </button>
+      {:else}
+        <div></div>
+      {/if}
 
       <button
         class="button w-button"

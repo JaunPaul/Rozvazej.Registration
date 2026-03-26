@@ -486,7 +486,14 @@ export class RegistrationState {
   // --- Validation & Navigation ---
 
   async validateCurrentStep(
-    stepId: "step1" | "step2" | "step3" | "step4" | "phase2"
+    stepId:
+      | "step1"
+      | "step2"
+      | "step3"
+      | "step4"
+      | "phase2Step1"
+      | "phase2Step2"
+      | "phase2Step3"
   ) {
     this.validating = true;
     const { ok, fieldErrors } = await validateStepAsync(
@@ -611,7 +618,12 @@ export class RegistrationState {
     const FALLBACK_SUBMIT_TIMEOUT_MS = 45_000;
 
     try {
-      const fieldsForSnapshot = [...steps.phase2, ...steps.alwaysInclude];
+      const fieldsForSnapshot = [
+        ...steps.phase2Step1,
+        ...steps.phase2Step2,
+        ...steps.phase2Step3,
+        ...steps.alwaysInclude,
+      ];
       const snapshot: any = this.mapStepsToSnapshot(
         this.values,
         fieldsForSnapshot as any

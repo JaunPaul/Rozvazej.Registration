@@ -3,35 +3,46 @@ import { isEu } from "../i18n/euCountriesFilter";
 // 1) Steps → field ids
 // 1) Steps → field ids
 export const steps: Record<
-  "step1" | "step2" | "step3" | "step4" | "phase2" | "alwaysInclude",
+  | "step1"
+  | "step2"
+  | "step3"
+  | "step4"
+  | "phase2Step1"
+  | "phase2Step2"
+  | "phase2Step3"
+  | "alwaysInclude",
   string[]
 > = {
   step1: ["firstName", "lastName", "birthLastName", "phone", "email"],
   step2: ["street", "houseNumber", "city", "zip", "deliveryCity"],
   step3: ["country", "communicationPassword", "birthDate"],
   step4: ["bankPrefix", "bankNumber", "bankCode", "insurance", "pinkStatement", "execution"],
-  phase2: [
+  phase2Step1: [
     "permanentResidenceCountry",
     "permanentResidenceStreet",
     "permanentResidenceStreetNumber",
     "permanentResidenceCity",
-    "filesNationalId",
-    "filesEuPassport",
-    "filesNonEu",
-    "filesEuResidence",
-    "filesNonEuResidence",
-    "filesDriversLicense",
     "transport",
     "gender",
     "placeOfBirth",
+    "filesDriversLicense",
+  ],
+  phase2Step2: [
     "documentExpiryDate",
     "documentType",
     "documentNumber",
     "documentIssuingCountry",
+    "filesNationalId",
+    "filesEuPassport",
+    "filesNonEu",
+  ],
+  phase2Step3: [
     "residenceDocumentType",
     "residenceDocumentNumber",
     "residenceDocumentExpiryDate",
     "residenceDocumentIssuingCountry",
+    "filesEuResidence",
+    "filesNonEuResidence",
   ],
   alwaysInclude: [
     "utm_source",
