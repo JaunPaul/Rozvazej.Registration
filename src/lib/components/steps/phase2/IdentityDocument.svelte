@@ -23,6 +23,29 @@
 </script>
 
 {#snippet documentFields(documentNumberLabel: string)}
+    <div class="input-group-wrap">
+        <div class="input-wrap">
+            <label for="documentType" class="field-label"
+                >{t("labels.documentType")}</label
+            >
+            <select
+                class="input-2"
+                id="documentType"
+                name="documentType"
+                bind:value={registrationState.values.documentType}
+            >
+                <option value="" disabled
+                    >{t("select.placeholder.documentType")}</option
+                >
+                <option value="občanský průkaz"
+                    >{t("options.documentType.id")}</option
+                >
+                <option value="pas">{t("options.documentType.passport")}</option
+                >
+            </select>
+            <Errors errors={registrationState.errors} path="documentType" />
+        </div>
+    </div>
     <div class="input-wrap">
         <label for="documentNumber" class="field-label"
             >{documentNumberLabel}</label
@@ -81,20 +104,19 @@
 
 <div in:fade class="box has-8-gap">
     {#if registrationState.values.country === "CZ"}
-        <CzechFileUpload {registrationState}></CzechFileUpload>
-
         {@render documentFields(t("labels.documentNumberEu"))}
+        <CzechFileUpload {registrationState}></CzechFileUpload>
     {/if}
 
     {#if registrationState.values.country.length > 0 && registrationState.values.country !== "CZ"}
         {#if registrationState.values.country && isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
-            <EuFileUpload {registrationState}></EuFileUpload>
             {@render documentFields(t("labels.documentNumberEu"))}
+            <EuFileUpload {registrationState}></EuFileUpload>
         {/if}
 
         {#if registrationState.values.country && !isEu(registrationState.values.country) && registrationState.values.country !== "CZ"}
-            <NonEuFileUpload {registrationState}></NonEuFileUpload>
             {@render documentFields(t("labels.documentNumberNonEu"))}
+            <NonEuFileUpload {registrationState}></NonEuFileUpload>
         {/if}
     {/if}
 </div>

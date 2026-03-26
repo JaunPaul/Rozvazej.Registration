@@ -146,6 +146,7 @@ export const formSchema = z.object({
   pinkStatement: z.boolean({ error: t("errors.pinkStatement") }),
   execution: z.boolean({ error: t("errors.execution") }),
   documentNumber: z.string().min(1, { error: t("errors.documentNumber") }),
+  documentType: z.string().min(1, { error: t("errors.documentType") }),
   documentIssuingCountry: z.string().min(1, { error: t("errors.country") }),
 });
 

@@ -46,6 +46,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.documentNumberEu": "Číslo občanského průkazu ",
     "labels.documentNumberNonEu":
       "Číslo víza NEBO povolení k pobytu NEBO pracovní povolení  ",
+    "labels.documentType": "Typ dokladu",
     "labels.documentIssuingCountry": "Země vydání dokladu",
     "labels.permanentResidenceCountry": "Země",
 
@@ -126,6 +127,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.permanentResidence": "Je vyžadován trvalý pobyt",
     "errors.placeOfBirth": "Místo narození povinné",
     "errors.documentIssuingCountry": "Tento vstup je povinný",
+    "errors.documentType": "Vyberte typ dokladu",
 
     "nav.prev": "Předchozí",
     "nav.next": "Pokračovat na krok",
@@ -153,6 +155,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "select.placeholder.insurance": "Vyberte zdravotní pojišťovnu",
     "select.placeholder.bank": "Vyberte banku",
     "select.placeholder.gender": "Vyberte pohlaví",
+    "select.placeholder.documentType": "Vyberte typ dokladu",
 
     "options.transport.car": "Auto",
     "options.transport.bike": "Kolo",
@@ -161,6 +164,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "options.gender.male": "Muž",
     "options.gender.female": "Žena",
     "options.gender.other": "Ostatní",
+    "options.documentType.id": "Občanský průkaz",
+    "options.documentType.passport": "Pas",
 
     "upload.button": "Nahrát soubor",
     "upload.max": "Maximální velikost souboru 2 MB.",
@@ -225,7 +230,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
 
     "labels.deliveryCompany":
       "Don’t limit yourself - with us you can ride for all three services at once: Bolt, Wolt, and Foodora. More platforms = more orders = higher earnings. Just choose where you want to start!",
-
+    "labels.documentType": "Document Type",
     "labels.documentIssuingCountry": "Issuing country",
     "labels.permanentResidenceCountry": "Country",
 
@@ -313,6 +318,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "errors.birthDateTooYoung": "You must be 15 or older",
     "errors.permanentResidence": "Permanent residence is required",
     "errors.placeOfBirth": "Place of birth required",
+    "errors.documentType": "Select document type",
 
     "nav.prev": "Back",
     "nav.next": "Continue to step",
@@ -344,6 +350,7 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "select.placeholder.insurance": "Select health insurer",
     "select.placeholder.gender": "Select gender",
     "select.placeholder.bank": "Select a bank",
+    "select.placeholder.documentType": "Select document type",
 
     "options.transport.car": "Car",
     "options.transport.bike": "Bicycle",
@@ -352,6 +359,8 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "options.gender.male": "Male",
     "options.gender.female": "Female",
     "options.gender.other": "Other",
+    "options.documentType.id": "ID Card",
+    "options.documentType.passport": "Passport",
 
     "upload.button": "Upload file",
     "upload.max": "Maximum file size is 2 MB.",

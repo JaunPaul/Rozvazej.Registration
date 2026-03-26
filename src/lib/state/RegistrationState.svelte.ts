@@ -281,6 +281,7 @@ export class RegistrationState {
     permanentResidenceStreetNumber: "",
     permanentResidenceCity: "",
     courierId: "",
+    documentType: "",
     documentNumber: "",
     documentIssuingCountry: "",
   });

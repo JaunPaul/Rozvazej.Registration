@@ -23,6 +23,7 @@ export const steps: Record<
     "gender",
     "placeOfBirth",
     "documentExpiryDate",
+    "documentType",
     "documentNumber",
     "documentIssuingCountry",
   ],
@@ -134,6 +135,10 @@ export const fields: Record<
   permanentResidenceCountry: {
     visibleWhen: (d) => d.country !== "CZ",
     requiredWhen: (d) => d.country !== "CZ",
+  },
+  documentType: {
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
   },
   documentNumber: {
     visibleWhen: (d) => true,
