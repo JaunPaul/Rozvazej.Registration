@@ -323,7 +323,7 @@ export class RegistrationState {
   toNextStepIndex = $state(2);
 
   stepNavText = $derived(`${t("nav.next")} ${this.toNextStepIndex}/4`);
-  stepNavTextPaseTwo = $derived(`${t("nav.next")} ${this.toNextStepIndex}/2`);
+  stepNavTextPaseTwo = $derived(`${t("nav.next")} ${this.toNextStepIndex}/3`);
   askCountryAgain = $state(false);
 
   constructor() {

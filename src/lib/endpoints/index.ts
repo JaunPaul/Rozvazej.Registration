@@ -1,6 +1,10 @@
 export const PHASE1_ENDPOINT =
-  "https://hook.eu1.make.com/nw3j7e6aki3oxj7f8ai831epwoyglogn";
+  "https://ondrejsteiger.app.n8n.cloud/webhook-test/4401edbf-60a7-4cc4-a4a6-c481af143785";
 export const PHASE2_ENDPOINT =
+  "https://ondrejsteiger.app.n8n.cloud/webhook-test/5a4c47f2-de30-493e-9c61-a7b86d7171df";
+export const __PHASE1_ENDPOINT =
+  "https://hook.eu1.make.com/nw3j7e6aki3oxj7f8ai831epwoyglogn";
+export const __PHASE2_ENDPOINT =
   "https://hook.eu1.make.com/yixxpesdj9yc1hwb8rg3aspew3gsa726";
 export const VERIFY_ENDPOINT =
   "https://hook.eu1.make.com/l2h1aqrtf5t32bqyaw8x71m1u95rd3ah";
