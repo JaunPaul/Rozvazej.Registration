@@ -36,14 +36,15 @@ export const steps: Record<
     "filesEuPassport",
     "filesNonEu",
   ],
-  phase2Step3: [
-    "residenceDocumentType",
-    "residenceDocumentNumber",
-    "residenceDocumentExpiryDate",
-    "residenceDocumentIssuingCountry",
-    "filesEuResidence",
-    "filesNonEuResidence",
-  ],
+   phase2Step3: [
+     "residenceDocumentType",
+     "residenceDocumentNumber",
+     "residenceDocumentExpiryDate",
+     "residenceDocumentIssuingCountry",
+     "visaCode",
+     "filesEuResidence",
+     "filesNonEuResidence",
+   ],
   alwaysInclude: [
     "utm_source",
     "utm_campaign",
@@ -173,22 +174,26 @@ export const fields: Record<
     visibleWhen: (d) => true,
     requiredWhen: (d) => true,
   },
-  residenceDocumentType: {
-    visibleWhen: (d) => d.country && d.country !== "CZ",
-    requiredWhen: (d) => d.country && d.country !== "CZ",
-  },
-  residenceDocumentNumber: {
-    visibleWhen: (d) => true,
-    requiredWhen: (d) => true,
-  },
-  residenceDocumentExpiryDate: {
-    visibleWhen: (d) => true,
-    requiredWhen: (d) => true,
-  },
-  residenceDocumentIssuingCountry: {
-    visibleWhen: (d) => true,
-    requiredWhen: (d) => true,
-  },
+   residenceDocumentType: {
+     visibleWhen: (d) => d.country && d.country !== "CZ",
+     requiredWhen: (d) => d.country && d.country !== "CZ",
+   },
+   residenceDocumentNumber: {
+     visibleWhen: (d) => true,
+     requiredWhen: (d) => true,
+   },
+   residenceDocumentExpiryDate: {
+     visibleWhen: (d) => true,
+     requiredWhen: (d) => true,
+   },
+   residenceDocumentIssuingCountry: {
+     visibleWhen: (d) => true,
+     requiredWhen: (d) => true,
+   },
+   visaCode: {
+     visibleWhen: (d) => d.residenceDocumentType === "Krátkodobé vízum" || d.residenceDocumentType === "Dlouhodobé vízum",
+     requiredWhen: (d) => d.residenceDocumentType === "Krátkodobé vízum" || d.residenceDocumentType === "Dlouhodobé vízum",
+   },
   // Archived / Unused
   applyAsCompany: { visibleWhen: (d) => false, requiredWhen: (d) => false },
   companyId: { visibleWhen: (d) => false, requiredWhen: (d) => false },

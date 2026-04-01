@@ -286,10 +286,11 @@ export class RegistrationState {
     documentType: "",
     documentNumber: "",
     documentIssuingCountry: "",
-    residenceDocumentType: "",
-    residenceDocumentNumber: "",
-    residenceDocumentExpiryDate: "",
-    residenceDocumentIssuingCountry: "",
+   residenceDocumentType: "",
+   residenceDocumentNumber: "",
+   residenceDocumentExpiryDate: "",
+   residenceDocumentIssuingCountry: "",
+   visaCode: "",
   });
 
   errors: CustomErrors = $state({});

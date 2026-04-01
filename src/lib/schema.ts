@@ -150,10 +150,11 @@ export const formSchema = z.object({
   documentNumber: z.string().min(1, { error: t("errors.documentNumber") }),
   documentType: z.string().min(1, { error: t("errors.documentType") }),
   documentIssuingCountry: z.string().min(1, { error: t("errors.country") }),
-  residenceDocumentType: z.string().min(1, { error: t("errors.residenceDocumentType") }),
-  residenceDocumentNumber: z.string().min(1, { error: t("errors.documentNumber") }),
-  residenceDocumentExpiryDate: z.string().min(1, { error: t("errors.documentExpiryDate") }),
-  residenceDocumentIssuingCountry: z.string().min(1, { error: t("errors.country") }),
+   residenceDocumentType: z.string().min(1, { error: t("errors.residenceDocumentType") }),
+   residenceDocumentNumber: z.string().min(1, { error: t("errors.documentNumber") }),
+   residenceDocumentExpiryDate: z.string().min(1, { error: t("errors.documentExpiryDate") }),
+   residenceDocumentIssuingCountry: z.string().min(1, { error: t("errors.country") }),
+   visaCode: z.string().min(1, { error: t("errors.visaCode") }),
 });
 
 export const verifyResponseSchema = z.object({
