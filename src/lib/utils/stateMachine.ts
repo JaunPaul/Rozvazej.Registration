@@ -15,8 +15,15 @@ export const steps: Record<
 > = {
   step1: ["firstName", "lastName", "birthLastName", "phone", "email"],
   step2: ["street", "houseNumber", "city", "zip", "deliveryCity"],
-  step3: ["country", "communicationPassword", "birthDate"],
-  step4: ["bankPrefix", "bankNumber", "bankCode", "insurance", "pinkStatement", "execution"],
+  step3: ["country", "communicationPassword", "birthDate", "nationalId"],
+  step4: [
+    "bankPrefix",
+    "bankNumber",
+    "bankCode",
+    "insurance",
+    "pinkStatement",
+    "execution",
+  ],
   phase2Step1: [
     "permanentResidenceCountry",
     "permanentResidenceStreet",
@@ -26,25 +33,27 @@ export const steps: Record<
     "gender",
     "placeOfBirth",
     "filesDriversLicense",
+    "country",
   ],
   phase2Step2: [
     "documentExpiryDate",
     "documentType",
     "documentNumber",
+    "nationalId",
     "documentIssuingCountry",
     "filesNationalId",
     "filesEuPassport",
     "filesNonEu",
   ],
-   phase2Step3: [
-     "residenceDocumentType",
-     "residenceDocumentNumber",
-     "residenceDocumentExpiryDate",
-     "residenceDocumentIssuingCountry",
-     "visaCode",
-     "filesEuResidence",
-     "filesNonEuResidence",
-   ],
+  phase2Step3: [
+    "residenceDocumentType",
+    "residenceDocumentNumber",
+    "residenceDocumentExpiryDate",
+    "residenceDocumentIssuingCountry",
+    "visaCode",
+    "filesEuResidence",
+    "filesNonEuResidence",
+  ],
   alwaysInclude: [
     "utm_source",
     "utm_campaign",
@@ -89,11 +98,14 @@ export const fields: Record<
 
   // Phase 1 - Step 3 (Citizenship)
   country: { visibleWhen: (d) => true, requiredWhen: (d) => true },
-  /* nationalId: {
+  nationalId: {
     visibleWhen: (d) => d.country === "CZ",
     requiredWhen: (d) => d.country === "CZ",
-  }, */
-  communicationPassword: { visibleWhen: (d) => true, requiredWhen: (d) => true },
+  },
+  communicationPassword: {
+    visibleWhen: (d) => true,
+    requiredWhen: (d) => true,
+  },
   /* passportOrId: {
     visibleWhen: (d) => d.country && d.country !== "CZ",
     requiredWhen: (d) => d.country && d.country !== "CZ",
@@ -122,7 +134,8 @@ export const fields: Record<
   },
   filesNonEu: {
     visibleWhen: (d) => !!(d.country && !isEu(d.country) && d.country !== "CZ"),
-    requiredWhen: (d) => !!(d.country && !isEu(d.country) && d.country !== "CZ"),
+    requiredWhen: (d) =>
+      !!(d.country && !isEu(d.country) && d.country !== "CZ"),
   },
   filesEuResidence: {
     visibleWhen: (d) => !!(d.country && isEu(d.country) && d.country !== "CZ"),
@@ -130,7 +143,8 @@ export const fields: Record<
   },
   filesNonEuResidence: {
     visibleWhen: (d) => !!(d.country && !isEu(d.country) && d.country !== "CZ"),
-    requiredWhen: (d) => !!(d.country && !isEu(d.country) && d.country !== "CZ"),
+    requiredWhen: (d) =>
+      !!(d.country && !isEu(d.country) && d.country !== "CZ"),
   },
   filesDriversLicense: {
     visibleWhen: (d) => d.transport === "auto",
@@ -167,33 +181,37 @@ export const fields: Record<
     requiredWhen: (d) => true,
   },
   documentNumber: {
-    visibleWhen: (d) => true,
-    requiredWhen: (d) => true,
+    visibleWhen: (d) => d.country !== "CZ",
+    requiredWhen: (d) => d.country !== "CZ",
   },
   documentIssuingCountry: {
     visibleWhen: (d) => true,
     requiredWhen: (d) => true,
   },
-   residenceDocumentType: {
-     visibleWhen: (d) => d.country && d.country !== "CZ",
-     requiredWhen: (d) => d.country && d.country !== "CZ",
-   },
-   residenceDocumentNumber: {
-     visibleWhen: (d) => true,
-     requiredWhen: (d) => true,
-   },
-   residenceDocumentExpiryDate: {
-     visibleWhen: (d) => true,
-     requiredWhen: (d) => true,
-   },
-   residenceDocumentIssuingCountry: {
-     visibleWhen: (d) => true,
-     requiredWhen: (d) => true,
-   },
-   visaCode: {
-     visibleWhen: (d) => d.residenceDocumentType === "Krátkodobé vízum" || d.residenceDocumentType === "Dlouhodobé vízum",
-     requiredWhen: (d) => d.residenceDocumentType === "Krátkodobé vízum" || d.residenceDocumentType === "Dlouhodobé vízum",
-   },
+  residenceDocumentType: {
+    visibleWhen: (d) => d.country && d.country !== "CZ",
+    requiredWhen: (d) => d.country && d.country !== "CZ",
+  },
+  residenceDocumentNumber: {
+    visibleWhen: (d) => d.country && d.country !== "CZ",
+    requiredWhen: (d) => d.country && d.country !== "CZ",
+  },
+  residenceDocumentExpiryDate: {
+    visibleWhen: (d) => d.country && d.country !== "CZ",
+    requiredWhen: (d) => d.country && d.country !== "CZ",
+  },
+  residenceDocumentIssuingCountry: {
+    visibleWhen: (d) => d.country && d.country !== "CZ",
+    requiredWhen: (d) => d.country && d.country !== "CZ",
+  },
+  visaCode: {
+    visibleWhen: (d) =>
+      d.residenceDocumentType === "Krátkodobé vízum" ||
+      d.residenceDocumentType === "Dlouhodobé vízum",
+    requiredWhen: (d) =>
+      d.residenceDocumentType === "Krátkodobé vízum" ||
+      d.residenceDocumentType === "Dlouhodobé vízum",
+  },
   // Archived / Unused
   applyAsCompany: { visibleWhen: (d) => false, requiredWhen: (d) => false },
   companyId: { visibleWhen: (d) => false, requiredWhen: (d) => false },

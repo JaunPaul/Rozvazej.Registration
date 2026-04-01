@@ -50,19 +50,38 @@
       <Errors errors={registrationState.errors} path="documentType" />
     </div>
   </div>
-  <div class="input-wrap">
-    <label for="documentNumber" class="field-label">{documentNumberLabel}</label
-    >
-    <input
-      class="input-2 w-input"
-      type="text"
-      id="documentNumber"
-      name="documentNumber"
-      placeholder={t("ph.documentNumber")}
-      bind:value={registrationState.values.documentNumber}
-    />
-    <Errors errors={registrationState.errors} path="documentNumber" />
-  </div>
+  {#if registrationState.values.country === "CZ"}
+    <div class="input-wrap">
+      <label for="nationalId" class="field-label"
+        >{t("labels.nationalId")}</label
+      >
+      <input
+        class="input-2 w-input"
+        type="text"
+        id="nationalId"
+        name="nationalId"
+        placeholder={t("ph.nationalId")}
+        bind:value={registrationState.values.nationalId}
+      />
+      <Errors errors={registrationState.errors} path="nationalId" />
+    </div>
+  {:else}
+    <div class="input-wrap">
+      <label for="documentNumber" class="field-label"
+        >{documentNumberLabel}</label
+      >
+      <input
+        class="input-2 w-input"
+        type="text"
+        id="documentNumber"
+        name="documentNumber"
+        placeholder={t("ph.documentNumber")}
+        bind:value={registrationState.values.documentNumber}
+      />
+      <Errors errors={registrationState.errors} path="documentNumber" />
+    </div>
+  {/if}
+
   <div class="input-wrap">
     <label for="documentExpiryDate" class="field-label"
       >{t("labels.documentExpiryDate")}</label
