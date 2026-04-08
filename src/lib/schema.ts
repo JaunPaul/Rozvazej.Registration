@@ -15,8 +15,10 @@ function isValidCzechBirthNumber(raw: string): boolean {
   //  +50 → female (all years)
   //  +20 → extension since 2004 (both genders)
   //  +70 → 50+20 for females since 2004
-  if (mm > 70) mm -= 70; // female + extension
-  else if (mm > 50) mm -= 50; // female
+  if (mm > 70)
+    mm -= 70; // female + extension
+  else if (mm > 50)
+    mm -= 50; // female
   else if (mm > 20) mm -= 20; // extension
 
   if (mm < 1 || mm > 12) return false;
@@ -74,6 +76,7 @@ export const formSchema = z.object({
     .string({ error: t("errors.firstName") })
     .min(1, { error: t("errors.firstName") }),
   lastName: z.string().min(1, { error: t("errors.lastName") }),
+  birthLastName: z.string().optional(),
   phone: z.string().min(1, { error: t("errors.phone") }),
   email: z.email({ error: t("errors.email") }),
   applyAsCompany: z.boolean({ error: t("errors.applyAsCompany") }),
@@ -86,7 +89,13 @@ export const formSchema = z.object({
     .trim()
     .refine(isValidCzechBirthNumber, { message: t("errors.nationalId") })
     .transform((s) => normalizeCzechBirthNumber(s)!),
-  passportOrId: z.string().min(1, { error: t("errors.passportOrId") }),
+  // passportOrId: z.string().min(1, { error: t("errors.passportOrId") }),
+  communicationPassword: z
+    .string()
+    .min(1, { error: t("errors.communicationPassword") })
+    .regex(/^[a-zA-Z0-9]+$/, {
+      message: t("errors.communicationPasswordSpecialChars"),
+    }),
   street: z.string().min(1, { error: t("errors.street") }),
   houseNumber: z.string().min(1, { error: t("errors.houseNumber") }),
   city: z.string().min(1, { error: t("errors.city") }),
@@ -101,6 +110,8 @@ export const formSchema = z.object({
   filesNationalId: fileArray(2),
   filesEuPassport: fileArray(2),
   filesNonEu: fileArray(2),
+  filesEuResidence: fileArray(1),
+  filesNonEuResidence: fileArray(1),
   filesDriversLicense: fileArray(1),
 
   // step3
@@ -119,13 +130,13 @@ export const formSchema = z.object({
         const cutoff = new Date(
           today.getFullYear() - 15,
           today.getMonth(),
-          today.getDate()
+          today.getDate(),
         );
         return date <= cutoff;
       },
       {
         message: t("errors.birthDateTooYoung"),
-      }
+      },
     ),
   documentExpiryDate: z
     .string()
@@ -138,9 +149,24 @@ export const formSchema = z.object({
   permanentResidenceCountry: z.string().min(1, { error: t("errors.country") }),
   placeOfBirth: z.string().min(1, { error: t("errors.placeOfBirth") }),
   insurance: z.string().min(1, { error: t("errors.insurance") }),
-  pinkStatement: z.coerce.boolean({ error: t("errors.pinkStatement") }),
+  pinkStatement: z.boolean({ error: t("errors.pinkStatement") }),
+  execution: z.boolean({ error: t("errors.execution") }),
   documentNumber: z.string().min(1, { error: t("errors.documentNumber") }),
+  documentType: z.string().min(1, { error: t("errors.documentType") }),
   documentIssuingCountry: z.string().min(1, { error: t("errors.country") }),
+  residenceDocumentType: z
+    .string()
+    .min(1, { error: t("errors.residenceDocumentType") }),
+  residenceDocumentNumber: z
+    .string()
+    .min(1, { error: t("errors.documentNumber") }),
+  residenceDocumentExpiryDate: z
+    .string()
+    .min(1, { error: t("errors.documentExpiryDate") }),
+  residenceDocumentIssuingCountry: z
+    .string()
+    .min(1, { error: t("errors.country") }),
+  visaCode: z.string().min(1, { error: t("errors.visaCode") }),
 });
 
 export const verifyResponseSchema = z.object({

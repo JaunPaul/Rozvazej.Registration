@@ -46,6 +46,24 @@
     <Errors errors={registrationState.errors} path="country" />
   </div>
 
+  <div class="input-wrap">
+    <label for="communicationPassword" class="field-label"
+      >{t("labels.communicationPassword")}</label
+    >
+    <input
+      class="input-2 w-input"
+      type="text"
+      id="communicationPassword"
+      name="communicationPassword"
+      placeholder={t("ph.communicationPassword")}
+      bind:value={registrationState.values.communicationPassword}
+    />
+    <div class="text-explain">
+      {t("hints.communicationPassword")}
+    </div>
+    <Errors errors={registrationState.errors} path="communicationPassword" />
+  </div>
+
   {#if registrationState.values.country === "CZ"}
     <div class="input-wrap">
       <label for="nationalId" class="field-label"
@@ -61,7 +79,10 @@
       />
       <Errors errors={registrationState.errors} path="nationalId" />
     </div>
-  {:else if registrationState.values.country}
+  {/if}
+
+  {#if registrationState.values.country}
+    <!--
     <div class="input-wrap">
       <label for="passportOrId" class="field-label"
         >{t("labels.passportOrId")}</label
@@ -76,6 +97,7 @@
       />
       <Errors errors={registrationState.errors} path="passportOrId" />
     </div>
+    -->
 
     <div class="input-wrap">
       <label for="birthDate" class="field-label">{t("labels.birthDate")}</label>

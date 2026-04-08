@@ -157,7 +157,9 @@ function appendSnapshotFieldsToFormData(
       k === "filesNationalId" ||
       k === "filesEuPassport" ||
       k === "filesNonEu" ||
-      k === "filesDriversLicense"
+      k === "filesDriversLicense" ||
+      k === "filesEuResidence" ||
+      k === "filesNonEuResidence"
     )
       continue;
 
@@ -182,17 +184,28 @@ function appendFilesToFormData(
     filesEuPassport?: File[];
     filesNonEu?: File[];
     filesDriversLicense?: File[];
+    filesEuResidence?: File[];
+    filesNonEuResidence?: File[];
   }
 ) {
+  // Prefix file names with bucket identifier for n8n binary mapping
   snapshot.filesNationalId?.forEach((f) =>
-    fd.append("filesNationalId", f, f.name)
+    fd.append("filesNationalId", f, `filesNationalId__${f.name}`)
   );
   snapshot.filesEuPassport?.forEach((f) =>
-    fd.append("filesEuPassport", f, f.name)
+    fd.append("filesEuPassport", f, `filesEuPassport__${f.name}`)
   );
-  snapshot.filesNonEu?.forEach((f) => fd.append("filesNonEu", f, f.name));
+  snapshot.filesNonEu?.forEach((f) =>
+    fd.append("filesNonEu", f, `filesNonEu__${f.name}`)
+  );
   snapshot.filesDriversLicense?.forEach((f) =>
-    fd.append("filesDriversLicense", f, f.name)
+    fd.append("filesDriversLicense", f, `filesDriversLicense__${f.name}`)
+  );
+  snapshot.filesEuResidence?.forEach((f) =>
+    fd.append("filesEuResidence", f, `filesEuResidence__${f.name}`)
+  );
+  snapshot.filesNonEuResidence?.forEach((f) =>
+    fd.append("filesNonEuResidence", f, `filesNonEuResidence__${f.name}`)
   );
 }
 
@@ -201,6 +214,8 @@ function extractFilesWithBuckets(snapshot: {
   filesEuPassport?: File[];
   filesNonEu?: File[];
   filesDriversLicense?: File[];
+  filesEuResidence?: File[];
+  filesNonEuResidence?: File[];
 }) {
   const out: { file: File; bucket: string }[] = [];
 
@@ -216,6 +231,12 @@ function extractFilesWithBuckets(snapshot: {
   snapshot.filesDriversLicense?.forEach((file) =>
     out.push({ file, bucket: "filesDriversLicense" })
   );
+  snapshot.filesEuResidence?.forEach((file) =>
+    out.push({ file, bucket: "filesEuResidence" })
+  );
+  snapshot.filesNonEuResidence?.forEach((file) =>
+    out.push({ file, bucket: "filesNonEuResidence" })
+  );
 
   return out;
 }
@@ -225,12 +246,14 @@ export class RegistrationState {
   values = $state({
     firstName: "",
     lastName: "",
+    birthLastName: "",
     email: "",
     phone: "",
     companyId: "",
     companyName: "",
     nationalId: "",
     passportOrId: "",
+    communicationPassword: "",
     deliveryCompany: [] as string[],
     deliveryCompanyWolt: false,
     deliveryCompanyFoodora: false,
@@ -250,12 +273,15 @@ export class RegistrationState {
     transport: "",
     insurance: "",
     pinkStatement: undefined as boolean | undefined,
+    execution: undefined as boolean | undefined,
     gender: "",
     birthDate: "",
     documentExpiryDate: "",
     filesNationalId: [] as File[],
     filesEuPassport: [] as File[],
     filesNonEu: [] as File[],
+    filesEuResidence: [] as File[],
+    filesNonEuResidence: [] as File[],
     filesDriversLicense: [] as File[],
     utm_source: "",
     utm_campaign: "",
@@ -278,8 +304,14 @@ export class RegistrationState {
     permanentResidenceStreetNumber: "",
     permanentResidenceCity: "",
     courierId: "",
+    documentType: "",
     documentNumber: "",
     documentIssuingCountry: "",
+   residenceDocumentType: "",
+   residenceDocumentNumber: "",
+   residenceDocumentExpiryDate: "",
+   residenceDocumentIssuingCountry: "",
+   visaCode: "",
   });
 
   errors: CustomErrors = $state({});
@@ -313,7 +345,7 @@ export class RegistrationState {
   toNextStepIndex = $state(2);
 
   stepNavText = $derived(`${t("nav.next")} ${this.toNextStepIndex}/4`);
-  stepNavTextPaseTwo = $derived(`${t("nav.next")} ${this.toNextStepIndex}/2`);
+  stepNavTextPaseTwo = $derived(`${t("nav.next")} ${this.toNextStepIndex}/3`);
   askCountryAgain = $state(false);
 
   constructor() {
@@ -392,6 +424,8 @@ export class RegistrationState {
         this.values.filesEuPassport = [];
         this.values.filesNonEu = [];
         this.values.filesDriversLicense = [];
+        this.values.filesEuResidence = [];
+        this.values.filesNonEuResidence = [];
       } catch (e) {
         console.error("Failed to parse saved form data", e);
       }
@@ -406,6 +440,8 @@ export class RegistrationState {
         filesEuPassport,
         filesNonEu,
         filesDriversLicense,
+        filesEuResidence,
+        filesNonEuResidence,
         ...rest
       } = this.values;
       sessionStorage.setItem("multi-form-session", JSON.stringify(rest));
@@ -476,7 +512,14 @@ export class RegistrationState {
   // --- Validation & Navigation ---
 
   async validateCurrentStep(
-    stepId: "step1" | "step2" | "step3" | "step4" | "phase2"
+    stepId:
+      | "step1"
+      | "step2"
+      | "step3"
+      | "step4"
+      | "phase2Step1"
+      | "phase2Step2"
+      | "phase2Step3"
   ) {
     this.validating = true;
     const { ok, fieldErrors } = await validateStepAsync(
@@ -601,7 +644,12 @@ export class RegistrationState {
     const FALLBACK_SUBMIT_TIMEOUT_MS = 45_000;
 
     try {
-      const fieldsForSnapshot = [...steps.phase2, ...steps.alwaysInclude];
+      const fieldsForSnapshot = [
+        ...steps.phase2Step1,
+        ...steps.phase2Step2,
+        ...steps.phase2Step3,
+        ...steps.alwaysInclude,
+      ];
       const snapshot: any = this.mapStepsToSnapshot(
         this.values,
         fieldsForSnapshot as any
@@ -610,11 +658,10 @@ export class RegistrationState {
       // Always ensure courierId present
       snapshot.courierId = this.values.courierId;
 
-      // ---------- Attempt 1: normal multipart submission ----------
-      const fdMultipart = new FormData();
-      appendSnapshotFieldsToFormData(fdMultipart, snapshot);
-      appendFilesToFormData(fdMultipart, snapshot);
-      fdMultipart.append("courierId", this.values.courierId);
+       // ---------- Attempt 1: normal multipart submission ----------
+       const fdMultipart = new FormData();
+       appendSnapshotFieldsToFormData(fdMultipart, snapshot);
+       appendFilesToFormData(fdMultipart, snapshot);
 
       let firstAttemptRes: Response | null = null;
       let firstAttemptText = "";
@@ -687,14 +734,11 @@ export class RegistrationState {
         );
       }
 
-      const fdFallback = new FormData();
-      appendSnapshotFieldsToFormData(fdFallback, snapshot);
+       const fdFallback = new FormData();
+       appendSnapshotFieldsToFormData(fdFallback, snapshot);
 
-      // include courierId + urls
-      fdFallback.append("courierId", this.values.courierId);
-
-      // Store the urls as JSON (FormData can't send arrays reliably otherwise)
-      fdFallback.append("cloudinaryUrls", JSON.stringify(urls));
+       // Store the urls as JSON (FormData can't send arrays reliably otherwise)
+       fdFallback.append("cloudinaryUrls", JSON.stringify(urls));
 
       // Optional: send structured metadata so backend can map urls to buckets/names if you need it
       if (filesWithBucket.length) {
@@ -857,6 +901,10 @@ export class RegistrationState {
     else if (bucket === "euPassport") this.values.filesEuPassport = newFiles;
     else if (bucket === "driversLicense")
       this.values.filesDriversLicense = newFiles;
+    else if (bucket === "euResidence")
+      this.values.filesEuResidence = newFiles;
+    else if (bucket === "nonEuResidence")
+      this.values.filesNonEuResidence = newFiles;
     else this.values.filesNonEu = newFiles;
   }
 
@@ -868,7 +916,11 @@ export class RegistrationState {
           ? this.values.filesEuPassport
           : bucket === "driversLicense"
             ? this.values.filesDriversLicense
-            : this.values.filesNonEu;
+            : bucket === "euResidence"
+              ? this.values.filesEuResidence
+              : bucket === "nonEuResidence"
+                ? this.values.filesNonEuResidence
+                : this.values.filesNonEu;
 
     const newFiles = targetArray.filter((f) => f !== file);
 
