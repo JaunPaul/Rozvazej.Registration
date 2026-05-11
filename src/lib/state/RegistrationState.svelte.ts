@@ -12,6 +12,7 @@ import {
 import { validateStepAsync } from "../utils/validation";
 import { SubmissionStatus } from "../enums/form";
 import type { Company, FormStates, CustomErrors, Bucket } from "../types";
+import { sendFoxentryFailedPaymentNotification } from "../utils/notifications";
 import {
   PHASE1_ENDPOINT,
   PHASE2_ENDPOINT,
@@ -35,6 +36,29 @@ function isNetworkishFetchError(err: any) {
     msg.includes("aborted") ||
     msg.includes("abort") ||
     msg.includes("timeout")
+  );
+}
+
+function getErrorStatus(err: any): number | undefined {
+  const direct = Number(err?.status);
+  if (!Number.isNaN(direct) && direct > 0) return direct;
+
+  const nested = Number(err?.response?.status);
+  if (!Number.isNaN(nested) && nested > 0) return nested;
+
+  return undefined;
+}
+
+function isFoxentryInternalFailure(err: any) {
+  const status = getErrorStatus(err);
+  if (status && status >= 500) return true;
+
+  const msg = String(err?.message ?? err ?? "").toLowerCase();
+  return (
+    msg.includes("foxentry") ||
+    msg.includes("failed to process your request") ||
+    msg.includes("internal") ||
+    msg.includes("status 500")
   );
 }
 
@@ -242,6 +266,8 @@ function extractFilesWithBuckets(snapshot: {
 }
 
 export class RegistrationState {
+  private foxentryFailureReported = false;
+
   // State
   values = $state({
     firstName: "",
@@ -352,6 +378,24 @@ export class RegistrationState {
     this.init();
   }
 
+  async disableFoxentryValidation(reason: string, err?: unknown) {
+    if (this.values.foxentryPaymentStatus === false) return;
+
+    this.values.foxentryPaymentStatus = false;
+    console.warn("Foxentry disabled, switching to local validation", {
+      reason,
+      error: String((err as any)?.message ?? err ?? "unknown"),
+      status: getErrorStatus(err),
+    });
+
+    if (!this.foxentryFailureReported) {
+      this.foxentryFailureReported = true;
+      await sendFoxentryFailedPaymentNotification(
+        `${window.location.href} | reason=${reason}`
+      );
+    }
+  }
+
   async init() {
     if (typeof window !== "undefined") {
       this.loadFromSession();
@@ -378,13 +422,16 @@ export class RegistrationState {
       // Foxentry Payment Check
       try {
         const foxentryPaymentStatus: any = await validateName("John", "name");
-        if (foxentryPaymentStatus?.status === 402) {
-          this.values.foxentryPaymentStatus = false;
-          // Assuming sendFoxentryFailedPaymentNotification is imported or handled
-          console.warn("Foxentry payment failed");
+        const status = Number(foxentryPaymentStatus?.status);
+        if (status === 402 || status >= 500) {
+          await this.disableFoxentryValidation(
+            `startup-check-status-${status}`,
+            foxentryPaymentStatus
+          );
         }
       } catch (e) {
         console.error("Foxentry check failed", e);
+        await this.disableFoxentryValidation("startup-check-throw", e);
       }
 
       // Drop-off tracking
@@ -522,14 +569,25 @@ export class RegistrationState {
       | "phase2Step3"
   ) {
     this.validating = true;
-    const { ok, fieldErrors } = await validateStepAsync(
-      stepId,
-      this.values,
-      this.values.foxentryPaymentStatus
-    );
-    this.errors = fieldErrors;
-    this.validating = false;
-    return ok;
+    try {
+      const { ok, fieldErrors } = await validateStepAsync(
+        stepId,
+        this.values,
+        this.values.foxentryPaymentStatus
+      );
+      this.errors = fieldErrors;
+      return ok;
+    } catch (err) {
+      if (this.values.foxentryPaymentStatus && isFoxentryInternalFailure(err)) {
+        await this.disableFoxentryValidation("step-validation", err);
+        const fallback = await validateStepAsync(stepId, this.values, false);
+        this.errors = fallback.fieldErrors;
+        return fallback.ok;
+      }
+      throw err;
+    } finally {
+      this.validating = false;
+    }
   }
 
   async nextStep(targetStep: string) {
@@ -935,17 +993,20 @@ export class RegistrationState {
 
   async onBlurEmail() {
     if (this.values.foxentryPaymentStatus === false) return;
-    const r = await validateEmail(this.values.email, {
-      acceptDisposableEmails: false,
-    });
+    try {
+      const r = await validateEmail(this.values.email, {
+        acceptDisposableEmails: false,
+      });
 
-    if (!r.isValid) {
-      this.errors.email = [t("errors.email")];
-    } else {
-      delete this.errors.email;
+      if (!r.isValid) {
+        this.errors.email = [t("errors.email")];
+      } else {
+        delete this.errors.email;
+      }
+      if (r.normalized) this.values.email = r.normalized;
+    } catch (err) {
+      await this.disableFoxentryValidation("email-validation", err);
     }
-    // Hint logic could go here if we had a UI for it
-    if (r.normalized) this.values.email = r.normalized;
   }
 
   async onBlurPhone() {
@@ -961,22 +1022,25 @@ export class RegistrationState {
     this.values.phone = normalized;
 
     if (this.values.foxentryPaymentStatus === false) return;
+    try {
+      const r = await validatePhone(this.values.phone, {
+        validationType: "basic",
+        preferredPrefixes: ["+420"],
+        formatNumber: false,
+        correctionMode: "full",
+        allowedPrefixes: ["+420"],
+      });
+      if (!r.isValid) {
+        this.errors.phone = [t("errors.phone")];
+      } else {
+        delete this.errors.phone;
+      }
 
-    const r = await validatePhone(this.values.phone, {
-      validationType: "basic",
-      preferredPrefixes: ["+420"],
-      formatNumber: false,
-      correctionMode: "full",
-      allowedPrefixes: ["+420"],
-    });
-    if (!r.isValid) {
-      this.errors.phone = [t("errors.phone")];
-    } else {
-      delete this.errors.phone;
-    }
-
-    if (r.normalized && r.normalized !== this.values.phone) {
-      this.values.phone = r.normalized;
+      if (r.normalized && r.normalized !== this.values.phone) {
+        this.values.phone = r.normalized;
+      }
+    } catch (err) {
+      await this.disableFoxentryValidation("phone-validation", err);
     }
   }
 
@@ -985,35 +1049,49 @@ export class RegistrationState {
     const val = this.values[field];
     if (val.length === 0) return;
 
-    const r = await validateName(
-      val,
-      field === "firstName" ? "name" : "surname"
-    );
+    try {
+      const r = await validateName(
+        val,
+        field === "firstName" ? "name" : "surname"
+      );
 
-    // Check if r is an error object or validity object
-    if (!("isValid" in r)) return; // Skip if error
+      if (!("isValid" in r)) {
+        const status = Number((r as any)?.status);
+        if (status >= 500) {
+          await this.disableFoxentryValidation("name-validation-status", r);
+        }
+        return;
+      }
 
-    if (!r.isValid) {
-      this.errors[field] = [t(`errors.fox.${field}`)];
-    } else {
-      delete this.errors[field];
+      if (!r.isValid) {
+        this.errors[field] = [t(`errors.fox.${field}`)];
+      } else {
+        delete this.errors[field];
+      }
+      if (r.normalized) this.values[field] = r.normalized;
+    } catch (err) {
+      await this.disableFoxentryValidation("name-validation-throw", err);
     }
-    if (r.normalized) this.values[field] = r.normalized;
   }
 
   // --- Address Search Logic ---
 
   searchForAddress = debounce(async (type: LocationSearchType, q: string) => {
-    const r = await searchLocations(
-      type,
-      q,
-      "CZ",
-      10,
-      0,
-      this.buildFilterFor(type),
-      { allowEmpty: this.hasContextFor(type) }
-    );
-    this.addressSuggestions = r.items;
+    try {
+      const r = await searchLocations(
+        type,
+        q,
+        "CZ",
+        10,
+        0,
+        this.buildFilterFor(type),
+        { allowEmpty: this.hasContextFor(type) }
+      );
+      this.addressSuggestions = r.items;
+    } catch (err) {
+      this.addressSuggestions = [];
+      await this.disableFoxentryValidation("address-search", err);
+    }
   }, 50);
 
   buildFilterFor(type: LocationSearchType) {
