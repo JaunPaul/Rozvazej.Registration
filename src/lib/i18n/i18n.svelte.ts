@@ -55,6 +55,20 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.residenceDocumentType": "Typ dokladu o pobytu",
     "labels.permanentResidenceCountry": "Země",
 
+    "info.labourOffice.heading":
+      "Jste v evidenci Úřadu práce, nebo se do ní chystáte?",
+    "info.labourOffice.intro":
+      "Pokud chcete jít na Úřad práce (nová registrace), nebo už na něm jste (stávající evidence), vaše aktivní DPP je hlavní překážka.",
+    "info.labourOffice.registration":
+      "Stop pro registraci i evidenci: Dokud máte podepsanou DPP, Úřad práce vás do evidence vůbec nevezme, nebo vás z ní okamžitě vyřadí.",
+    "info.labourOffice.earnings":
+      "Nulový výdělek nepomůže: Je jedno, kolik peněz vyděláte. I když máte tento měsíc 0 Kč a neodpracujete ani hodinu, smlouva stále platí. Aktivní smlouva je překážka, i když máte nulový výdělek.",
+    "info.wolt.heading": "Už jste registrovaný jako kurýr v aplikaci Wolt?",
+    "info.wolt.description":
+      "Pokud už jste v aplikaci Wolt registrovaný jako kurýr, vyplňte prosím ve formuláři stejné kontaktní údaje (e-mail a telefon), jaké máte uvedené v aplikaci Wolt. Jinak vás nebudeme moci správně spárovat.",
+    "hints.foreignAddress":
+      "⚠️ Důležité: Zadejte adresu svého pobytu ve státě, jehož jste občanem. Bez této adresy vás nebudeme moci správně přihlásit na Českou správu sociálního zabezpečení (ČSSZ).",
+
     "hints.czPhone":
       "Pro rozvážení v České republice je nezbytné <strong>české telefonní číslo.</strong>",
     "hints.birthLastName": "Nevyplňujte, pokud je stejné",
@@ -258,6 +272,20 @@ const dict = $state<Record<Locale, Record<string, string>>>({
     "labels.documentIssuingCountry": "Issuing country",
     "labels.residenceDocumentType": "Residence Document Type",
     "labels.permanentResidenceCountry": "Country",
+
+    "info.labourOffice.heading":
+      "Are you registered with the Labour Office, or planning to register?",
+    "info.labourOffice.intro":
+      "If you want to register with the Labour Office (new registration), or are already registered, your active agreement to perform work (DPP) is the main obstacle.",
+    "info.labourOffice.registration":
+      "A barrier to registering and remaining registered: As long as you have a signed DPP, the Labour Office will not register you, or will immediately remove you from its register.",
+    "info.labourOffice.earnings":
+      "Zero earnings will not help: It does not matter how much you earn. Even if you earn CZK 0 this month and do not work a single hour, the agreement remains valid. An active agreement is an obstacle even if you have no earnings.",
+    "info.wolt.heading": "Are you already registered as a courier in the Wolt app?",
+    "info.wolt.description":
+      "If you are already registered as a courier in the Wolt app, please enter the same contact details (email and phone number) in this form as you have in the Wolt app. Otherwise, we will not be able to correctly match your registration to your Wolt account.",
+    "hints.foreignAddress":
+      "⚠️ Important: Enter your residential address in the country of which you are a citizen. Without this address, we will not be able to register you correctly with the Czech Social Security Administration (ČSSZ).",
 
     "hints.czPhone":
       "For deliveries in the Czech Republic you must provide a <strong>Czech phone number.</strong>",
