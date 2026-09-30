@@ -32,6 +32,7 @@
     </div>
     <div class="form-line"></div>
   </div>
+  <p class="text-explain">{t("hints.foreignAddress")}</p>
   <div>
     <div class="input-group-wrap">
       <div class="input-wrap relative">

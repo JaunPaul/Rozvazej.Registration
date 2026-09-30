@@ -2,6 +2,7 @@
   import { fade } from "svelte/transition";
   import type { RegistrationState } from "../../state/RegistrationState.svelte";
   import Errors from "../Errors.svelte";
+  import RegistrationInfo from "../RegistrationInfo.svelte";
   import { t } from "../../i18n/i18n.svelte";
 
   let { registrationState }: { registrationState: RegistrationState } =
@@ -9,6 +10,23 @@
 </script>
 
 <div in:fade class="box has-8-gap">
+  <div>
+    <RegistrationInfo
+      id="labour-office-info"
+      heading={t("info.labourOffice.heading")}
+    >
+      <p>{t("info.labourOffice.intro")}</p>
+      <ul>
+        <li>{t("info.labourOffice.registration")}</li>
+        <li>{t("info.labourOffice.earnings")}</li>
+      </ul>
+    </RegistrationInfo>
+    {#if registrationState.values.submitSource === "Wolt"}
+      <RegistrationInfo id="wolt-info" heading={t("info.wolt.heading")}>
+        <p>{t("info.wolt.description")}</p>
+      </RegistrationInfo>
+    {/if}
+  </div>
   <div class="input-group-wrap">
     <div class="input-wrap">
       <label for="firstName" class="field-label">{t("labels.firstName")}</label>
