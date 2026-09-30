@@ -2,6 +2,7 @@
   import { fade } from "svelte/transition";
   import type { RegistrationState } from "../../state/RegistrationState.svelte";
   import Errors from "../Errors.svelte";
+  import RegistrationInfo from "../RegistrationInfo.svelte";
   import { t } from "../../i18n/i18n.svelte";
 
   let { registrationState }: { registrationState: RegistrationState } =
@@ -9,6 +10,23 @@
 </script>
 
 <div in:fade class="box has-8-gap">
+  <div>
+    <RegistrationInfo
+      id="labour-office-info"
+      heading={t("info.labourOffice.heading")}
+    >
+      <p>{t("info.labourOffice.intro")}</p>
+      <ul>
+        <li>{t("info.labourOffice.registration")}</li>
+        <li>{t("info.labourOffice.earnings")}</li>
+      </ul>
+    </RegistrationInfo>
+    {#if registrationState.values.submitSource === "Wolt"}
+      <RegistrationInfo id="wolt-info" heading={t("info.wolt.heading")}>
+        <p>{t("info.wolt.description")}</p>
+      </RegistrationInfo>
+    {/if}
+  </div>
   <div class="input-group-wrap">
     <div class="input-wrap">
       <label for="firstName" class="field-label">{t("labels.firstName")}</label>
@@ -16,6 +34,7 @@
         class="input-2 w-input"
         type="text"
         id="firstName"
+        name="firstName"
         placeholder={t("ph.firstName")}
         bind:value={registrationState.values.firstName}
         onblur={() => registrationState.onBlurName("firstName")}
@@ -28,6 +47,7 @@
         class="input-2 w-input"
         type="text"
         id="lastName"
+        name="lastName"
         placeholder={t("ph.lastName")}
         bind:value={registrationState.values.lastName}
         onblur={() => registrationState.onBlurName("lastName")}
@@ -38,11 +58,32 @@
 
   <div class="input-group-wrap">
     <div class="input-wrap">
+      <label for="birthLastName" class="field-label"
+        >{t("labels.birthLastName")}</label
+      >
+      <input
+        class="input-2 w-input"
+        type="text"
+        id="birthLastName"
+        name="birthLastName"
+        placeholder={t("ph.birthLastName")}
+        bind:value={registrationState.values.birthLastName}
+      />
+      <div class="text-explain">
+        {@html t("hints.birthLastName")}
+      </div>
+      <Errors errors={registrationState.errors} path="birthLastName" />
+    </div>
+  </div>
+
+  <div class="input-group-wrap">
+    <div class="input-wrap">
       <label for="phone" class="field-label">{t("labels.phone")}</label>
       <input
         class="input-2 w-input"
         type="text"
         id="phone"
+        name="phone"
         placeholder={t("ph.phone")}
         bind:value={registrationState.values.phone}
         onblur={() => registrationState.onBlurPhone()}
@@ -58,6 +99,7 @@
         class="input-2 w-input"
         type="email"
         id="email"
+        name="email"
         placeholder={t("ph.email")}
         bind:value={registrationState.values.email}
         onblur={() => registrationState.onBlurEmail()}

@@ -1,4 +1,4 @@
-import { t } from "../i18n/i18n.svelte";
+import { t, setLocale, type Locale } from "../i18n/i18n.svelte";
 import {
   validateEmail,
   validateName,
@@ -12,20 +12,274 @@ import {
 import { validateStepAsync } from "../utils/validation";
 import { SubmissionStatus } from "../enums/form";
 import type { Company, FormStates, CustomErrors, Bucket } from "../types";
-import { PHASE1_ENDPOINT, PHASE2_ENDPOINT } from "../endpoints";
+import { sendFoxentryFailedPaymentNotification } from "../utils/notifications";
+import {
+  PHASE1_ENDPOINT,
+  PHASE2_ENDPOINT,
+  CLOUDINARY_UPLOAD_URL,
+  CLOUDINARY_UPLOAD_PRESET,
+} from "../endpoints";
 import { steps } from "../utils/stateMachine";
 
+const FALLBACK_HTTP_STATUSES = new Set([408, 413, 429, 500, 502, 503, 504]);
+
+function isNetworkishFetchError(err: any) {
+  const msg = String(err?.message ?? err ?? "").toLowerCase();
+  // Browsers vary, especially iOS/Safari
+  return (
+    msg.includes("failed to fetch") ||
+    msg.includes("networkerror") ||
+    msg.includes("load failed") ||
+    msg.includes("connection") ||
+    msg.includes("reset") ||
+    msg.includes("socket") ||
+    msg.includes("aborted") ||
+    msg.includes("abort") ||
+    msg.includes("timeout")
+  );
+}
+
+function getErrorStatus(err: any): number | undefined {
+  const direct = Number(err?.status);
+  if (!Number.isNaN(direct) && direct > 0) return direct;
+
+  const nested = Number(err?.response?.status);
+  if (!Number.isNaN(nested) && nested > 0) return nested;
+
+  return undefined;
+}
+
+function isFoxentryInternalFailure(err: any) {
+  const status = getErrorStatus(err);
+  if (status && status >= 500) return true;
+
+  const msg = String(err?.message ?? err ?? "").toLowerCase();
+  return (
+    msg.includes("foxentry") ||
+    msg.includes("failed to process your request") ||
+    msg.includes("internal") ||
+    msg.includes("status 500")
+  );
+}
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number,
+  timeoutMessage = "Request timed out"
+) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(timeoutMessage), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: ctrl.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+// --- Helpers: Cloudinary upload (fallback path) ---
+
+type CloudinaryUploadFailure = {
+  file: File;
+  bucket: string; // e.g. "filesNationalId"
+  error: string;
+};
+
+type CloudinaryUploadResult = {
+  urls: string[];
+  failures: CloudinaryUploadFailure[];
+};
+
+async function uploadOneToCloudinary(
+  cloudinaryUrl: string,
+  preset: string,
+  file: File,
+  timeoutMs: number
+): Promise<string> {
+  const fd = new FormData();
+  fd.append("file", file, file.name);
+  fd.append("upload_preset", preset);
+
+  // If you use unsigned presets/folders, add them here:
+  // fd.append("upload_preset", "YOUR_PRESET");
+  // fd.append("folder", "registrations/phase2");
+
+  const res = await fetchWithTimeout(
+    cloudinaryUrl,
+    { method: "POST", body: fd },
+    timeoutMs,
+    `Cloudinary upload timed out after ${timeoutMs}ms`
+  );
+
+  const text = await res.text();
+
+  if (!res.ok) {
+    throw new Error(
+      `Cloudinary upload failed (${res.status}): ${text.slice(0, 300)}`
+    );
+  }
+
+  let data: any;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(`Cloudinary returned non-JSON: ${text.slice(0, 300)}`);
+  }
+
+  const url = data?.secure_url || data?.url;
+  if (!url) {
+    throw new Error(
+      `Cloudinary response missing secure_url/url: ${text.slice(0, 300)}`
+    );
+  }
+
+  return String(url);
+}
+
+export async function uploadAllToCloudinary(
+  cloudinaryUrl: string,
+  preset: string,
+  filesWithBucket: { file: File; bucket: string }[],
+  perFileTimeoutMs = 60_000
+): Promise<CloudinaryUploadResult> {
+  if (!filesWithBucket.length) return { urls: [], failures: [] };
+
+  const settled = await Promise.allSettled(
+    filesWithBucket.map(({ file }) =>
+      uploadOneToCloudinary(cloudinaryUrl, preset, file, perFileTimeoutMs)
+    )
+  );
+
+  const urls: string[] = [];
+  const failures: CloudinaryUploadFailure[] = [];
+
+  settled.forEach((r, idx) => {
+    const meta = filesWithBucket[idx];
+    if (r.status === "fulfilled") {
+      urls.push(r.value);
+    } else {
+      failures.push({
+        file: meta.file,
+        bucket: meta.bucket,
+        error: String((r.reason as any)?.message ?? r.reason),
+      });
+    }
+  });
+
+  return { urls, failures };
+}
+
+// --- Helpers: FormData building ---
+
+function appendSnapshotFieldsToFormData(
+  fd: FormData,
+  snapshot: Record<string, any>
+) {
+  for (const [k, v] of Object.entries(snapshot)) {
+    // files are handled separately
+    if (
+      k === "filesNationalId" ||
+      k === "filesEuPassport" ||
+      k === "filesNonEu" ||
+      k === "filesDriversLicense" ||
+      k === "filesEuResidence" ||
+      k === "filesNonEuResidence"
+    )
+      continue;
+
+    if (v === undefined || v === null) continue;
+
+    if (
+      typeof v === "string" ||
+      typeof v === "number" ||
+      typeof v === "boolean"
+    ) {
+      fd.append(k, String(v));
+    } else {
+      fd.append(k, JSON.stringify(v));
+    }
+  }
+}
+
+function appendFilesToFormData(
+  fd: FormData,
+  snapshot: {
+    filesNationalId?: File[];
+    filesEuPassport?: File[];
+    filesNonEu?: File[];
+    filesDriversLicense?: File[];
+    filesEuResidence?: File[];
+    filesNonEuResidence?: File[];
+  }
+) {
+  // Prefix file names with bucket identifier for n8n binary mapping
+  snapshot.filesNationalId?.forEach((f) =>
+    fd.append("filesNationalId", f, `filesNationalId__${f.name}`)
+  );
+  snapshot.filesEuPassport?.forEach((f) =>
+    fd.append("filesEuPassport", f, `filesEuPassport__${f.name}`)
+  );
+  snapshot.filesNonEu?.forEach((f) =>
+    fd.append("filesNonEu", f, `filesNonEu__${f.name}`)
+  );
+  snapshot.filesDriversLicense?.forEach((f) =>
+    fd.append("filesDriversLicense", f, `filesDriversLicense__${f.name}`)
+  );
+  snapshot.filesEuResidence?.forEach((f) =>
+    fd.append("filesEuResidence", f, `filesEuResidence__${f.name}`)
+  );
+  snapshot.filesNonEuResidence?.forEach((f) =>
+    fd.append("filesNonEuResidence", f, `filesNonEuResidence__${f.name}`)
+  );
+}
+
+function extractFilesWithBuckets(snapshot: {
+  filesNationalId?: File[];
+  filesEuPassport?: File[];
+  filesNonEu?: File[];
+  filesDriversLicense?: File[];
+  filesEuResidence?: File[];
+  filesNonEuResidence?: File[];
+}) {
+  const out: { file: File; bucket: string }[] = [];
+
+  snapshot.filesNationalId?.forEach((file) =>
+    out.push({ file, bucket: "filesNationalId" })
+  );
+  snapshot.filesEuPassport?.forEach((file) =>
+    out.push({ file, bucket: "filesEuPassport" })
+  );
+  snapshot.filesNonEu?.forEach((file) =>
+    out.push({ file, bucket: "filesNonEu" })
+  );
+  snapshot.filesDriversLicense?.forEach((file) =>
+    out.push({ file, bucket: "filesDriversLicense" })
+  );
+  snapshot.filesEuResidence?.forEach((file) =>
+    out.push({ file, bucket: "filesEuResidence" })
+  );
+  snapshot.filesNonEuResidence?.forEach((file) =>
+    out.push({ file, bucket: "filesNonEuResidence" })
+  );
+
+  return out;
+}
+
 export class RegistrationState {
+  private foxentryFailureReported = false;
+
   // State
   values = $state({
     firstName: "",
     lastName: "",
+    birthLastName: "",
     email: "",
     phone: "",
     companyId: "",
     companyName: "",
     nationalId: "",
     passportOrId: "",
+    communicationPassword: "",
     deliveryCompany: [] as string[],
     deliveryCompanyWolt: false,
     deliveryCompanyFoodora: false,
@@ -45,12 +299,15 @@ export class RegistrationState {
     transport: "",
     insurance: "",
     pinkStatement: undefined as boolean | undefined,
+    execution: undefined as boolean | undefined,
     gender: "",
     birthDate: "",
-    passportExpiryDate: "",
+    documentExpiryDate: "",
     filesNationalId: [] as File[],
     filesEuPassport: [] as File[],
     filesNonEu: [] as File[],
+    filesEuResidence: [] as File[],
+    filesNonEuResidence: [] as File[],
     filesDriversLicense: [] as File[],
     utm_source: "",
     utm_campaign: "",
@@ -72,7 +329,15 @@ export class RegistrationState {
     permanentResidenceStreet: "",
     permanentResidenceStreetNumber: "",
     permanentResidenceCity: "",
-    userId: "",
+    courierId: "",
+    documentType: "",
+    documentNumber: "",
+    documentIssuingCountry: "",
+   residenceDocumentType: "",
+   residenceDocumentNumber: "",
+   residenceDocumentExpiryDate: "",
+   residenceDocumentIssuingCountry: "",
+   visaCode: "",
   });
 
   errors: CustomErrors = $state({});
@@ -88,7 +353,8 @@ export class RegistrationState {
   submitting = $state(false);
   disable = $state(false);
   verified = $state(false);
-  verificationStatus: "pending" | "success" | "fail" = $state("pending");
+  verificationStatus: "pending" | "success" | "fail" | "error" =
+    $state("pending");
 
   // Foxentry State
   addressSuggestions: FxLocation[] = $state([]);
@@ -105,11 +371,29 @@ export class RegistrationState {
   toNextStepIndex = $state(2);
 
   stepNavText = $derived(`${t("nav.next")} ${this.toNextStepIndex}/4`);
-  stepNavTextPaseTwo = $derived(`${t("nav.next")} ${this.toNextStepIndex}/2`);
+  stepNavTextPaseTwo = $derived(`${t("nav.next")} ${this.toNextStepIndex}/3`);
   askCountryAgain = $state(false);
 
   constructor() {
     this.init();
+  }
+
+  async disableFoxentryValidation(reason: string, err?: unknown) {
+    if (this.values.foxentryPaymentStatus === false) return;
+
+    this.values.foxentryPaymentStatus = false;
+    console.warn("Foxentry disabled, switching to local validation", {
+      reason,
+      error: String((err as any)?.message ?? err ?? "unknown"),
+      status: getErrorStatus(err),
+    });
+
+    if (!this.foxentryFailureReported) {
+      this.foxentryFailureReported = true;
+      await sendFoxentryFailedPaymentNotification(
+        `${window.location.href} | reason=${reason}`
+      );
+    }
   }
 
   async init() {
@@ -117,13 +401,15 @@ export class RegistrationState {
       this.loadFromSession();
       this.loadFromUrl();
       this.values.submitSource = this.getCompanyByDomain()[0];
+      let locale: Locale = $state(this.checkLanguage());
+      setLocale(locale);
 
       // Auto-detect phase based on URL param
       const params = new URLSearchParams(window.location.search);
       if (params.get("phase") === "2") {
         this.currentPhase = 2;
         this.currentStep = "step1"; // Reset step for phase 2
-        this.values.userId = params.get("userId") ?? "";
+        this.values.courierId = params.get("userId") ?? "";
         const country = params.get("country");
 
         if (!country) {
@@ -136,13 +422,16 @@ export class RegistrationState {
       // Foxentry Payment Check
       try {
         const foxentryPaymentStatus: any = await validateName("John", "name");
-        if (foxentryPaymentStatus?.status === 402) {
-          this.values.foxentryPaymentStatus = false;
-          // Assuming sendFoxentryFailedPaymentNotification is imported or handled
-          console.warn("Foxentry payment failed");
+        const status = Number(foxentryPaymentStatus?.status);
+        if (status === 402 || status >= 500) {
+          await this.disableFoxentryValidation(
+            `startup-check-status-${status}`,
+            foxentryPaymentStatus
+          );
         }
       } catch (e) {
         console.error("Foxentry check failed", e);
+        await this.disableFoxentryValidation("startup-check-throw", e);
       }
 
       // Drop-off tracking
@@ -153,7 +442,11 @@ export class RegistrationState {
       this.trackPageView(this.currentStep);
     }
   }
-
+  checkLanguage(): "cs" | "en" {
+    const path = typeof window !== "undefined" ? window.location.pathname : "";
+    if (path.endsWith("-en")) return "en";
+    return "cs";
+  }
   trackDropOff(step: string) {
     if (typeof window === "undefined") return;
     (window as any).dataLayer = (window as any).dataLayer || [];
@@ -178,6 +471,8 @@ export class RegistrationState {
         this.values.filesEuPassport = [];
         this.values.filesNonEu = [];
         this.values.filesDriversLicense = [];
+        this.values.filesEuResidence = [];
+        this.values.filesNonEuResidence = [];
       } catch (e) {
         console.error("Failed to parse saved form data", e);
       }
@@ -192,6 +487,8 @@ export class RegistrationState {
         filesEuPassport,
         filesNonEu,
         filesDriversLicense,
+        filesEuResidence,
+        filesNonEuResidence,
         ...rest
       } = this.values;
       sessionStorage.setItem("multi-form-session", JSON.stringify(rest));
@@ -262,17 +559,35 @@ export class RegistrationState {
   // --- Validation & Navigation ---
 
   async validateCurrentStep(
-    stepId: "step1" | "step2" | "step3" | "step4" | "phase2"
+    stepId:
+      | "step1"
+      | "step2"
+      | "step3"
+      | "step4"
+      | "phase2Step1"
+      | "phase2Step2"
+      | "phase2Step3"
   ) {
     this.validating = true;
-    const { ok, fieldErrors } = await validateStepAsync(
-      stepId,
-      this.values,
-      this.values.foxentryPaymentStatus
-    );
-    this.errors = fieldErrors;
-    this.validating = false;
-    return ok;
+    try {
+      const { ok, fieldErrors } = await validateStepAsync(
+        stepId,
+        this.values,
+        this.values.foxentryPaymentStatus
+      );
+      this.errors = fieldErrors;
+      return ok;
+    } catch (err) {
+      if (this.values.foxentryPaymentStatus && isFoxentryInternalFailure(err)) {
+        await this.disableFoxentryValidation("step-validation", err);
+        const fallback = await validateStepAsync(stepId, this.values, false);
+        this.errors = fallback.fieldErrors;
+        return fallback.ok;
+      }
+      throw err;
+    } finally {
+      this.validating = false;
+    }
   }
 
   async nextStep(targetStep: string) {
@@ -315,7 +630,10 @@ export class RegistrationState {
         ...steps.step4,
         ...steps.alwaysInclude,
       ];
-      const snapshot = this.mapStepsToSnapshot(this.values, fieldsForSnapshot);
+      const snapshot = this.mapStepsToSnapshot(
+        this.values,
+        fieldsForSnapshot as any
+      );
       const fd = new FormData();
       for (const [k, v] of Object.entries(snapshot)) {
         if (
@@ -343,6 +661,10 @@ export class RegistrationState {
         body: fd,
       });
 
+      if (!res.ok) {
+        throw new Error(`Submission failed with status: ${res.status}`);
+      }
+
       const text = await res.text();
       console.log("[formsubmission]", text);
       this.formState = "success";
@@ -355,6 +677,9 @@ export class RegistrationState {
       console.error(err);
       this.formState = "fail";
       this.submissionStatus = SubmissionStatus.REJECTED;
+
+      // Capture error
+      await this.captureError(err);
     } finally {
       this.disable = false;
       this.submitting = false;
@@ -369,71 +694,211 @@ export class RegistrationState {
     this.submitting = true;
     this.formState = "submitting";
 
-    // Placeholder endpoint
     const endpoint = PHASE2_ENDPOINT;
-    // artificial delay
-    // await sleep(3000);
+
+    // Tune these based on real-world behavior:
+    const MULTIPART_TIMEOUT_MS = 90_000; // longer to allow big uploads
+    const CLOUDINARY_PER_FILE_TIMEOUT_MS = 60_000;
+    const FALLBACK_SUBMIT_TIMEOUT_MS = 45_000;
+
     try {
-      const fieldsForSnapshot = [...steps.phase2, ...steps.alwaysInclude];
-      const snapshot = this.mapStepsToSnapshot(this.values, fieldsForSnapshot);
-      const fd = new FormData();
-      for (const [k, v] of Object.entries(snapshot)) {
-        if (
-          k === "filesNationalId" ||
-          k === "filesEuPassport" ||
-          k === "filesNonEu" ||
-          k === "filesDriversLicense"
-        )
-          continue;
-        if (v === undefined || v === null) continue;
+      const fieldsForSnapshot = [
+        ...steps.phase2Step1,
+        ...steps.phase2Step2,
+        ...steps.phase2Step3,
+        ...steps.alwaysInclude,
+      ];
+      const snapshot: any = this.mapStepsToSnapshot(
+        this.values,
+        fieldsForSnapshot as any
+      );
 
-        if (
-          typeof v === "string" ||
-          typeof v === "number" ||
-          typeof v === "boolean"
-        ) {
-          fd.append(k, String(v));
-        } else {
-          // Nested objects (if any): send as JSON string
-          fd.append(k, JSON.stringify(v));
+      // Always ensure courierId present
+      snapshot.courierId = this.values.courierId;
+
+       // ---------- Attempt 1: normal multipart submission ----------
+       const fdMultipart = new FormData();
+       appendSnapshotFieldsToFormData(fdMultipart, snapshot);
+       appendFilesToFormData(fdMultipart, snapshot);
+
+      let firstAttemptRes: Response | null = null;
+      let firstAttemptText = "";
+
+      try {
+        firstAttemptRes = await fetchWithTimeout(
+          endpoint,
+          { method: "POST", body: fdMultipart },
+          MULTIPART_TIMEOUT_MS,
+          `Phase2 multipart timed out after ${MULTIPART_TIMEOUT_MS}ms`
+        );
+
+        firstAttemptText = await firstAttemptRes.text();
+
+        if (!firstAttemptRes.ok) {
+          // Only fallback on "transport-ish / infra-ish" statuses.
+          // For 400/422 validation etc, don't hide the bug with fallback.
+          if (FALLBACK_HTTP_STATUSES.has(firstAttemptRes.status)) {
+            throw new Error(
+              `Multipart failed with status ${firstAttemptRes.status}`
+            );
+          }
+
+          throw new Error(
+            `Submission failed (${firstAttemptRes.status
+            }): ${firstAttemptText.slice(0, 300)}`
+          );
         }
+
+        // ✅ success
+        console.log("[formsubmission]", firstAttemptText);
+        this.formState = "success";
+        this.submissionStatus = SubmissionStatus.APPROVED;
+        this.errors = {};
+        window.location.replace("/dekujeme");
+        return;
+      } catch (err: any) {
+        const shouldFallback =
+          isNetworkishFetchError(err) ||
+          (firstAttemptRes &&
+            FALLBACK_HTTP_STATUSES.has(firstAttemptRes.status));
+
+        if (!shouldFallback) throw err;
+
+        console.warn(
+          "[submitPhase2] Multipart failed; trying Cloudinary fallback.",
+          {
+            err: String(err?.message ?? err),
+            status: firstAttemptRes?.status,
+            responsePreview: firstAttemptText.slice(0, 300),
+          }
+        );
       }
-      snapshot.filesNationalId?.forEach((f) =>
-        fd.append("filesNationalId", f, f.name)
-      );
-      snapshot.filesEuPassport?.forEach((f) =>
-        fd.append("filesEuPassport", f, f.name)
-      );
-      snapshot.filesNonEu?.forEach((f) => fd.append("filesNonEu", f, f.name));
-      snapshot.filesDriversLicense?.forEach((f) =>
-        fd.append("filesDriversLicense", f, f.name)
+
+      // ---------- Fallback: upload files to Cloudinary, then submit without files ----------
+      const filesWithBucket = extractFilesWithBuckets(snapshot);
+
+      const { urls, failures } = await uploadAllToCloudinary(
+        CLOUDINARY_UPLOAD_URL,
+        CLOUDINARY_UPLOAD_PRESET,
+        filesWithBucket,
+        CLOUDINARY_PER_FILE_TIMEOUT_MS
       );
 
-      snapshot.userId = this.values.userId;
+      // Decision: if *all* uploads failed and we have files, stop (nothing useful to send).
+      if (filesWithBucket.length > 0 && urls.length === 0) {
+        throw new Error(
+          `Cloudinary fallback failed: no files uploaded. Example error: ${failures[0]?.error ?? "unknown"
+          }`
+        );
+      }
 
-      const res = await fetch(endpoint, {
-        method: "POST",
-        body: fd,
-      });
+       const fdFallback = new FormData();
+       appendSnapshotFieldsToFormData(fdFallback, snapshot);
 
-      const text = await res.text();
-      console.log("[formsubmission]", text);
+       // Store the urls as JSON (FormData can't send arrays reliably otherwise)
+       fdFallback.append("cloudinaryUrls", JSON.stringify(urls));
+
+      // Optional: send structured metadata so backend can map urls to buckets/names if you need it
+      if (filesWithBucket.length) {
+        fdFallback.append(
+          "cloudinaryFilesMeta",
+          JSON.stringify(
+            filesWithBucket.map(({ file, bucket }, idx) => ({
+              bucket,
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              lastModified: file.lastModified,
+              // best-effort mapping: order aligned with successful urls, but not perfect if failures exist
+              // you can improve by uploading sequentially and capturing per-file url.
+              // For now, keep metadata for debugging.
+              index: idx,
+            }))
+          )
+        );
+      }
+
+      if (failures.length) {
+        fdFallback.append(
+          "cloudinaryUploadFailures",
+          JSON.stringify(
+            failures.map((f) => ({
+              bucket: f.bucket,
+              name: f.file.name,
+              size: f.file.size,
+              type: f.file.type,
+              lastModified: f.file.lastModified,
+              error: f.error,
+            }))
+          )
+        );
+      }
+
+      // Mark that we used fallback (handy in Make logs)
+      fdFallback.append("uploadMode", "cloudinary_fallback");
+
+      const fallbackRes = await fetchWithTimeout(
+        endpoint,
+        { method: "POST", body: fdFallback },
+        FALLBACK_SUBMIT_TIMEOUT_MS,
+        `Phase2 fallback submit timed out after ${FALLBACK_SUBMIT_TIMEOUT_MS}ms`
+      );
+
+      const fallbackText = await fallbackRes.text();
+
+      if (!fallbackRes.ok) {
+        throw new Error(
+          `Fallback submission failed (${fallbackRes.status
+          }): ${fallbackText.slice(0, 300)}`
+        );
+      }
+
+      console.log("[formsubmission fallback]", fallbackText);
       this.formState = "success";
       this.submissionStatus = SubmissionStatus.APPROVED;
-
       this.errors = {};
-      const welcome = "/dekujeme";
-      window.location.replace(welcome);
+      window.location.replace("/dekujeme");
     } catch (err) {
       console.error(err);
       this.formState = "fail";
       this.submissionStatus = SubmissionStatus.REJECTED;
+      await this.captureError(err);
     } finally {
       this.disable = false;
       this.submitting = false;
-
       this.trackCompletion(this.submissionStatus);
       this.trackCompletionWithoutAds(this.submissionStatus);
+    }
+  }
+
+  async captureError(error: any) {
+    try {
+      const userAgent =
+        navigator.userAgent.toLowerCase() ?? "Cannot detect browser";
+      const errorPayload = {
+        url: window.location.href,
+        response: {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          values: this.values,
+          browser: userAgent,
+        },
+        created_at: new Date().toISOString(),
+        session_id: this.values.sessionId,
+      };
+
+      await fetch(
+        "https://n8n-kn-digital-b6b8cc160b77.herokuapp.com/webhook/67c46be5-d570-47b3-8855-296d9edb7f03",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(errorPayload),
+        }
+      );
+    } catch (e) {
+      console.error("Failed to capture error", e);
     }
   }
 
@@ -442,19 +907,49 @@ export class RegistrationState {
   appendFiles(bucket: Bucket, files: FileList | File[]) {
     const fileList = Array.isArray(files) ? files : Array.from(files);
 
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+    const validFiles: File[] = [];
+    let hasLargeFile = false;
+
+    fileList.forEach(f => {
+      if (f.size > MAX_FILE_SIZE) {
+        hasLargeFile = true;
+      } else {
+        validFiles.push(f);
+      }
+    });
+
+    const errorKey =
+      bucket === "nationalId"
+        ? "filesNationalId"
+        : bucket === "euPassport"
+          ? "filesEuPassport"
+          : bucket === "driversLicense"
+            ? "filesDriversLicense"
+            : "filesNonEu";
+
+    if (hasLargeFile) {
+      this.errors[errorKey] = [t("upload.error.size")];
+    } else {
+      // Clear error if it exists and we're adding valid files w/o issues
+      if (this.errors[errorKey]) {
+        delete this.errors[errorKey];
+      }
+    }
+
     const targetArray =
       bucket === "nationalId"
         ? this.values.filesNationalId
         : bucket === "euPassport"
-        ? this.values.filesEuPassport
-        : bucket === "driversLicense"
-        ? this.values.filesDriversLicense
-        : this.values.filesNonEu;
+          ? this.values.filesEuPassport
+          : bucket === "driversLicense"
+            ? this.values.filesDriversLicense
+            : this.values.filesNonEu;
 
     // Dedupe
     const current = targetArray;
     const byKey = new Map<string, File>();
-    [...current, ...fileList].forEach((f) => {
+    [...current, ...validFiles].forEach((f) => {
       byKey.set(`${f.name}|${f.size}|${f.lastModified}`, f);
     });
 
@@ -464,6 +959,10 @@ export class RegistrationState {
     else if (bucket === "euPassport") this.values.filesEuPassport = newFiles;
     else if (bucket === "driversLicense")
       this.values.filesDriversLicense = newFiles;
+    else if (bucket === "euResidence")
+      this.values.filesEuResidence = newFiles;
+    else if (bucket === "nonEuResidence")
+      this.values.filesNonEuResidence = newFiles;
     else this.values.filesNonEu = newFiles;
   }
 
@@ -472,10 +971,14 @@ export class RegistrationState {
       bucket === "nationalId"
         ? this.values.filesNationalId
         : bucket === "euPassport"
-        ? this.values.filesEuPassport
-        : bucket === "driversLicense"
-        ? this.values.filesDriversLicense
-        : this.values.filesNonEu;
+          ? this.values.filesEuPassport
+          : bucket === "driversLicense"
+            ? this.values.filesDriversLicense
+            : bucket === "euResidence"
+              ? this.values.filesEuResidence
+              : bucket === "nonEuResidence"
+                ? this.values.filesNonEuResidence
+                : this.values.filesNonEu;
 
     const newFiles = targetArray.filter((f) => f !== file);
 
@@ -490,17 +993,20 @@ export class RegistrationState {
 
   async onBlurEmail() {
     if (this.values.foxentryPaymentStatus === false) return;
-    const r = await validateEmail(this.values.email, {
-      acceptDisposableEmails: false,
-    });
+    try {
+      const r = await validateEmail(this.values.email, {
+        acceptDisposableEmails: false,
+      });
 
-    if (!r.isValid) {
-      this.errors.email = [t("errors.email")];
-    } else {
-      delete this.errors.email;
+      if (!r.isValid) {
+        this.errors.email = [t("errors.email")];
+      } else {
+        delete this.errors.email;
+      }
+      if (r.normalized) this.values.email = r.normalized;
+    } catch (err) {
+      await this.disableFoxentryValidation("email-validation", err);
     }
-    // Hint logic could go here if we had a UI for it
-    if (r.normalized) this.values.email = r.normalized;
   }
 
   async onBlurPhone() {
@@ -516,22 +1022,25 @@ export class RegistrationState {
     this.values.phone = normalized;
 
     if (this.values.foxentryPaymentStatus === false) return;
+    try {
+      const r = await validatePhone(this.values.phone, {
+        validationType: "basic",
+        preferredPrefixes: ["+420"],
+        formatNumber: false,
+        correctionMode: "full",
+        allowedPrefixes: ["+420"],
+      });
+      if (!r.isValid) {
+        this.errors.phone = [t("errors.phone")];
+      } else {
+        delete this.errors.phone;
+      }
 
-    const r = await validatePhone(this.values.phone, {
-      validationType: "basic",
-      preferredPrefixes: ["+420"],
-      formatNumber: false,
-      correctionMode: "full",
-      allowedPrefixes: ["+420"],
-    });
-    if (!r.isValid) {
-      this.errors.phone = [t("errors.phone")];
-    } else {
-      delete this.errors.phone;
-    }
-
-    if (r.normalized && r.normalized !== this.values.phone) {
-      this.values.phone = r.normalized;
+      if (r.normalized && r.normalized !== this.values.phone) {
+        this.values.phone = r.normalized;
+      }
+    } catch (err) {
+      await this.disableFoxentryValidation("phone-validation", err);
     }
   }
 
@@ -540,35 +1049,49 @@ export class RegistrationState {
     const val = this.values[field];
     if (val.length === 0) return;
 
-    const r = await validateName(
-      val,
-      field === "firstName" ? "name" : "surname"
-    );
+    try {
+      const r = await validateName(
+        val,
+        field === "firstName" ? "name" : "surname"
+      );
 
-    // Check if r is an error object or validity object
-    if (!("isValid" in r)) return; // Skip if error
+      if (!("isValid" in r)) {
+        const status = Number((r as any)?.status);
+        if (status >= 500) {
+          await this.disableFoxentryValidation("name-validation-status", r);
+        }
+        return;
+      }
 
-    if (!r.isValid) {
-      this.errors[field] = [t(`errors.fox.${field}`)];
-    } else {
-      delete this.errors[field];
+      if (!r.isValid) {
+        this.errors[field] = [t(`errors.fox.${field}`)];
+      } else {
+        delete this.errors[field];
+      }
+      if (r.normalized) this.values[field] = r.normalized;
+    } catch (err) {
+      await this.disableFoxentryValidation("name-validation-throw", err);
     }
-    if (r.normalized) this.values[field] = r.normalized;
   }
 
   // --- Address Search Logic ---
 
   searchForAddress = debounce(async (type: LocationSearchType, q: string) => {
-    const r = await searchLocations(
-      type,
-      q,
-      "CZ",
-      10,
-      0,
-      this.buildFilterFor(type),
-      { allowEmpty: this.hasContextFor(type) }
-    );
-    this.addressSuggestions = r.items;
+    try {
+      const r = await searchLocations(
+        type,
+        q,
+        "CZ",
+        10,
+        0,
+        this.buildFilterFor(type),
+        { allowEmpty: this.hasContextFor(type) }
+      );
+      this.addressSuggestions = r.items;
+    } catch (err) {
+      this.addressSuggestions = [];
+      await this.disableFoxentryValidation("address-search", err);
+    }
   }, 50);
 
   buildFilterFor(type: LocationSearchType) {

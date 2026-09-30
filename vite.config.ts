@@ -6,7 +6,6 @@ export default defineConfig({
   plugins: [svelte()],
   base: "/Rozvazej.Registration/",
   build: {
-    outDir: "dist/Rozvazej.Registration",
     rollupOptions: {
       output: {
         entryFileNames: "multi-step.js",

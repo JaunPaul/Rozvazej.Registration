@@ -19,6 +19,7 @@
                 class="input-2"
                 type="text"
                 id="bankPrefix"
+                name="bankPrefix"
                 placeholder={t("ph.bank.prefix")}
                 bind:value={registrationState.values.bankPrefix}
             />
@@ -31,6 +32,7 @@
                 class="input-2 w-input"
                 type="text"
                 id="bankNumber"
+                name="bankNumber"
                 placeholder={t("ph.bank.number")}
                 bind:value={registrationState.values.bankNumber}
             />
@@ -43,6 +45,7 @@
             <select
                 class="input-2"
                 id="bankCode"
+                name="bankCode"
                 bind:value={registrationState.values.bankCode}
             >
                 <option value="" disabled>{t("select.placeholder.bank")}</option
@@ -106,6 +109,7 @@
         <select
             class="input-2"
             id="insurance"
+            name="insurance"
             bind:value={registrationState.values.insurance}
         >
             <option value="" disabled
@@ -132,6 +136,7 @@
                 <input
                     id="pinkStatementYes"
                     type="radio"
+                    name="pinkStatement"
                     bind:group={registrationState.values.pinkStatement}
                     value={true}
                     style="opacity:0;position:absolute"
@@ -146,6 +151,7 @@
                 <input
                     id="pinkStatementNo"
                     type="radio"
+                    name="pinkStatement"
                     bind:group={registrationState.values.pinkStatement}
                     value={false}
                     style="opacity:0;position:absolute"
@@ -157,5 +163,43 @@
             {@html t("hints.pinkstatement")}
         </div>
         <Errors errors={registrationState.errors} path="pinkStatement" />
+    </div>
+    <div class="input-wrap">
+        <label class="field-label" for="executionYes"
+            >{t("labels.execution")}</label
+        >
+        <div class="input-group-wrap">
+            <label
+                class="registrationtype w-radio"
+                class:is-checked={registrationState.values.execution ===
+                    true}
+            >
+                <input
+                    id="executionYes"
+                    type="radio"
+                    name="execution"
+                    bind:group={registrationState.values.execution}
+                    value={true}
+                    style="opacity:0;position:absolute"
+                />
+                <span class="w-form-label">{t("answer.yes")}</span>
+            </label>
+            <label
+                class="registrationtype w-radio"
+                class:is-checked={registrationState.values.execution ===
+                    false}
+            >
+                <input
+                    id="executionNo"
+                    type="radio"
+                    name="execution"
+                    bind:group={registrationState.values.execution}
+                    value={false}
+                    style="opacity:0;position:absolute"
+                />
+                <span class="w-form-label">{t("answer.no")}</span>
+            </label>
+        </div>
+        <Errors errors={registrationState.errors} path="execution" />
     </div>
 </div>

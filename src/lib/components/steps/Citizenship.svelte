@@ -19,7 +19,7 @@
   const fifteenYearsAgo = new Date(
     today.getFullYear() - 15,
     today.getMonth(),
-    today.getDate()
+    today.getDate(),
   );
 
   const maxBirthDate = toDateInputValue(fifteenYearsAgo);
@@ -31,6 +31,7 @@
     <select
       class="input-2"
       id="country"
+      name="country"
       bind:value={registrationState.values.country}
     >
       <option value="" disabled>{t("select.placeholder.country")}</option>
@@ -45,6 +46,24 @@
     <Errors errors={registrationState.errors} path="country" />
   </div>
 
+  <div class="input-wrap">
+    <label for="communicationPassword" class="field-label"
+      >{t("labels.communicationPassword")}</label
+    >
+    <input
+      class="input-2 w-input"
+      type="text"
+      id="communicationPassword"
+      name="communicationPassword"
+      placeholder={t("ph.communicationPassword")}
+      bind:value={registrationState.values.communicationPassword}
+    />
+    <div class="text-explain">
+      {t("hints.communicationPassword")}
+    </div>
+    <Errors errors={registrationState.errors} path="communicationPassword" />
+  </div>
+
   {#if registrationState.values.country === "CZ"}
     <div class="input-wrap">
       <label for="nationalId" class="field-label"
@@ -54,12 +73,16 @@
         class="input-2 w-input"
         type="text"
         id="nationalId"
+        name="nationalId"
         placeholder={t("ph.nationalId")}
         bind:value={registrationState.values.nationalId}
       />
       <Errors errors={registrationState.errors} path="nationalId" />
     </div>
-  {:else if registrationState.values.country}
+  {/if}
+
+  {#if registrationState.values.country}
+    <!--
     <div class="input-wrap">
       <label for="passportOrId" class="field-label"
         >{t("labels.passportOrId")}</label
@@ -68,11 +91,13 @@
         class="input-2 w-input"
         type="text"
         id="passportOrId"
+        name="passportOrId"
         placeholder={t("ph.passportOrId")}
         bind:value={registrationState.values.passportOrId}
       />
       <Errors errors={registrationState.errors} path="passportOrId" />
     </div>
+    -->
 
     <div class="input-wrap">
       <label for="birthDate" class="field-label">{t("labels.birthDate")}</label>
@@ -80,6 +105,7 @@
         class="input-2 w-input"
         type="date"
         id="birthDate"
+        name="birthDate"
         max={maxBirthDate}
         bind:value={registrationState.values.birthDate}
       />

@@ -3,7 +3,7 @@
   import type { RegistrationState } from "../../state/RegistrationState.svelte";
   import Errors from "../Errors.svelte";
   import { t } from "../../i18n/i18n.svelte";
-  import { getCities } from "../../i18n/citiesGetter";
+  import { getSplitCities } from "../../i18n/citiesGetter";
 
   let { registrationState }: { registrationState: RegistrationState } =
     $props();
@@ -46,6 +46,7 @@
         class="input-2 w-input"
         type="text"
         id="street"
+        name="street"
         placeholder=""
         bind:value={registrationState.values.street}
         onfocus={() => registrationState.onAddressFocus("street")}
@@ -79,6 +80,7 @@
         class="input-2 w-input"
         type="text"
         id="houseNumber"
+        name="houseNumber"
         placeholder=""
         bind:value={registrationState.values.houseNumber}
         onfocus={() => registrationState.onAddressFocus("number.full")}
@@ -112,6 +114,7 @@
         class="input-2 w-input"
         type="text"
         id="city"
+        name="city"
         placeholder=""
         bind:value={registrationState.values.city}
         onfocus={() => registrationState.onAddressFocus("city")}
@@ -143,6 +146,7 @@
         class="input-2 w-input"
         type="text"
         id="zip"
+        name="zip"
         placeholder=""
         bind:value={registrationState.values.zip}
         onfocus={() => registrationState.onAddressFocus("zip")}
@@ -176,11 +180,12 @@
     <select
       class="input-2 w-select"
       id="deliveryCity"
+      name="deliveryCity"
       bind:value={registrationState.values.deliveryCity}
     >
       <option value="" disabled>{t("select.placeholder.city")}</option>
-      {#await getCities("cs", registrationState.values.deliveryCompany[0] || "") then cities}
-        {#each [...cities].sort() as city}
+      {#await getSplitCities(registrationState.values.submitSource || "") then cities}
+        {#each [...cities] as city}
           <option value={city}>{city}</option>
         {/each}
       {/await}

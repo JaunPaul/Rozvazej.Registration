@@ -6,28 +6,28 @@
 
   let { registrationState }: { registrationState: RegistrationState } =
     $props();
-  let filesNationalIdInput: HTMLInputElement | undefined = $state();
+  let filesNonEuResidenceInput: HTMLInputElement | undefined = $state();
 </script>
 
 <div class="upload">
-  <label class="field-label" for="filesNationalId"
-    >{@html t("labels.doc.nationalId")}</label
+  <label class="field-label" for="filesNonEuResidence"
+    >{@html t("labels.doc.nonEuResidence")}</label
   >
   <div class="w-file-upload">
     <input
-      id="filesNationalId"
-      name="filesNationalId"
-      type="file"
+      id="filesNonEuResidence"
+      name="filesNonEuResidence"
       class="w-file-upload-input"
+      type="file"
       multiple
       onchange={(e) => {
         if (e.currentTarget.files) {
-          registrationState.appendFiles("nationalId", e.currentTarget.files);
+          registrationState.appendFiles("nonEuResidence", e.currentTarget.files);
         }
       }}
-      bind:this={filesNationalIdInput}
+      bind:this={filesNonEuResidenceInput}
     />
-    <button class="upload-button" onclick={() => filesNationalIdInput?.click()}>
+    <button class="upload-button" onclick={() => filesNonEuResidenceInput?.click()}>
       <label for="File-1-2" class="w-file-upload-label">
         <div class="w-icon-file-upload-icon"></div>
         <div class="w-inline-block">
@@ -35,12 +35,12 @@
         </div>
       </label></button
     >
-    {#each registrationState.values.filesNationalId as file}
-      <FileItem f={file} b={"nationalId"} {registrationState} />
+    {#each registrationState.values.filesNonEuResidence as file}
+      <FileItem f={file} b={"nonEuResidence"} {registrationState} />
     {/each}
     <div class="text-explain">
-      {@html t("hints.doc.nationalId")}
+      {@html t("hints.doc.nonEuResidence")}
     </div>
   </div>
-  <Errors errors={registrationState.errors} path="filesNationalId" />
+  <Errors errors={registrationState.errors} path="filesNonEuResidence" />
 </div>

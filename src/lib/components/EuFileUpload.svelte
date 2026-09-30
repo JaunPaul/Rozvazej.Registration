@@ -16,6 +16,7 @@
   <div class="w-file-upload">
     <input
       id="filesEuPassport"
+      name="filesEuPassport"
       type="file"
       class="w-file-upload-input"
       multiple

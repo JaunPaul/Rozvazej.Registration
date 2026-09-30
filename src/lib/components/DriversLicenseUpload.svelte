@@ -16,6 +16,7 @@
   <div class="w-file-upload">
     <input
       id="filesDriversLicense"
+      name="filesDriversLicense"
       type="file"
       class="w-file-upload-input"
       multiple
@@ -23,7 +24,7 @@
         if (e.currentTarget.files) {
           registrationState.appendFiles(
             "driversLicense",
-            e.currentTarget.files
+            e.currentTarget.files,
           );
         }
       }}

@@ -21,7 +21,6 @@ export async function verifyUser(
     });
 
     const result = await response.json();
-
     const parsedResult = verifyResponseSchema.safeParse(result);
 
     return parsedResult;
